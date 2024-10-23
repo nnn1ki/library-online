@@ -1,4 +1,6 @@
-from .settings import *
+from app.settings import *
+
+DEBUG = False
 
 #for SQLite
 DATABASES = {
