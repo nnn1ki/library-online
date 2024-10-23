@@ -1,0 +1,9 @@
+local_settings.py
+**/__pycache__/**
+**/node_modules/**
+db.sqlite3
+**/__pycache__/
+**/node_modules/
+.vscode
+.conda
+.venv
