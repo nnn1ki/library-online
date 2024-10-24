@@ -1,0 +1,9 @@
+FROM node as build-frontend
+
+WORKDIR /app
+COPY client/. /app/
+RUN --mount=type=cache,target=/app/.npm npm set cache /app/.npm && npm install && npm run build
+
+FROM nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=build-frontend /app/dist/. /usr/share/nginx/html/

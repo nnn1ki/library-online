@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  library-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.django
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY}"
+    volumes:
+      - media:/app/media
+      - django-static:/app/staticfiles
+    depends_on:
+      - postgres
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+      # args:
+        # VITE_SOMETHING: "${VITE_SOMETHING}"
+    restart: unless-stopped
+    ports:
+      - "${LIBRARY_PORT}:80"
+    volumes:
+      - media:/usr/share/nginx/html/media
+      - django-static:/usr/share/nginx/html/static
+    depends_on:
+      - postgres
+      - library-service
+
+volumes:
+  db-data:
+  media:
+  django-static:

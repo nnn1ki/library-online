@@ -1,0 +1,18 @@
+from app.settings import *
+import os
+
+DEBUG = False
+ALLOWED_HOSTS = ["*"]
+
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": "postgres",
+        "PORT": "5432",
+    }
+}
