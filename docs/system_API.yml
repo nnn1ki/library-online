@@ -1,0 +1,11 @@
+openapi: '3.0.3'
+info:
+  title: Online library service
+  version: '1.0'
+servers:
+  - url: http://library.istu.edu/opac 
+tags:
+  - name: client
+  - name: catalog
+  - name: basket
+paths:
