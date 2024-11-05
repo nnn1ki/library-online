@@ -9,3 +9,64 @@ tags:
   - name: catalog
   - name: basket
 paths:
+  /api/book/:
+    get:
+      tags:
+        - catalog
+      summary: Список книг с фильтрами
+      parameters:
+        - name: filter_name
+          in: query
+          schema:
+            description: Фильрация по названию книги
+            type: string
+        - name: filter_author
+          in: query
+          schema:
+            description: Фильтрация по автору
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+  /api/book/{id}/:
+    get:
+      tags:
+        - catalog
+      summary: Информация о книге по id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Книга не найдена
+
+components:
+  schemas:
+    Book:
+      properties:
+        id:
+          type: number
+        name:
+          description: Название книги
+          type: string
+        author:
+          description: Автор книги
+          type: string
+        book_description:
+          description: Описание книги
+          type: string
