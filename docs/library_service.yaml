@@ -3,49 +3,9 @@ info:
   title: Online library service
   version: '1.0'
 servers:
-  - url: http://library.istu.edu/opac 
+  - url: http://library.istu.edu/
 tags:
-  - name: databases
-    description: About databases
+  - name: client
+  - name: catalog
+  - name: basket
 paths:
-  /databases:
-    get:
-      tags:
-        - databases
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Databases'
-components:
-  schemas:
-    Database:
-      properties:
-        name:
-          type: string
-          example: ISTU
-        description:
-          type: string
-          example: Учебники, монографии и продолжающиеся издания
-    Databases:
-      type: array
-      xml:
-        wrapped: true
-      items:
-        $ref: '#/components/schemas/Database'
-    Scenario:
-      properties:
-        prefix:
-          type: string
-          example: A=
-        description:
-          type: string
-          example: Автор
-    Scenarios:
-      type: array
-      xml:
-        wrapped: true
-      items:
-        $ref: '#/components/schemas/Scenario'
