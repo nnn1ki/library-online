@@ -33,12 +33,10 @@ paths:
           description: Фильтрация по филиалам
           schema:
             anyOf:
-              - type: string
-                example: istu
+              - $ref: "#/components/schemas/LibraryName"
               - type: array
                 items:
-                  type: string
-                  example: istu
+                  $ref: "#/components/schemas/LibraryName"
       responses:
         '200':
           description: OK
@@ -58,7 +56,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            $ref: "#/components/schemas/BookId"
       responses:
         '404':
           description: Книга не найдена
@@ -85,8 +83,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
-                  description: id книги
+                  $ref: "#/components/schemas/BookId"
     post:
       tags:
         - basket
@@ -99,9 +96,8 @@ paths:
             schema:
               type: object
               properties:
-                book_id:
-                  type: string
-                  example: L711
+                id:
+                  $ref: "#/components/schemas/BookId"
       responses:
         '401':
           description: Unauthorized
@@ -121,8 +117,7 @@ paths:
             schema:
               type: array
               items:
-                type: string
-                description: id книги
+                $ref: "#/components/schemas/BookId"
       responses:
         '401':
             description: Unauthorized
@@ -168,8 +163,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-            example: istu
+            $ref: "#/components/schemas/LibraryName"
       responses:
         '200':
           description: OK
@@ -182,11 +176,14 @@ paths:
 
 components:
   schemas:
+    BookId:
+      type: string
+      description: ID книги
+      example: L711
     Book:
       properties:
         id:
-          type: string
-          example: L711
+          $ref: "#/components/schemas/BookId"
         name:
           description: Название книги
           type: string
@@ -214,22 +211,22 @@ components:
                 description: Описание ссылки
                 type: string
         library:
-          description: Филиал, где находится книга
-          type: string
-          example: istu
+          $ref: "#/components/schemas/LibraryName"
         copies_count:
           description: Количество экземпляров книги доступных к заказу
           type: number
         can_be_ordered:
           description: Можно ли заказать книгу
           type: boolean
-      
+    
+    LibraryName:
+      type: string
+      description: Название филиала
+      example: istu
     Library:
       properties:
         name:
-          description: Название филиала
-          type: string
-          example: istu
+          $ref: "#/components/schemas/LibraryName"
         description:
           description: Описание филиала
           type: string
