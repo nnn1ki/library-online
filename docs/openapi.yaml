@@ -25,6 +25,12 @@ paths:
           schema:
             description: Фильтрация по автору
             type: string
+        - name: filter_library
+          in: query
+          schema:
+            description: Фильтрация по филиалам
+            type: string
+        
       responses:
         '200':
           description: OK
@@ -44,7 +50,7 @@ paths:
           in: path
           required: true
           schema:
-            type: number
+            type: string
       responses:
         '200':
           description: OK
@@ -54,13 +60,46 @@ paths:
                 $ref: '#/components/schemas/Book'
         '404':
           description: Книга не найдена
-
+  /api/basket/:
+    post:
+      tags:
+        - catalog
+      summary: Добавление книги в корзину
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                book_id:
+                  type: string
+                  example: L711
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Книга не найдена
+  /api/libraries/:
+    get:
+      tags:
+        - catalog
+      summary: Получение спсика филиалов
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Library'
 components:
   schemas:
     Book:
       properties:
         id:
-          type: number
+          type: string
         name:
           description: Название книги
           type: string
@@ -69,4 +108,34 @@ components:
           type: string
         book_description:
           description: Описание книги
+          type: string
+        book_logo:
+          description: Обложка книги
+          type: string
+        links:
+          description: Ссылки, сопровождающие книгу
+          type: object
+          properties:
+            url:
+              description: Ссылки
+              type: string           
+            description:
+              description: Опсиание ссылки
+              type: string
+        library:
+          description: ID филиала, где находится книга
+          type: number
+        copies_count:
+          description: Количество экземпляров книги доступных к заказу
+          type: number
+        can_be_ordered:
+          description: Можно ли заказать книгу
+          type: boolean
+    Library:
+      properties:
+        name:
+          description: Название филиала
+          type: string
+        address:
+          description: Адрес филиала
           type: string
