@@ -5,6 +5,7 @@ info:
 servers:
   - url: http://library.istu.edu/
 tags:
+  - name: auth
   - name: client
   - name: catalog
   - name: basket
@@ -71,7 +72,6 @@ paths:
     get:
       tags:
         - basket
-        - client
       summary: Получение списка книг в корзине
       responses:
         '401':
@@ -87,7 +87,6 @@ paths:
     post:
       tags:
         - basket
-        - client
       summary: Добавление книги в корзину
       requestBody:
         required: true
@@ -108,7 +107,6 @@ paths:
     put:
       tags:
         - basket
-        - client
       summary: Редактирование списка книг в корзине
       requestBody:
         required: true
@@ -129,7 +127,6 @@ paths:
     delete:
       tags:
         - basket
-        - client
       summary: Удаление книги из корзины    
       responses:
         '401':
