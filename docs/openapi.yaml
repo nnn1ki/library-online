@@ -67,6 +67,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Book'
+  /api/book/announcement/:
+    get:
+      tags:
+        - catalog
+      summary: Получение списка новых книг в библиотеке
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
   
   /api/basket/:
     get:
@@ -83,7 +97,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BookId"
+                  $ref: "#/components/schemas/Book"
     post:
       tags:
         - basket
