@@ -6,9 +6,13 @@ servers:
   - url: http://library.istu.edu/
 tags:
   - name: auth
+    description: Методы, связанные с аутентификацией
   - name: client
+    description: Методы, связанные с клиентом
   - name: catalog
+    description: Методы, связанные с каталогом и поиском книг
   - name: basket
+    description: Методы, связанные с корзиной
 
 paths:
   /api/book/:
@@ -223,9 +227,17 @@ components:
                 type: string
         library:
           $ref: "#/components/schemas/LibraryName"
-        copies_count:
-          description: Количество экземпляров книги доступных к заказу
-          type: number
+        copies:
+          description: Экземпляры книги по библиотекам
+          type: array
+          items:
+            type: object
+            properties:
+              library:
+                $ref: "#/components/schemas/LibraryName"
+              amount:
+                description: Количество экземпляров, доступных к заказу в данной библиотеке
+                type: number
         can_be_ordered:
           description: Можно ли заказать книгу
           type: boolean
