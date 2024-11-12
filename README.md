@@ -15,21 +15,15 @@
 ```mermaid
 graph TD
     client(Клиент) <--> nginx(nginx)
-
     nginx <--> static(Статичные файлы)
-
     nginx <--> listener(HTTP слушатель)
-
     psql(PostgreSQL) <--> listener
 
     subgraph django сервер
-    
     listener <--> cacher(Прослойка над ирбисом)
-    
     end
     
     cacher <--> irbis(Внутренняя система ИРБИС)
-
     cacher <--> redis(Redis)
 ```
 
@@ -37,7 +31,10 @@ graph TD
 
 ```mermaid
 erDiagram
-    TODO1 ||--o{ TODO2 : todos
+    User ||--o{ BasketItem : adds
+    User ||--o{ Order : makes
+    Order ||--|{ OrderItem : contains
+    Library ||--o{ OrderItem : "takes from"
 ```
 
 ## Работа с проектом
