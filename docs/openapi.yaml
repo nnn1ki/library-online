@@ -1,0 +1,260 @@
+openapi: '3.0.3'
+info:
+  title: Online library service
+  version: '1.0'
+servers:
+  - url: http://library.istu.edu/
+tags:
+  - name: auth
+    description: Методы, связанные с аутентификацией
+  - name: client
+    description: Методы, связанные с клиентом
+  - name: catalog
+    description: Методы, связанные с каталогом и поиском книг
+  - name: basket
+    description: Методы, связанные с корзиной
+
+paths:
+  /api/book/:
+    get:
+      tags:
+        - catalog
+      summary: Список книг с фильтрами
+      parameters:
+        - name: name
+          in: query
+          description: Фильтрация по названию книги
+          schema:
+            type: string
+            example: Война и мир
+        - name: author
+          in: query
+          description: Фильтрация по автору
+          schema:
+            type: string
+            example: Толстой
+        - name: library
+          in: query
+          description: Фильтрация по филиалам
+          schema:
+            anyOf:
+              - $ref: "#/components/schemas/LibraryName"
+              - type: array
+                items:
+                  $ref: "#/components/schemas/LibraryName"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+  /api/book/{id}/:
+    get:
+      tags:
+        - catalog
+      summary: Информация о книге по id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/BookId"
+      responses:
+        '404':
+          description: Книга не найдена
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+  /api/book/announcement/:
+    get:
+      tags:
+        - catalog
+      summary: Получение списка новых книг в библиотеке
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+  
+  /api/basket/:
+    get:
+      tags:
+        - basket
+      summary: Получение списка книг в корзине
+      responses:
+        '401':
+          description: Unauthorized
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+    post:
+      tags:
+        - basket
+      summary: Добавление книги в корзину
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  $ref: "#/components/schemas/BookId"
+      responses:
+        '401':
+          description: Unauthorized
+        '404':
+          description: Книга не найдена
+        '200':
+          description: OK
+    put:
+      tags:
+        - basket
+      summary: Редактирование списка книг в корзине
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/BookId"
+      responses:
+        '401':
+            description: Unauthorized
+        '404':
+          description: Книга не найдена
+        '200':
+          description: OK
+  /api/basket/{id}/:
+    delete:
+      tags:
+        - basket
+      summary: Удаление книги из корзины    
+      responses:
+        '401':
+          description: Unauthorized
+        '404':
+          description: Книга не найдена
+        '200':
+          description: OK  
+  
+  /api/library/:
+    get:
+      tags:
+        - catalog
+      summary: Получение списка филиалов
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Library'
+  /api/library/{name}/:
+    get:
+      tags:
+        - catalog
+      summary: Информация о филиале по названию
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/LibraryName"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Library'
+        '404':
+          description: Филиал не найден
+
+components:
+  schemas:
+    BookId:
+      type: string
+      description: ID книги
+      example: L711
+    Book:
+      properties:
+        id:
+          $ref: "#/components/schemas/BookId"
+        name:
+          description: Название книги
+          type: string
+        author:
+          description: Автор книги
+          type: string
+        book_description:
+          description: Описание книги
+          type: string
+        book_logo:
+          description: Обложка книги
+          type: string
+          nullable: true
+        links:
+          description: Ссылки, сопровождающие книгу
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              url:
+                description: Ссылка
+                type: string           
+              description:
+                description: Описание ссылки
+                type: string
+        library:
+          $ref: "#/components/schemas/LibraryName"
+        copies:
+          description: Экземпляры книги по библиотекам
+          type: array
+          items:
+            type: object
+            properties:
+              library:
+                $ref: "#/components/schemas/LibraryName"
+              amount:
+                description: Количество экземпляров, доступных к заказу в данной библиотеке
+                type: number
+        can_be_ordered:
+          description: Можно ли заказать книгу
+          type: boolean
+    
+    LibraryName:
+      type: string
+      description: Название филиала
+      example: istu
+    Library:
+      properties:
+        name:
+          $ref: "#/components/schemas/LibraryName"
+        description:
+          description: Описание филиала
+          type: string
+          example: Библиотека ИрНИТУ
+        address:
+          description: Адрес филиала
+          type: string
+          example: г. Иркутск, ул. Лермонтова, 83
