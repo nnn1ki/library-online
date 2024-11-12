@@ -24,7 +24,7 @@ graph TD
     end
     
     cacher <--> irbis(Внутренняя система ИРБИС)
-    cacher <--> redis(Redis)
+    cacher <--> psql
 ```
 
 ### ER-диаграмма базы данных на сервере
