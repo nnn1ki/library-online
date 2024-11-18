@@ -228,16 +228,8 @@ components:
         library:
           $ref: "#/components/schemas/LibraryName"
         copies:
-          description: Экземпляры книги по библиотекам
-          type: array
-          items:
-            type: object
-            properties:
-              library:
-                $ref: "#/components/schemas/LibraryName"
-              amount:
-                description: Количество экземпляров, доступных к заказу в данной библиотеке
-                type: number
+          description: Количество доступных к заказу экземпляров
+          type: number
         can_be_ordered:
           description: Можно ли заказать книгу
           type: boolean
