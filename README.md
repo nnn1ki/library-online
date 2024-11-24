@@ -31,10 +31,83 @@ graph TD
 
 ```mermaid
 erDiagram
-    User ||--o{ BasketItem : adds
-    User ||--o{ Order : makes
+    User ||--|| UserProfile : has
+    User ||--|{ Order : makes
+    User ||--|| Basket : has
+    UserProfile ||--|| UserRole : has
     Order ||--|{ OrderItem : contains
-    Library ||--o{ OrderItem : "takes from"
+    Order ||--|{ History : has
+    OrderItem }|--|{ Catalog : references
+    Basket ||--|{ BasketItem : contains
+    Catalog ||--|{ Section : includes
+    Catalog ||--|{ Branch : includes
+    
+    User { 
+      int id PK 
+    }
+
+    UserProfile {
+      int id PK 
+      varchar library_card
+      varchar campus_id 
+      varchar mira_id
+      int user_id FK
+      int role_id FK
+    }
+
+    UserRole{
+        int id PK
+        varchar user_role 
+    }
+    
+    Basket {
+        int id PK 
+        DATETIME basket_created_at 
+        int user_id FK
+    }
+
+    BasketItem{
+        int id PK
+        varchar book_id
+        int basket_id FK
+    }
+
+    Order{
+        int id PK  
+        int user_id FK
+    }
+
+    History{
+        int id PK
+        varchar description
+        varchar status
+        DATETIME confirmed_at
+        int order_id FK 
+    }
+
+    OrderItem{
+        int id PK
+        int order_id FK
+        varchar exemplar_id
+        int catalog_id FK
+    }
+
+    Section{
+        int id PK
+        varchar name
+        varchar description 
+    }
+
+    Branch {
+        int id PK
+        varchar location 
+    }
+
+    Catalog{
+        int id PK
+        int branch_id FK
+        int section_id FK
+    }
 ```
 
 ## Работа с проектом
