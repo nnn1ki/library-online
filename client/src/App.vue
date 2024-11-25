@@ -6,7 +6,7 @@
     <header>
       <nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid navbar-mine">
-          <a class="navbar-brand" href="#">ИрНИТУ</a>
+          <a class="navbar-brand" href="/">ИрНИТУ</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -20,9 +20,6 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <router-link class="nav-link" to="/"> ИрНИТУ </router-link>
-              </li>
               <li class="nav-item">
                 <router-link class="nav-link" to="/basket">
                   <button class="btn btn-outline-info" type="button">
@@ -42,7 +39,7 @@
         </div>
       </nav>
     </header>
-    
+
     <main>
       <div>
         <router-view />
