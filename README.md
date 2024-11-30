@@ -1,9 +1,128 @@
-# library-online
-Service for online ordering of literature in Scientific Technical Library of Irkutsk National Research Technical University
+# Сервис онлайн заказа литературы
 
-# Запуск приложения
+1. [Описание сервиса](#описание-сервиса)
+2. [Описание проекта](#описание-проекта)
+3. [Работа с проектом](#работа-с-проектом)
 
-## Локальный запуск
+## Описание сервиса
+
+Сервис позволяет через сайт производить заказ литературы из библиотек ИрНИТУ.
+
+## Описание проекта
+
+### Диаграмма компонентов проекта
+
+```mermaid
+graph TD
+    client(Клиент) <--> nginx(nginx)
+    nginx <--> static(Статичные файлы)
+    nginx <--> listener(HTTP слушатель)
+    psql(PostgreSQL) <--> listener
+
+    subgraph django сервер
+    listener <--> cacher(Прослойка над ирбисом)
+    end
+    
+    cacher <--> irbis(Внутренняя система ИРБИС)
+    cacher <--> psql
+```
+
+### ER-диаграмма базы данных на сервере
+
+```mermaid
+erDiagram
+    User ||--|| UserProfile : has
+    User ||--|{ Order : makes
+    User ||--|| Basket : has
+    UserProfile }|--|| UserRole : has
+    Order ||--|{ OrderItem : contains
+    Order ||--|{ History : has
+    OrderItem }|--|| Catalog : references
+    Basket ||--o{ BasketItem : contains
+    Catalog }|--|| Section : includes
+    Catalog }|--|| Library : includes
+    
+    User { 
+      int id PK 
+    }
+
+    UserProfile {
+      int id PK 
+      varchar library_card
+      varchar campus_id 
+      varchar mira_id
+      int user_id FK
+      int role_id FK
+    }
+
+    UserRole{
+        int id PK
+        varchar user_role 
+    }
+    
+    Basket {
+        int id PK 
+        DATETIME basket_created_at 
+        int user_id FK
+    }
+
+    BasketItem{
+        int id PK
+        varchar book_id
+        int basket_id FK
+    }
+
+    Order{
+        int id PK  
+        int user_id FK
+    }
+
+    History{
+        int id PK
+        varchar description
+        varchar status
+        DATETIME confirmed_at
+        int order_id FK 
+    }
+
+    OrderItem{
+        int id PK
+        int order_id FK
+        varchar exemplar_id
+        int catalog_id FK
+    }
+
+    Section{
+        int id PK
+        varchar name
+        varchar description
+    }
+
+    Library {
+        int id PK
+        varchar location
+        varchar description
+    }
+
+    Catalog{
+        int id PK
+        int library_id FK
+        int section_id FK
+    }
+```
+
+## Работа с проектом
+
+### Структура директорий проекта
+
+В корне проекта находятся файлы, связанные с проектом в целом. В том числе к ним относится конфигурация для запуска на проде и описание Docker-контейнеров.  
+В директории `docs` находится OpenAPI документация проекта.  
+В директории `backend` находится код для бэкенда на Django.  
+В директории `client` находится код для веб-клиента на Vue.
+
+### Запуск приложения
+
+#### Локальный запуск
 
 Для запуска фронтенда используется nodejs:
 ```sh
@@ -24,7 +143,7 @@ python manage.py runserver
 python manage.py runserver --settings local_settings
 ```
 
-## Запуск на проде
+#### Запуск на проде
 
 В корне необходимо создать два файла: `prod_settings.py` и `.env`. Рекомендуется скопировать в них текст из соответствующих им .example файлов: `prod_settings.py.example` и `.env.example`.  
 
