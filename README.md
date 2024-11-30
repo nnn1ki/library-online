@@ -34,13 +34,13 @@ erDiagram
     User ||--|| UserProfile : has
     User ||--|{ Order : makes
     User ||--|| Basket : has
-    UserProfile ||--|| UserRole : has
+    UserProfile }|--|| UserRole : has
     Order ||--|{ OrderItem : contains
     Order ||--|{ History : has
-    OrderItem }|--|{ Catalog : references
-    Basket ||--|{ BasketItem : contains
-    Catalog ||--|{ Section : includes
-    Catalog ||--|{ Branch : includes
+    OrderItem }|--|| Catalog : references
+    Basket ||--o{ BasketItem : contains
+    Catalog }|--|| Section : includes
+    Catalog }|--|| Library : includes
     
     User { 
       int id PK 
@@ -95,17 +95,18 @@ erDiagram
     Section{
         int id PK
         varchar name
-        varchar description 
+        varchar description
     }
 
-    Branch {
+    Library {
         int id PK
-        varchar location 
+        varchar location
+        varchar description
     }
 
     Catalog{
         int id PK
-        int branch_id FK
+        int library_id FK
         int section_id FK
     }
 ```
