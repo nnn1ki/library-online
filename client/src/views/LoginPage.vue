@@ -28,10 +28,23 @@ import axios from "axios";
           required
         />
       </div>
-        <button type="submit" class="btn btn-primary w-100" style="margin-bottom: 10px">Войти</button>
-        <button type="button" class="btn btn-outline-primary w-100">
-          Зарегистрироваться
-        </button>
+      <button
+        type="submit"
+        class="btn btn-primary w-100"
+        style="margin-bottom: 10px"
+      >
+        Войти
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary w-100"
+        style="margin-bottom: 10px"
+      >
+        Войти через кампус
+      </button>
+      <button type="button" class="btn btn-outline-primary w-100">
+        Зарегистрироваться
+      </button>
     </form>
 
     <form form v-else @submit.prevent="logout" class="w-50 mx-auto">
