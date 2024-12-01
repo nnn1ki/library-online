@@ -6,6 +6,8 @@ ALLOWED_HOSTS = ["*"]
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
+IRBIS_HOSTNAME = os.environ.get("IRBIS_HOSTNAME")
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
