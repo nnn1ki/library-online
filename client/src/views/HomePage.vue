@@ -77,13 +77,10 @@ const books = ref([
   },
 ]);
 
-const displayedBooks = ref([]);
-
 onBeforeMount(async () => {
   for (const book of books.value) {
     book.imageUrl = await generateBookImage(book.title, book.author);
   }
-  displayedBooks.value = books.value;
 });
 
 async function generateBookImage(title, author) {
@@ -104,34 +101,6 @@ async function generateBookImage(title, author) {
   ctx.fillText(author, canvas.width / 2, canvas.height / 2 + 20);
 
   return canvas.toDataURL("image/png");
-}
-
-function search() {
-  displayedBooks.value = filteredBooks();
-}
-
-function filteredBooks() {
-  return books.value.filter((book) => {
-    let match = false;
-    for (const condition of conditions.value) {
-      const { filterType, filterValue, andOrOperator } = condition;
-      let bookValue = "";
-      switch (filterType) {
-        case "Заглавие/Название":
-          bookValue = book.title;
-          break;
-        case "Автор":
-          bookValue = book.author;
-          break;
-      }
-      if (andOrOperator === null || andOrOperator === "И") {
-        match = match && bookValue.includes(filterValue);
-      } else {
-        match = match || bookValue.includes(filterValue);
-      }
-    }
-    return match;
-  });
 }
 </script>
 
@@ -190,13 +159,11 @@ function filteredBooks() {
         </div>
       </div>
     </div>
-    <div class="row">
-      <div
-        class="col-md-3"
-        v-for="book in displayedBooks"
-        :key="book.title"
-        style="margin-bottom: 20px"
-      >
+    <div
+      class="grid"
+      style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px"
+    >
+      <div v-for="book in books" :key="book.title" style="margin-bottom: 20px">
         <div class="card">
           <img :src="book.imageUrl" class="card-img-top" :alt="book.title" />
           <div class="card-body">
