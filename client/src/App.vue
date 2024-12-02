@@ -34,6 +34,13 @@
                   </button>
                 </router-link>
               </li>
+              <li>
+                <router-link class="nav-link" to="/note">
+                  <button class="btn btn-outline-info" type="button">
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                  </button>
+                </router-link>
+              </li>
             </ul>
           </div>
         </div>
