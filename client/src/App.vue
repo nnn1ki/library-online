@@ -46,12 +46,45 @@
       </div>
     </main>
 
-    <footer></footer>
+    <footer>
+      <div>
+        <p>
+          ИРНИТУ | Координаты | Обратная связь | Электронный каталог | Режим
+          работы | Правила пользования
+        </p>
+        <p>
+          © ИРНИТУ, 2024. Все права защищены. Перепечатка возможна только с
+          письменного разрешения НТБ ИРНИТУ.
+        </p>
+      </div>
+    </footer>
   </div>
 </template>
 
 <style scoped>
 .nav-item {
   align-content: center;
+}
+
+body {
+  background: #ededed;
+  min-height: 100vh;
+  position: relative;
+}
+
+header {
+  background: #ededed;
+}
+
+main {
+  background: #fff;
+}
+
+footer {
+  background: #ededed;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
 }
 </style>
