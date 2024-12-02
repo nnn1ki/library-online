@@ -225,8 +225,6 @@ components:
               description:
                 description: Описание ссылки
                 type: string
-        library:
-          $ref: "#/components/schemas/LibraryName"
         copies:
           description: Количество доступных к заказу экземпляров
           type: number
