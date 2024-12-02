@@ -1,57 +1,26 @@
 from rest_framework import serializers
-from .models import (
-    UserProfile,
-    Basket,
-    BasketItem,
-    Order,
-    History,
-    OrderItem,
-    Section,
-    Branch,
-    Catalog,
-)
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = '__all__'
+# TODO: создать директорию serializers для логического разделения сериалайзеров по файлам (эти сериалайзеры можно поместить в один файл)
 
-class BasketSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Basket
-        fields = '__all__'
+class LibrarySerializer(serializers.Serializer):
+    library_name = serializers.CharField()
+    description = serializers.CharField()
+    address = serializers.CharField()
 
-class BasketItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BasketItem
-        fields = '__all__'
+class LinkSerializer(serializers.Serializer):
+    url = serializers.URLField()
+    description = serializers.CharField()
 
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = '__all__'
+class CopiesSerializer(serializers.Serializer):
+    library = LinkSerializer()
+    amount = serializers.IntegerField()
 
-class HistorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = History
-        fields = '__all__'
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = '__all__'
-
-class SectionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Section
-        fields = '__all__'
-
-class BranchSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Branch
-        fields = '__all__'
-
-class CatalogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Catalog
-        fields = '__all__'
+class BookSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    name = serializers.CharField()
+    author = serializers.CharField()
+    book_description = serializers.CharField()
+    book_logo = serializers.ImageField()
+    links = LinkSerializer(many = True)
+    copies = CopiesSerializer(many = True)
+    can_be_ordered = serializers.BooleanField()
