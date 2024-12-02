@@ -26,4 +26,4 @@ class Catalog(models.Model):
         verbose_name_plural = "Каталоги"
 
     def __str__(self):
-        return f"Catalog {self.id} in Branch {self.library.location}, Section {self.section.name}"
+        return f"Catalog {self.id} in Library {self.library.location}, Section {self.section.name}"
