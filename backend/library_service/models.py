@@ -1,14 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
 
+# TODO: создать директорию models для логического разделения моделей по файлам
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile')
     library_card = models.CharField(verbose_name="Номер читательского билета", max_length=255)
     campus_id = models.CharField(verbose_name="ID кампуса",max_length=255)
     mira_id = models.CharField(verbose_name="ID mira",max_length=255)
-    role = models.ForeignKey(Group, on_delete=models.CASCADE)
     
     class Meta:
         verbose_name = "Профиль"
@@ -73,7 +72,7 @@ class Section(models.Model):
     def __str__(self):
         return self.name
 
-class Branch(models.Model):
+class Library(models.Model):
     location = models.CharField(max_length=255, verbose_name="Место")
     class Meta:
         verbose_name = "Филиал"
@@ -83,14 +82,14 @@ class Branch(models.Model):
         return self.location
 
 class Catalog(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name="Филиал")
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, verbose_name="Филиал")
     section = models.ForeignKey(Section, on_delete=models.CASCADE, verbose_name="Секция")
     class Meta:
         verbose_name = "Каталог"
         verbose_name_plural = "Каталоги"
 
     def __str__(self):
-        return f"Catalog {self.id} in Branch {self.branch.location}, Section {self.section.name}"
+        return f"Catalog {self.id} in Branch {self.library.location}, Section {self.section.name}"
     
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

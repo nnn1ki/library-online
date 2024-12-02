@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from library_service.models import *
 
-from serializers import *
+from library_service.serializers import *
 
 # TODO: создать директорию views для логического разделения вьюсетов по файлам (эти вьюсеты можно поместить в один файл)
 
