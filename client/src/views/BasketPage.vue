@@ -66,37 +66,56 @@ const toggleBookSelection = (book) => {
 };
 
 const selectedCount = computed(() => selectedBooks.value.length);
+
+const removeBook = (book) => {
+  const index = books.value.indexOf(book);
+  if (index !== -1) {
+    books.value.splice(index, 1);
+  }  
+  const selectedIndex = selectedBooks.value.indexOf(book);
+  if (selectedIndex !== -1) {
+    selectedBooks.value.splice(selectedIndex, 1);
+  }
+};
+
+const clearBasket = () => {
+  books.value = [];
+  selectedBooks.value = [];
+};
 </script>
 
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div class="col" style="margin-right: 10px">
+      <div class="col" style="margin: 0 30px 0 10px">
         <div
           class="row"
           v-for="book in books"
           :key="book.title"
-          style="padding-bottom: 10px"
+          style="padding: 10px 0 10px 0; border-top: 1px solid gray"
         >
-          <div class="col-auto">
-            <div>
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="checkboxNoLabel"
-                :value="book"
-                @change="toggleBookSelection(book)"
-                aria-label="..."
-              />
-            </div>
+          <div
+            class="col-auto d-flex justify-content-center align-items-center"
+          >
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="checkboxNoLabel"
+              :value="book"
+              @change="toggleBookSelection(book)"
+              aria-label="..."
+            />
           </div>
-          <div class="col-auto image-container" style="height: 100px">
+          <div
+            class="col-auto image-container d-flex justify-content-center align-items-center"
+          >
             <img
               src="https://i.pinimg.com/736x/05/fd/d8/05fdd8079f6e2e7fe66124954346145a.jpg"
               :alt="book.title"
               class="book-image img-thumbnail"
             />
           </div>
+
           <div class="col">
             <div class="row">
               <div class="col">
@@ -119,8 +138,12 @@ const selectedCount = computed(() => selectedBooks.value.length);
                   </button>
                 </div>
                 <div class="row">
-                  <button type="button" class="btn btn-danger">
-                    Удалить из корзины
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    @click="removeBook(book)"
+                  >
+                    Удалить
                   </button>
                 </div>
               </div>
@@ -128,20 +151,33 @@ const selectedCount = computed(() => selectedBooks.value.length);
           </div>
         </div>
       </div>
-      <div class="col-2 sticky-column">
-        <div class="row">
-          <h5>Итого: {{ selectedCount }} выбранных</h5>
-        </div>
-        <div class="row" style="padding-bottom: 5px">
-          <button type="button" class="btn btn-success">Оформить заказ</button>
-        </div>
-        <div class="row" style="padding-bottom: 5px">
-          <button type="button" class="btn btn-warning">
-            Сохранить в файл
-          </button>
-        </div>
-        <div class="row">
-          <button type="button" class="btn btn-danger">Очистить корзину</button>
+      <div class="col-2">
+        <div
+          style="
+            margin: 0 10px 0 0;
+            border: 1px solid gray;
+            border-radius: 10px;
+            padding: 20px;
+          "
+        >
+          <div class="row">
+            <h5>Итого: {{ selectedCount }} к заказу</h5>
+          </div>
+          <div class="row" style="padding-bottom: 5px">
+            <button type="button" class="btn btn-success">
+              Оформить заказ
+            </button>
+          </div>
+          <div class="row" style="padding-bottom: 5px">
+            <button type="button" class="btn btn-warning">
+              Сохранить в файл
+            </button>
+          </div>
+          <div class="row">
+            <button type="button" class="btn btn-danger" @click="clearBasket">
+              Очистить корзину
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -150,9 +186,7 @@ const selectedCount = computed(() => selectedBooks.value.length);
 
 <style lang="scss" scoped>
 .image-container {
-  width: 120px;
-  height: 180px;
-  overflow: hidden;
+  height: 100px;
 }
 
 .book-image {
