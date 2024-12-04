@@ -3,11 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 
-from library_service.models import *
-
-from library_service.serializers import *
-
-# TODO: создать директорию views для логического разделения вьюсетов по файлам (эти вьюсеты можно поместить в один файл)
+from library_service.serializers.catalog import *
 
 class BookViewset(GenericViewSet):
     serializer_class = BookSerializer

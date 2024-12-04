@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-# TODO: создать директорию serializers для логического разделения сериалайзеров по файлам (эти сериалайзеры можно поместить в один файл)
-
 class LibrarySerializer(serializers.Serializer):
     library_name = serializers.CharField()
     description = serializers.CharField()
