@@ -2,8 +2,10 @@ from rest_framework.decorators import action
 
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
+from rest_framework import mixins
 
 from library_service.serializers.catalog import *
+from library_service.models.catalog import *
 
 class BookViewset(GenericViewSet):
     serializer_class = BookSerializer
@@ -27,17 +29,6 @@ class BookViewset(GenericViewSet):
 
         return Response()
     
-class LibraryViewset(GenericViewSet):
+class LibraryViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+    queryset = Library.objects.all()
     serializer_class = LibrarySerializer
-
-    def list(self, request, *args, **kwargs):
-         
-        #TO-DO
-
-        return Response()
-    
-    def retrieve(self, request, *args, **kwargs):
-
-        #TO-DO
-
-        return Response()

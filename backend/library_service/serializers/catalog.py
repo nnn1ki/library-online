@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
-class LibrarySerializer(serializers.Serializer):
-    library_name = serializers.CharField()
-    description = serializers.CharField()
-    address = serializers.CharField()
+from library_service.models.catalog import *
+
+class LibrarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Library
+        fields = ["id", "description", "address"]
 
 class LinkSerializer(serializers.Serializer):
     url = serializers.URLField()

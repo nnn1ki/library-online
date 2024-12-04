@@ -38,7 +38,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 @admin.register(Library)
 class LibraryAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "description", "address"]
+    list_display = ["id", "description", "address"]
     search_fields = ["location",]
 
 @admin.register(LibraryDatabase)

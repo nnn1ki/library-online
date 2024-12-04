@@ -38,10 +38,10 @@ paths:
           description: Фильтрация по филиалам
           schema:
             anyOf:
-              - $ref: "#/components/schemas/LibraryName"
+              - $ref: "#/components/schemas/LibraryId"
               - type: array
                 items:
-                  $ref: "#/components/schemas/LibraryName"
+                  $ref: "#/components/schemas/LibraryId"
       responses:
         '200':
           description: OK
@@ -168,17 +168,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Library'
-  /api/library/{name}/:
+  /api/library/{id}/:
     get:
       tags:
         - catalog
       summary: Информация о филиале по названию
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/LibraryName"
+            $ref: "#/components/schemas/LibraryId"
       responses:
         '200':
           description: OK
@@ -227,7 +227,7 @@ components:
                 type: string
         library:
           description: Библиотека, в которой находятся книги
-          $ref: "#/components/schemas/LibraryName"
+          $ref: "#/components/schemas/LibraryId"
         copies:
           description: Количество доступных к заказу экземпляров
           type: number
@@ -235,14 +235,14 @@ components:
           description: Можно ли заказать книгу
           type: boolean
     
-    LibraryName:
-      type: string
-      description: Название филиала
-      example: istu
+    LibraryId:
+      type: number
+      description: ID филиала
+      example: 1
     Library:
       properties:
-        name:
-          $ref: "#/components/schemas/LibraryName"
+        id:
+          $ref: "#/components/schemas/LibraryId"
         description:
           description: Описание филиала
           type: string
