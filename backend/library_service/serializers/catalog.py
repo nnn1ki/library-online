@@ -11,16 +11,12 @@ class LinkSerializer(serializers.Serializer):
     url = serializers.URLField()
     description = serializers.CharField()
 
-class CopiesSerializer(serializers.Serializer):
-    library = LinkSerializer()
-    amount = serializers.IntegerField()
-
 class BookSerializer(serializers.Serializer):
     id = serializers.CharField()
-    name = serializers.CharField()
-    author = serializers.CharField()
-    book_description = serializers.CharField()
-    book_logo = serializers.ImageField()
+    description = serializers.CharField()
+    year = serializers.IntegerField()
+    cover = serializers.CharField()
     links = LinkSerializer(many = True)
-    copies = CopiesSerializer(many = True)
+    library = serializers.IntegerField()
+    copies = serializers.IntegerField()
     can_be_ordered = serializers.BooleanField()

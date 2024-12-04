@@ -5,13 +5,13 @@ from django.conf import settings
 
 @dataclass_json
 @dataclass
-class BookLink:
+class IrbisBookLink:
     url: str | None
     description: str | None
 
 @dataclass_json
 @dataclass
-class BookExemplar:
+class IrbisBookExemplar:
     number: str | None
     amount: int
     onhand: str | None
@@ -20,25 +20,25 @@ class BookExemplar:
 
 @dataclass_json
 @dataclass
-class Book:
+class IrbisBook:
+    db: str | None
     selected: bool
     mfn: int
     id: str | None
     order: bool
     arrangement: str | None
-    agents: list[str]
+    description: str | None
+    agents: list[str] | None
     additional: str | None
     cover: str | None
-    links: list[BookLink]
-    exemplars: list[BookExemplar]
-    see: list[str]
-    cards: list[str]
+    links: list[IrbisBookLink] | None
+    exemplars: list[IrbisBookExemplar]
+    see: list[str] | None
+    cards: list[str] | None
     year: int
     electronic: bool
 
-# TODO: описать остальные параметры; это низкоуровневая функция, поверх которой будет реализована аггрегирующая функция на все БД
-# с полноценными фильтрами вместо строки expression
-def search(database: str, expression: str) -> list[Book]:
+def irbis_search(database: str, expression: str) -> list[IrbisBook]:
     payload = {
         "database": database,
         "expression": expression
@@ -47,4 +47,4 @@ def search(database: str, expression: str) -> list[Book]:
     r = requests.post(f"{settings.IRBIS_HOSTNAME}/search", json=payload)
     r.raise_for_status()
     
-    return Book.schema().load(r.json(), many=True)
+    return IrbisBook.schema().load(r.json(), many=True)

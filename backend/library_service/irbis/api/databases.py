@@ -5,13 +5,13 @@ from django.conf import settings
 
 @dataclass_json
 @dataclass
-class Database:
+class IrbisDatabase:
     name: str | None
     description: str | None
     order: bool
 
-def databases_list() -> list[Database]:
+def irbis_databases() -> list[IrbisDatabase]:
     r = requests.get(f"{settings.IRBIS_HOSTNAME}/databases")
     r.raise_for_status()
     
-    return Database.schema().load(r.json(), many=True)
+    return IrbisDatabase.schema().load(r.json(), many=True)

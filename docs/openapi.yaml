@@ -199,16 +199,13 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/BookId"
-        name:
-          description: Название книги
-          type: string
-        author:
-          description: Автор книги
-          type: string
-        book_description:
+        description:
           description: Описание книги
           type: string
-        book_logo:
+        year:
+          description: Год издания книги
+          type: number
+        cover:
           description: Обложка книги
           type: string
           nullable: true
