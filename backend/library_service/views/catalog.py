@@ -12,11 +12,15 @@ class BookViewset(GenericViewSet):
     serializer_class = BookSerializer
 
     def list(self, request, *args, **kwargs):
+        library: str = self.request.query_params.get("library")
+        name: str = self.request.query_params.get("name")
+        author: str = self.request.query_params.get("author")
+
         libraries = Library.objects.all()
-
-        name = self.request.query_params.get("name")
-
-        books = books_list(libraries, name)
+        if library is not None:
+            libraries = libraries.filter(id=int(library))
+        
+        books = books_list(libraries, name, author)
         serializer = self.get_serializer(books, many=True)
 
         return Response(serializer.data)

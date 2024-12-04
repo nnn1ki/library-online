@@ -22,13 +22,21 @@ class Book:
     copies: int
     can_be_ordered: bool
 
-def books_list(libraries: Iterable[Library], name: str) -> list[Book]:
+def books_list(libraries: Iterable[Library], name: str | None, author: str | None) -> list[Book]:
+    queries = [
+        f"T={name}" if name is not None else None,
+        f"A={author}" if author is not None else None
+    ]
+    queries = [q for q in queries if q is not None]
+
+    query = "&".join(queries) + "$"
+    
     result = []
 
     for library in libraries:
         databases: Iterable[LibraryDatabase] = library.databases.all()
         for db in databases:
-            search_result = irbis_search(db.database, f"T={name}$")
+            search_result = irbis_search(db.database, query)
             result += [Book(
                 book.id,
                 book.description,

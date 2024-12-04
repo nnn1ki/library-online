@@ -37,11 +37,7 @@ paths:
           in: query
           description: Фильтрация по филиалам
           schema:
-            anyOf:
-              - $ref: "#/components/schemas/LibraryId"
-              - type: array
-                items:
-                  $ref: "#/components/schemas/LibraryId"
+            $ref: "#/components/schemas/LibraryId"
       responses:
         '200':
           description: OK
