@@ -37,10 +37,9 @@ erDiagram
     UserProfile }|--|| UserRole : has
     Order ||--|{ OrderItem : contains
     Order ||--|{ History : has
-    OrderItem }|--|| Catalog : references
     Basket ||--o{ BasketItem : contains
-    Catalog }|--|| Section : includes
-    Catalog }|--|| Library : includes
+    
+    LibraryDatabase }|--|| Library : includes
     
     User { 
       int id PK 
@@ -89,25 +88,19 @@ erDiagram
         int id PK
         int order_id FK
         varchar exemplar_id
-        int catalog_id FK
-    }
-
-    Section{
-        int id PK
-        varchar name
-        varchar description
     }
 
     Library {
         int id PK
-        varchar location
+        varchar name
+        varchar address
         varchar description
     }
 
-    Catalog{
+    LibraryDatabase {
         int id PK
+        varchar database
         int library_id FK
-        int section_id FK
     }
 ```
 

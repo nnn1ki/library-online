@@ -33,23 +33,14 @@ class HistoryAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ["id", "order", "exemplar_id", "catalog"]
-    list_filter = ["order", "catalog"]
-
-
-@admin.register(Section)
-class SectionAdmin(admin.ModelAdmin):
-    list_display = ["id", "name"]
-    list_filter = ["name",]
-
+    list_display = ["id", "order", "exemplar_id"]
+    list_filter = ["order"]
 
 @admin.register(Library)
 class LibraryAdmin(admin.ModelAdmin):
-    list_display = ["id", "location"]
+    list_display = ["id", "name", "description", "address"]
     search_fields = ["location",]
 
-
-@admin.register(Catalog)
-class CatalogAdmin(admin.ModelAdmin):
-    list_display = ["id", "library", "section"]
-    list_filter = ["library", "section"]
+@admin.register(LibraryDatabase)
+class LibraryDatabaseAdmin(admin.ModelAdmin):
+    list_display = ["id", "database", "library"]
