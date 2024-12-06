@@ -35,7 +35,7 @@ paths:
             example: Толстой
         - name: library
           in: query
-          description: Фильтрация по филиалам
+          description: Фильтрация по билблиотекам
           schema:
             $ref: "#/components/schemas/LibraryId"
       responses:
@@ -154,7 +154,7 @@ paths:
     get:
       tags:
         - catalog
-      summary: Получение списка филиалов
+      summary: Получение списка библиотек
       responses:
         '200':
           description: OK
@@ -168,7 +168,7 @@ paths:
     get:
       tags:
         - catalog
-      summary: Информация о филиале по названию
+      summary: Информация о бибилиотеке по названию
       parameters:
         - name: id
           in: path
@@ -183,7 +183,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Library'
         '404':
-          description: Филиал не найден
+          description: Библиотека не найдена
 
 components:
   schemas:
@@ -230,17 +230,17 @@ components:
     
     LibraryId:
       type: number
-      description: ID филиала
+      description: ID библотеки
       example: 1
     Library:
       properties:
         id:
           $ref: "#/components/schemas/LibraryId"
         description:
-          description: Описание филиала
+          description: Описание библиотеки
           type: string
           example: Библиотека ИрНИТУ
         address:
-          description: Адрес филиала
+          description: Адрес библиотеки
           type: string
           example: г. Иркутск, ул. Лермонтова, 83
