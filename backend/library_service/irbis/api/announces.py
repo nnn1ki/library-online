@@ -7,11 +7,11 @@ from django.conf import settings
 @dataclass
 class IrbisAnnounce:
     picture: str | None
-    description: str | None
     link: str | None
+    description: str | None = None
 
 def irbis_announces_list() -> list[IrbisAnnounce]:
     r = requests.get(f"{settings.IRBIS_HOSTNAME}/announces")
     r.raise_for_status()
-    
+
     return IrbisAnnounce.schema().load(r.json(), many=True)

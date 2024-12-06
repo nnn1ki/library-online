@@ -20,4 +20,4 @@ class LibraryDatabase(models.Model):
         verbose_name_plural = "Базы данных библиотек"
 
     def __str__(self):
-        return f"{self.database} - {self.library.name}"
+        return f"{self.database} - {self.library.description}"
