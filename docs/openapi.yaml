@@ -35,13 +35,9 @@ paths:
             example: Толстой
         - name: library
           in: query
-          description: Фильтрация по филиалам
+          description: Фильтрация по билблиотекам
           schema:
-            anyOf:
-              - $ref: "#/components/schemas/LibraryName"
-              - type: array
-                items:
-                  $ref: "#/components/schemas/LibraryName"
+            $ref: "#/components/schemas/LibraryId"
       responses:
         '200':
           description: OK
@@ -158,7 +154,7 @@ paths:
     get:
       tags:
         - catalog
-      summary: Получение списка филиалов
+      summary: Получение списка библиотек
       responses:
         '200':
           description: OK
@@ -168,17 +164,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Library'
-  /api/library/{name}/:
+  /api/library/{id}/:
     get:
       tags:
         - catalog
-      summary: Информация о филиале по названию
+      summary: Информация о бибилиотеке по названию
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/LibraryName"
+            $ref: "#/components/schemas/LibraryId"
       responses:
         '200':
           description: OK
@@ -187,7 +183,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Library'
         '404':
-          description: Филиал не найден
+          description: Библиотека не найдена
 
 components:
   schemas:
@@ -199,16 +195,13 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/BookId"
-        name:
-          description: Название книги
-          type: string
-        author:
-          description: Автор книги
-          type: string
-        book_description:
+        description:
           description: Описание книги
           type: string
-        book_logo:
+        year:
+          description: Год издания книги
+          type: number
+        cover:
           description: Обложка книги
           type: string
           nullable: true
@@ -225,6 +218,9 @@ components:
               description:
                 description: Описание ссылки
                 type: string
+        library:
+          description: Библиотека, в которой находятся книги
+          $ref: "#/components/schemas/LibraryId"
         copies:
           description: Количество доступных к заказу экземпляров
           type: number
@@ -232,19 +228,19 @@ components:
           description: Можно ли заказать книгу
           type: boolean
     
-    LibraryName:
-      type: string
-      description: Название филиала
-      example: istu
+    LibraryId:
+      type: number
+      description: ID библотеки
+      example: 1
     Library:
       properties:
-        name:
-          $ref: "#/components/schemas/LibraryName"
+        id:
+          $ref: "#/components/schemas/LibraryId"
         description:
-          description: Описание филиала
+          description: Описание библиотеки
           type: string
           example: Библиотека ИрНИТУ
         address:
-          description: Адрес филиала
+          description: Адрес библиотеки
           type: string
           example: г. Иркутск, ул. Лермонтова, 83

@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from library_service.models.catalog import Catalog
-
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     class Meta:
@@ -28,7 +26,6 @@ class History(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     exemplar_id = models.CharField(max_length=255)
-    catalog = models.ForeignKey(Catalog, on_delete=models.CASCADE)
     
     class Meta:
         verbose_name = "Элемент заказа"
