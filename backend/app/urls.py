@@ -22,10 +22,12 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from library_service.views.catalog import *
+from library_service.views.basket import *
 
 router = DefaultRouter()
 router.register("book", BookViewset, basename="book")
 router.register("library", LibraryViewset, basename="library")
+router.register("basket", BasketViewset, basename="basket")
 
 
 urlpatterns = [
