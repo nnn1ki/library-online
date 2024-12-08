@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@vue/compiler-sfc": "^3.5.13",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
@@ -33,6 +34,7 @@
     "sass-embedded": "^1.81.0",
     "typescript": "~5.5.4",
     "vite": "^5.4.8",
+    "vue-language-server": "^0.0.67",
     "vue-tsc": "^2.1.6"
   }
 }
