@@ -10,7 +10,7 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "HomePage",
+      name: "home",
       component: HomePage,
     },
     {
@@ -35,5 +35,7 @@ const router = createRouter({
     },
   ]
 })
+
+
 
 export default router

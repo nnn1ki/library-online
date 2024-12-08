@@ -1,10 +1,10 @@
 <script setup>
-import { onBeforeMount, ref } from "vue";
-import axios from "axios";
-import _ from "lodash";
-import { createCanvas, loadImage } from "canvas";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router"; // Для работы с параметрами маршрута
+import SearchFilter from "../components/SearchFilter.vue"; // Импорт компонента фильтра
+import Card from "../components/Card.vue"; // Импорт компонента карточки книги
 
-// пока так
+// Массив всех книг
 const books = ref([
   { title: "Война и мир", author: "Лев Толстой", imageUrl: null, quantity: 10 },
   { title: "Преступление и наказание", author: "Федор Достоевский", imageUrl: null, quantity: 8 },
@@ -16,46 +16,50 @@ const books = ref([
   { title: "Властелин колец", author: "Джон Рональд Руэл Толкин", imageUrl: null, quantity: 11 }
 ]);
 
+// Массив фильтруемых книг
+const filteredBooks = ref([...books.value]);
 
-//todo - вынести работу с картинками в другое место (в компонент карточки и\или поменять его работу) 
-onBeforeMount(async () => {
-  for (const book of books.value) {
-    book.imageUrl = await generateBookImage(book.title, book.author);
-  }
+// Стейт для поисковых значений
+const searchQuery = ref({
+  title: "",
+  author: ""
 });
 
-async function generateBookImage(title, author) {
-  const height = 700;
-  const width = height * (3 / 4);
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext("2d");
-
-  // Заливка белым фоном
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Рисование текста
-  ctx.font = "24px Arial";
-  ctx.fillStyle = "black";
-  ctx.textAlign = "center";
-  ctx.fillText(title, canvas.width / 2, canvas.height / 2 - 20);
-  ctx.fillText(author, canvas.width / 2, canvas.height / 2 + 20);
-
-  return canvas.toDataURL("image/png");
+// Функция для фильтрации книг на основе значений из формы поиска
+function filterBooks() {
+  filteredBooks.value = books.value.filter(book => {
+    const titleMatch = book.title.toLowerCase().includes(searchQuery.value.title.toLowerCase());
+    const authorMatch = book.author.toLowerCase().includes(searchQuery.value.author.toLowerCase());
+    return titleMatch && authorMatch; // Книга подходит, если совпадает хотя бы одно из условий
+  });
 }
+
+// Функция для сброса фильтра (показывать все книги)
+function resetFilter() {
+  searchQuery.value.title = "";
+  searchQuery.value.author = "";
+  filteredBooks.value = [...books.value]; // Показываем все книги
+}
+
+// Действие при клике на кнопку поиска
+function onSearchClick() {
+  filterBooks();
+}
+
+// Наблюдаем за изменением query параметров в URL, если они есть
+const route = useRoute();
+watch(() => route.query, filterBooks, { immediate: true });
 </script>
 
 <template>
-  <div class="container-fluid">
-    
-    <!-- поиск -->
-    <SearchFilter/>
+  <div class="container">
+    <!-- Компонент фильтра -->
+    <SearchFilter v-model:searchQuery="searchQuery" @search="onSearchClick" @reset="resetFilter" />
 
-    <!-- вывод карточек книг -->
-    <!-- сделать условное выделение от количесва книг в доступе -->
-    <div class="books-grid"> 
+    <!-- Сетка книг -->
+    <div class="books-grid">
       <Card
-        v-for="book in books"
+        v-for="book in filteredBooks"
         :key="book.title"
         :title="book.title"
         :author="book.author"
@@ -63,38 +67,17 @@ async function generateBookImage(title, author) {
         :quantity="book.quantity"
       />
     </div>
-
   </div>
 </template>
 
-<script>
-  import Card from "@/components/Card.vue";
-  import SearchFilter from "@/components/SearchFilter.vue";
-  
-  export default {
-    name: 'HomePage',
-    components: {
-      Card,
-      SearchFilter,
-    }
-  }
-
-</script>
-
-
-
 <style scoped>
-  .container {
-    padding: 20px;
-  }
+.container {
+  padding: 20px;
+}
 
-  .books-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-  }
-
-  .filters {
-    margin-bottom: 20px;
-  }
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
 </style>

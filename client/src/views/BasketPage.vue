@@ -1,57 +1,15 @@
 <script setup>
-import { computed, onBeforeMount, ref } from "vue";
-import axios from "axios";
-import _ from "lodash";
+import { computed, ref } from "vue";
 
 const books = ref([
-  {
-    title: "Война и мир",
-    author: "Лев Толстой",
-    imageUrl: null,
-    quantity: 10,
-  },
-  {
-    title: "Преступление и наказание",
-    author: "Федор Достоевский",
-    imageUrl: null,
-    quantity: 8,
-  },
-  {
-    title: "Гарри Поттер и философский камень",
-    author: "Джоан Роулинг",
-    imageUrl: null,
-    quantity: 15,
-  },
-  {
-    title: "Сто лет одиночества",
-    author: "Габриэль Гарсиа Маркес",
-    imageUrl: null,
-    quantity: 6,
-  },
-  {
-    title: "Великий Гэтсби",
-    author: "Фрэнсис Скотт Фицджеральд",
-    imageUrl: null,
-    quantity: 12,
-  },
-  {
-    title: "Мастер и Маргарита",
-    author: "Михаил Булгаков",
-    imageUrl: null,
-    quantity: 9,
-  },
-  {
-    title: "Гордость и предубеждение",
-    author: "Джейн Остин",
-    imageUrl: null,
-    quantity: 7,
-  },
-  {
-    title: "Властелин колец",
-    author: "Джон Рональд Руэл Толкин",
-    imageUrl: null,
-    quantity: 11,
-  },
+  { title: "Война и мир", author: "Лев Толстой", imageUrl: null, quantity: 10 },
+  { title: "Преступление и наказание", author: "Федор Достоевский", imageUrl: null, quantity: 8 },
+  { title: "Гарри Поттер и философский камень", author: "Джоан Роулинг", imageUrl: null, quantity: 15 },
+  { title: "Сто лет одиночества", author: "Габриэль Гарсиа Маркес", imageUrl: null, quantity: 6 },
+  { title: "Великий Гэтсби", author: "Фрэнсис Скотт Фицджеральд", imageUrl: null, quantity: 12 },
+  { title: "Мастер и Маргарита", author: "Михаил Булгаков", imageUrl: null, quantity: 9 },
+  { title: "Гордость и предубеждение", author: "Джейн Остин", imageUrl: null, quantity: 7 },
+  { title: "Властелин колец", author: "Джон Рональд Руэл Толкин", imageUrl: null, quantity: 11 },
 ]);
 
 const selectedBooks = ref([]);
@@ -71,7 +29,7 @@ const removeBook = (book) => {
   const index = books.value.indexOf(book);
   if (index !== -1) {
     books.value.splice(index, 1);
-  }  
+  }
   const selectedIndex = selectedBooks.value.indexOf(book);
   if (selectedIndex !== -1) {
     selectedBooks.value.splice(selectedIndex, 1);
@@ -79,7 +37,6 @@ const removeBook = (book) => {
 };
 
 const clearBasket = () => {
-  books.value = [];
   selectedBooks.value = [];
 };
 </script>
@@ -87,96 +44,49 @@ const clearBasket = () => {
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div class="col" style="margin: 0 30px 0 10px">
-        <div
-          class="row"
-          v-for="book in books"
-          :key="book.title"
-          style="padding: 10px 0 10px 0; border-top: 1px solid gray"
-        >
-          <div
-            class="col-auto d-flex justify-content-center align-items-center"
-          >
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="checkboxNoLabel"
-              :value="book"
-              @change="toggleBookSelection(book)"
-              aria-label="..."
-            />
-          </div>
-          <div
-            class="col-auto image-container d-flex justify-content-center align-items-center"
-          >
-            <img
-              src="https://i.pinimg.com/736x/05/fd/d8/05fdd8079f6e2e7fe66124954346145a.jpg"
-              :alt="book.title"
-              class="book-image img-thumbnail"
-            />
-          </div>
-
-          <div class="col">
-            <div class="row">
-              <div class="col">
-                <div class="card-body">
-                  <h6 class="card-title">{{ book.title }}</h6>
-                  <h7 class="card-title">{{ book.author }}</h7>
-                  <h7 class="card-title">{{ book.year }}</h7>
-                  <h7 class="card-title">{{ book.catalog }}</h7>
-                </div>
-              </div>
-              <div class="col-auto">
-                <div class="row" style="padding-bottom: 3px">
-                  <button type="button" class="btn btn-secondary">
-                    Читать онлайн
-                  </button>
-                </div>
-                <div class="row" style="padding-bottom: 3px">
-                  <button type="button" class="btn btn-secondary">
-                    Подробнее
-                  </button>
-                </div>
-                <div class="row">
-                  <button
-                    type="button"
-                    class="btn btn-danger"
-                    @click="removeBook(book)"
-                  >
-                    Удалить
-                  </button>
+      <!-- Картинки книг и их описание -->
+      <div class="col-9">
+        <div v-for="book in books" :key="book.title" class="book-card">
+          <div class="row align-items-center">
+            <div class="col-auto">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                :value="book"
+                @change="toggleBookSelection(book)"
+                aria-label="Выбрать книгу"
+              />
+            </div>
+            <div class="col-auto">
+              <img
+                :src="book.imageUrl || 'https://via.placeholder.com/150'"
+                :alt="book.title"
+                class="book-image img-fluid"
+              />
+            </div>
+            <div class="col">
+              <div class="book-info">
+                <h6 class="book-title">{{ book.title }}</h6>
+                <p class="book-author">{{ book.author }}</p>
+                <div class="btn-group">
+                  <button class="btn btn-secondary" @click="removeBook(book)">Удалить</button>
+                  <button class="btn btn-info">Подробнее</button>
+                  <button class="btn btn-primary">Читать онлайн</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-2">
-        <div
-          style="
-            margin: 0 10px 0 0;
-            border: 1px solid gray;
-            border-radius: 10px;
-            padding: 20px;
-          "
-        >
-          <div class="row">
-            <h5>Итого: {{ selectedCount }} к заказу</h5>
-          </div>
-          <div class="row" style="padding-bottom: 5px">
-            <button type="button" class="btn btn-success">
-              Оформить заказ
-            </button>
-          </div>
-          <div class="row" style="padding-bottom: 5px">
-            <button type="button" class="btn btn-warning">
-              Сохранить в файл
-            </button>
-          </div>
-          <div class="row">
-            <button type="button" class="btn btn-danger" @click="clearBasket">
-              Очистить корзину
-            </button>
+
+      <!-- Блок с итогами и действиями -->
+      <div class="col-3">
+        <div class="summary-box">
+          <h5 class="summary-title">Итого: {{ selectedCount }} книг</h5>
+          <div class="btn-group-vertical w-100">
+            <button class="btn btn-success" :disabled="selectedCount === 0">Оформить заказ</button>
+            <button class="btn btn-warning">Сохранить в файл</button>
+            <button class="btn btn-danger" @click="clearBasket">Очистить корзину</button>
           </div>
         </div>
       </div>
@@ -184,14 +94,69 @@ const clearBasket = () => {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.image-container {
-  height: 100px;
+<style scoped>
+/* Основной контейнер для карточек */
+.book-card {
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 15px;
 }
 
+/* Стиль для изображения книги */
 .book-image {
-  width: 100%;
-  height: auto;
-  max-height: 100%;
+  max-width: 120px;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Информация о книге */
+.book-info {
+  padding-left: 15px;
+}
+
+.book-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.book-author {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+/* Кнопки в карточке книги */
+.btn-group button {
+  margin-right: 5px;
+}
+
+/* Блок с итогами корзины */
+.summary-box {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary-title {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.btn-group-vertical .btn {
+  margin-bottom: 10px;
+}
+
+/* Дополнительные стили */
+.container-fluid {
+  padding: 30px;
+}
+
+.row {
+  margin-bottom: 30px;
 }
 </style>

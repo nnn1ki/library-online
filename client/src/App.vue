@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div>    
+  <div class="app">    
     <Header></Header>
 
     <main>
@@ -10,9 +10,10 @@
         <router-view />
       </div>
     </main>
+
     
-    <Footer></Footer>
   </div>
+  <Footer/>
 </template>
 
 
@@ -20,6 +21,8 @@
   import Button from './components/Button.vue';
   import Header from './components/Header.vue';
   import Footer from './components/Footer.vue';
+
+
 
   export default {
     name: 'App', 
@@ -49,4 +52,6 @@
     flex: 1; /* Это заставляет основной контент занять все доступное пространство */
     padding: 20px;
   }
+
+
 </style>
