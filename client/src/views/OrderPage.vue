@@ -1,113 +1,105 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed } from 'vue'
 
-const selectedBooks = ref([
-  { title: "Война и мир", author: "Лев Толстой", quantity: 1 },
-  { title: "Гарри Поттер и философский камень", author: "Джоан Роулинг", quantity: 2 },
-]);
+const books = ref([
+  { title: 'Война и мир', author: 'Лев Толстой', quantity: 10 },
+  { title: 'Преступление и наказание', author: 'Федор Достоевский', quantity: 8 },
+  { title: 'Гарри Поттер и философский камень', author: 'Джоан Роулинг', quantity: 15 },
+  { title: 'Сто лет одиночества', author: 'Габриэль Гарсиа Маркес', quantity: 6 },
+  { title: 'Великий Гэтсби', author: 'Фрэнсис Скотт Фицджеральд', quantity: 12 },
+  { title: 'Мастер и Маргарита', author: 'Михаил Булгаков', quantity: 9 },
+  { title: 'Гордость и предубеждение', author: 'Джейн Остин', quantity: 7 },
+  { title: 'Властелин колец', author: 'Джон Рональд Руэл Толкин', quantity: 11 },
+])
 
-// Поле для ввода email (опционально)
-const email = ref("");
+const selectedBooks = ref([])
 
-// Подсчитываем общее количество книг
-const totalBooks = computed(() => {
-  return selectedBooks.value.reduce((total, book) => total + book.quantity, 0);
-});
+const toggleBookSelection = (book) => {
+  const index = selectedBooks.value.indexOf(book)
+  if (index === -1) {
+    selectedBooks.value.push(book)
+  } else {
+    selectedBooks.value.splice(index, 1)
+  }
+}
 
-// Функция для оформления заказа
-const placeOrder = () => {
-  // Логика оформления заказа
-  console.log("Заказ оформлен!");
-  // Можно добавить логику отправки заказа на сервер или отображения сообщения о успешном заказе
-};
+const selectedCount = computed(() => selectedBooks.value.length)
+
+const removeBook = (book) => {
+  const index = books.value.indexOf(book)
+  if (index !== -1) {
+    books.value.splice(index, 1)
+  }
+  const selectedIndex = selectedBooks.value.indexOf(book)
+  if (selectedIndex !== -1) {
+    selectedBooks.value.splice(selectedIndex, 1)
+  }
+}
+
+const clearBasket = () => {
+  books.value = []
+  selectedBooks.value = []
+}
 </script>
 
 <template>
-  <div class="container">
-    <div class="order-summary">
-      <h2>Оформление заказа</h2>
-
-      <!-- Список книг -->
-      <div class="book-list">
-        <h5>Список книг:</h5>
-        <ul>
-          <li v-for="book in selectedBooks" :key="book.title">
-            <strong>{{ book.title }}</strong> — {{ book.author }} (x{{ book.quantity }})
-          </li>
-        </ul>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="list-group">
+          <div 
+            v-for="book in books" 
+            :key="book.title" 
+            class="list-group-item d-flex justify-content-between align-items-center"
+          >
+            <div class="d-flex align-items-center">
+              <input
+                type="checkbox"
+                class="form-check-input me-3"
+                :value="book"
+                @change="toggleBookSelection(book)"
+              />
+              <div class="me-3">
+                <img
+                  src="https://via.placeholder.com/50"
+                  :alt="book.title"
+                  class="img-fluid"
+                  style="max-height: 50px; object-fit: cover;"
+                />
+              </div>
+              <div>
+                <h5 class="mb-1">{{ book.title }}</h5>
+                <p class="mb-1">{{ book.author }}</p>
+                <small>{{ book.quantity }} книг в наличии</small>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              class="btn btn-danger"
+              @click="removeBook(book)"
+            >
+              Удалить
+            </button>
+          </div>
+        </div>
       </div>
-
-      <!-- Информация о заказе -->
-      <div class="order-info">
-        <p><strong>Оформлено книг:</strong> {{ totalBooks }} шт</p>
-        <p><strong>Срок готовности:</strong> 1-2 дня</p>
-      </div>
-
-      <!-- Поле для ввода email (опционально) -->
-      <div class="email-input">
-        <label for="email">Email (необязательно)</label>
-        <input
-          id="email"
-          type="email"
-          v-model="email"
-          placeholder="Введите ваш email для получения уведомлений"
-        />
-      </div>
-
-      <!-- Кнопка оформления заказа -->
-      <div class="order-button">
-        <button class="btn btn-success" @click="placeOrder">Оформить заказ</button>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Итого: {{ selectedCount }} к заказу</h5>
+            <button class="btn btn-success w-100 mb-2">Оформить заказ</button>
+            <button class="btn btn-warning w-100 mb-2">Сохранить в файл</button>
+            <button class="btn btn-danger w-100" @click="clearBasket">Очистить корзину</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.order-summary {
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.order-summary h2 {
-  margin-bottom: 20px;
-  font-size: 1.8rem;
-}
-
-.order-info p {
-  margin: 10px 0;
-  font-size: 1.1rem;
-}
-
-.email-input {
-  margin: 20px 0;
-}
-
-.email-input input {
-  width: 100%;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-.book-list ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.book-list li {
-  margin-bottom: 5px;
-}
-
-.order-button {
-  margin-top: 20px;
-}
-
-.order-button button {
-  width: 100%;
-  padding: 12px;
-  font-size: 1.1rem;
-  border-radius: 8px;
+img {
+  max-width: 100%;
+  height: auto;
 }
 </style>

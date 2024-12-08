@@ -52,32 +52,33 @@ watch(() => route.query, filterBooks, { immediate: true });
 </script>
 
 <template>
-  <div class="container">
+  <div class="container mt-4">
     <!-- Компонент фильтра -->
     <SearchFilter v-model:searchQuery="searchQuery" @search="onSearchClick" @reset="resetFilter" />
 
-    <!-- Сетка книг -->
-    <div class="books-grid">
-      <Card
+    <!-- Сетка книг (Bootstrap grid system) -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
+      <div 
         v-for="book in filteredBooks"
         :key="book.title"
-        :title="book.title"
-        :author="book.author"
-        :imageUrl="book.imageUrl"
-        :quantity="book.quantity"
-      />
+        class="col"
+      >
+        <Card 
+          :title="book.title"
+          :author="book.author"
+          :imageUrl="book.imageUrl"
+          :quantity="book.quantity"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+/* Убираем паддинг у контейнера */
 .container {
   padding: 20px;
 }
 
-.books-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
+/* Можно добавить любые дополнительные стили для карточек, если нужно */
 </style>

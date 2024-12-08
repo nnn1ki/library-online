@@ -1,42 +1,54 @@
 <template>
-  <div class="instructions-page container">
-    <h1 class="text-center my-4">Как использовать наш сервис</h1>
+  <div class="instructions-page container py-5">
+    <h1 class="text-center mb-4">Как использовать наш сервис</h1>
 
     <!-- Шаги инструкции -->
-    <div class="steps">
-      <div class="step-card">
-        <h2>Шаг 1: Регистрация</h2>
-        <p>Для начала необходимо зарегистрироваться на сайте. Перейдите на страницу <a href="/users">Регистрация</a>, введите свои данные и подтвердите регистрацию через email.</p>
-      </div>
-
-      <div class="step-card">
-        <h2>Шаг 2: Выбор книг</h2>
-        <p>Вы можете выбрать книги через каталог, который находится на главной странице. Используйте фильтры поиска, чтобы ускорить процесс выбора нужных книг.</p>
-      </div>
-
-      <div class="step-card">
-        <h2>Шаг 3: Добавление в корзину</h2>
-        <p>Нажмите на кнопку "Добавить в корзину" рядом с книгой, чтобы добавить её в вашу корзину. Вы можете выбрать несколько книг для оформления заказа.</p>
-      </div>
-
-      <div class="step-card">
-        <h2>Шаг 4: Оформление заказа</h2>
-        <p>Перейдите в корзину и нажмите "Оформить заказ". Введите ваш email для получения уведомлений о статусе заказа, и подтвердите ваш выбор.</p>
-      </div>
-
-      <div class="step-card">
-        <h2>Шаг 5: Получение книг</h2>
-        <p>После оформления заказа, ваши книги будут готовы в течение 1-2 дней. Мы уведомим вас, как только заказ будет готов.</p>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      <div class="col" v-for="(step, index) in steps" :key="index">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h2 class="card-title text-primary">{{ step.title }}</h2>
+            <p class="card-text">{{ step.description }}</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Важная информация -->
-    <div class="important-info mt-5">
+    <div class="important-info bg-light p-4 mt-5 rounded border">
       <h3 class="text-center">Свяжитесь с нами</h3>
-      <p>Если у вас возникли вопросы, пожалуйста, свяжитесь с нашей службой поддержки через email: <a href="mailto:support@yourservice.com">support@yourservice.com</a>.</p>
+      <p class="text-center">
+        Если у вас возникли вопросы, пожалуйста, свяжитесь с нашей службой поддержки через email: 
+        <a href="mailto:support@yourservice.com">support@yourservice.com</a>.
+      </p>
     </div>
   </div>
 </template>
+
+<script setup>
+const steps = [
+  {
+    title: "Шаг 1: Регистрация",
+    description: "Для начала необходимо зарегистрироваться на сайте. Перейдите на страницу 'Регистрация', введите свои данные и подтвердите регистрацию через email.",
+  },
+  {
+    title: "Шаг 2: Выбор книг",
+    description: "Вы можете выбрать книги через каталог, который находится на главной странице. Используйте фильтры поиска, чтобы ускорить процесс выбора нужных книг.",
+  },
+  {
+    title: "Шаг 3: Добавление в корзину",
+    description: "Нажмите на кнопку 'Добавить в корзину' рядом с книгой, чтобы добавить её в вашу корзину. Вы можете выбрать несколько книг для оформления заказа.",
+  },
+  {
+    title: "Шаг 4: Оформление заказа",
+    description: "Перейдите в корзину и нажмите 'Оформить заказ'. Введите ваш email для получения уведомлений о статусе заказа, и подтвердите ваш выбор.",
+  },
+  {
+    title: "Шаг 5: Получение книг",
+    description: "После оформления заказа, ваши книги будут готовы в течение 1-2 дней. Мы уведомим вас, как только заказ будет готов.",
+  },
+];
+</script>
 
 <style scoped>
 .instructions-page {
@@ -49,40 +61,18 @@ h1 {
   color: #333;
 }
 
-.steps {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-top: 40px;
-}
-
-.step-card {
-  background-color: #ffffff;
-  border: 1px solid #e7e7e7;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
-}
-
-.step-card:hover {
-  transform: scale(1.05);
-}
-
-.step-card h2 {
+.card-title {
   font-size: 1.5rem;
-  color: #007bff;
 }
 
-.step-card p {
+.card-text {
   font-size: 1rem;
   color: #555;
 }
 
 .important-info {
-  margin-top: 60px;
-  padding: 20px;
   background-color: #f9f9f9;
+  padding: 20px;
   border-radius: 10px;
   border: 1px solid #e7e7e7;
 }

@@ -1,41 +1,64 @@
 <template>
-  <div class="search-filter">
+  <div class="search-filter p-3 border rounded bg-light">
+
     <!-- Фильтры -->
-    <div v-for="(condition, index) in conditions" :key="index" class="filter-condition">
-      <div class="filter-condition-row">
-        <select v-model="condition.andOrOperator" class="form-select" @change="updateSearchParams">
+    <div v-for="(condition, index) in conditions" :key="index" class="filter-condition mb-3">
+      <div class="d-flex align-items-center gap-2">
+        
+        <!-- Операторы AND/OR -->
+        <select v-model="condition.andOrOperator" class="form-select form-select-sm" @change="updateSearchParams">
           <option v-for="andOr in andOrFilters" :key="andOr">{{ andOr }}</option>
         </select>
 
-        <select v-model="condition.filterType" class="form-select" @change="updateSearchParams">
+        <!-- Тип фильтра (Название, Автор, Количество) -->
+        <select v-model="condition.filterType" class="form-select form-select-sm" @change="updateSearchParams">
           <option v-for="filter in filters" :key="filter">{{ filter }}</option>
         </select>
 
+        <!-- Значение фильтра (ввод текста) -->
         <input
           v-model="condition.filterValue"
           type="text"
-          class="form-control"
+          class="form-control form-control-sm"
           placeholder="Введите значение"
           @input="updateSearchParams"
         />
 
-        <button v-if="index > 0" class="btn btn-danger" @click="removeCondition(index)">
+        <!-- Удалить условие -->
+        <button v-if="index > 0" class="btn btn-danger btn-sm" @click="removeCondition(index)">
           <i class="bi bi-x-square"></i>
         </button>
       </div>
     </div>
 
-    <!-- Кнопки для добавления условия и запуска поиска -->
-    <div class="actions">
-      <button class="btn btn-primary" @click="addCondition">
+    <!-- Кнопки для добавления нового условия и запуска поиска -->
+    <div class="actions d-flex justify-content-between">
+      <button class="btn btn-outline-primary btn-sm" @click="addCondition">
         Добавить условие <i class="bi bi-plus-square"></i>
       </button>
-      <button class="btn btn-success" @click="search">
+      <button class="btn btn-success btn-sm" @click="search">
         Поиск <i class="bi bi-search"></i>
       </button>
     </div>
   </div>
 </template>
+
+<style scoped>
+.search-filter {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.filter-condition {
+  display: flex;
+  align-items: center;
+}
+
+.actions button {
+  min-width: 120px;
+}
+</style>
 
 <script setup>
 import { ref, defineEmits, watch } from "vue";
@@ -100,7 +123,7 @@ function search() {
 }
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .search-filter {
   background: #f4f4ff;
   padding: 20px;
@@ -133,4 +156,4 @@ function search() {
   justify-content: space-between;
   gap: 10px;
 }
-</style>
+</style> -->
