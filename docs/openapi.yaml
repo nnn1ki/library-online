@@ -13,6 +13,12 @@ tags:
     description: Методы, связанные с каталогом и поиском книг
   - name: basket
     description: Методы, связанные с корзиной
+  - name: order
+    description: Методы, связанные с заказом
+  - name: borrowed
+    description: Методы, свзанные с задолженными книгами
+  - name: status
+    description: Методы для работы со статусами заказов
 
 paths:
   /api/book/:
@@ -185,6 +191,53 @@ paths:
         '404':
           description: Библиотека не найдена
 
+  /api/order/:
+    get:
+      tags:
+        - order
+      summary: Получение списка заказов
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+        - order
+      summary: Создание нового заказа
+      responses:
+        '200':
+          description: OK
+  /api/order/{id}/:
+    put:
+      tags: 
+        - order
+      summary: Изменение заказа  
+      responses:
+        '200':
+          description: OK
+
+  /api/borrowed/:
+    get:
+      tags:
+        - borrowed
+      description: Получение спсика долгов
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+        - borrowed
+      description: Создание списка долгов
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - borrowed
+      description: Обновление спсика долгов
+      responses:
+        '200':
+          description: OK
+
 components:
   schemas:
     BookId:
@@ -244,3 +297,28 @@ components:
           description: Адрес библиотеки
           type: string
           example: г. Иркутск, ул. Лермонтова, 83
+
+    Status:
+      properties:
+        status_name:
+          description: Статус заказа
+          type: string
+          example: new
+        date:
+          description: Дата присвоения статуса
+          type: string
+          format: date-time
+          example: "2024-12-31"
+
+    OrderToCreate:
+      properties:
+        books: 
+          type: array
+          nullable: false
+          items:
+            $ref: "#/components/schemas/BookId"
+        borroweds: 
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/BookId"
