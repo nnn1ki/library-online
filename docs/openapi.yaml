@@ -14,11 +14,7 @@ tags:
   - name: basket
     description: Методы, связанные с корзиной
   - name: order
-    description: Методы, связанные с заказом
-  - name: borrowed
-    description: Методы, свзанные с задолженными книгами
-  - name: status
-    description: Методы для работы со статусами заказов
+    description: Методы, связанные с заказами
 
 paths:
   /api/book/:
@@ -118,12 +114,12 @@ paths:
                 id:
                   $ref: "#/components/schemas/BookId"
       responses:
+        '200':
+          description: OK
         '401':
           description: Unauthorized
         '404':
           description: Книга не найдена
-        '200':
-          description: OK
     put:
       tags:
         - basket
@@ -195,10 +191,18 @@ paths:
     get:
       tags:
         - order
-      summary: Получение списка заказов
+      summary: Получение списка заказов на пользователя
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '401':
+          description: Unauthorized
     post:
       tags:
         - order
@@ -210,59 +214,102 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  $ref: "#/components/schemas/OrderToCreate"
+                library:
+                  $ref: "#/components/schemas/LibraryId"
+                books:
+                  type: array
+                  description: Список заказываемых книг
+                  items:
+                    $ref: "#/components/schemas/BookId"
+                borrowed: 
+                  type: array
+                  description: Список долгов, которые будут принесены
+                  nullable: true
+                  items:
+                    $ref: "#/components/schemas/BorrowedBookId"
       responses:
         '200':
           description: OK
+        '400':
+          description: Ошибка в заказе
+        '401':
+          description: Unauthorized
   /api/order/{id}/:
     put:
       tags: 
         - order
-      summary: Изменение заказа  
+      summary: Изменение заказа. Возможно только лишь сразу же после того, как заказ был создан
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/OrderId"
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  library:
+                    $ref: "#/components/schemas/LibraryId"
+                  books:
+                    type: array
+                    description: Список заказываемых книг
+                    items:
+                      $ref: "#/components/schemas/BookId"
+                  borrowed: 
+                    type: array
+                    description: Список долгов, которые будут принесены
+                    nullable: true
+                    items:
+                      $ref: "#/components/schemas/BorrowedBookId"
       responses:
         '200':
           description: OK
+        '400':
+          description: Ошибка в заказе или статус закана не равен new
+        '401':
+          description: Unauthorized
+        '404':
+          description: Заказ не найден
+    delete:
+      tags: 
+        - order
+      summary: Отмена заказа. Возможно только пока заказ не был выдан
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/OrderId"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Статус заказа done или более поздний
+        '401':
+          description: Unauthorized
+        '404':
+          description: Заказ не найден
 
   /api/borrowed/:
     get:
       tags:
-        - borrowed
-      summary: Получение спсика долгов
+        - order
+      summary: Получение списка взятых книг с автоматическим фильтром по тем, которые не были возвращены (долги)
       responses:
         '200':
           description: OK
-    post:
-      tags:
-        - borrowed
-      summary: Создание списка долгов
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                  $ref: "#/components/schemas/BookId"
-      responses:
-        '200':
-          description: OK
-    put:
-      tags:
-        - borrowed
-      summary: Обновление спсика долгов
-      responses:
-        '200':
-          description: OK
-
-  /api/status/:
-    post:
-      tags:
-        - status
-      description: Создание нового статуса
-      responses:
-        '200':
-          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BorrowedBook"
+        '401':
+          description: Unauthorized
 
 components:
   schemas:
@@ -271,6 +318,7 @@ components:
       description: ID книги
       example: L711
     Book:
+      type: object
       properties:
         id:
           $ref: "#/components/schemas/BookId"
@@ -312,6 +360,7 @@ components:
       description: ID библотеки
       example: 1
     Library:
+      type: object
       properties:
         id:
           $ref: "#/components/schemas/LibraryId"
@@ -325,37 +374,57 @@ components:
           example: г. Иркутск, ул. Лермонтова, 83
 
     Status:
+      type: object
       properties:
-        status_name:
+        status:
           description: Статус заказа
           type: string
-          example: new
+          enum:
+           - new
+           - processing # Пока отсутствует
+           - ready
+           - done
+           - cancelled
+           - error
+           - archived
         date:
           description: Дата присвоения статуса
           type: string
           format: date-time
           example: "2024-12-31"
-
-    OrderToCreate:
+    OrderId:
+      type: number
+      description: ID заказа
+    Order:
+      type: object
       properties:
-        books: 
+        id:
+          $ref: "#/components/schemas/OrderId"
+        books:
+          description: Список заказанных книг
           type: array
-          nullable: false
           items:
-            $ref: "#/components/schemas/BookId"
-        borroweds: 
+            $ref: "#/components/schemas/BorrowedBook"
+        statuses:
+          description: Список статусов заказа
           type: array
-          nullable: true
           items:
-            $ref: "#/components/schemas/BookId"
-
-    StatusToAdd:
+            $ref: "#/components/schemas/Status"
+        library:
+          $ref: "#/components/schemas/Library"
+    
+    BorrowedBookId:
+      type: number
+      description: ID взятой книги
+    BorrowedBook:
+      type: object
       properties:
-        order_id:
-          type: string
-          description: ID заказа
-          example: 1
-        status:
-          type: string
-          description: Статус заказа
-          example: new
+        id:
+          $ref: "#/components/schemas/BorrowedBookId"
+        book:
+          $ref: "#/components/schemas/Book"
+        order:
+          $ref: "#/components/schemas/OrderId"
+        returned:
+          type: boolean
+          description: Возвращена ли книга
