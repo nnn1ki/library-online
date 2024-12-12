@@ -80,7 +80,7 @@ erDiagram
         int id PK
         varchar description
         varchar status
-        DATETIME confirmed_at
+        DATETIME date
         int order_id FK 
     }
 
@@ -88,6 +88,8 @@ erDiagram
         int id PK
         int order_id FK
         varchar exemplar_id
+        bool handed
+        bool returned
     }
 
     Library {

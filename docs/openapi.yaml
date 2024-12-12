@@ -298,7 +298,7 @@ paths:
     get:
       tags:
         - order
-      summary: Получение списка взятых книг с автоматическим фильтром по тем, которые не были возвращены (долги)
+      summary: Получение списка взятых книг с автоматическим фильтром по тем, которые были выданы, но не возвращены (долги)
       responses:
         '200':
           description: OK
@@ -392,6 +392,9 @@ components:
           type: string
           format: date-time
           example: "2024-12-31"
+        description:
+          type: string
+          description: Описание статуса
     OrderId:
       type: number
       description: ID заказа
@@ -425,6 +428,9 @@ components:
           $ref: "#/components/schemas/Book"
         order:
           $ref: "#/components/schemas/OrderId"
+        handed:
+          type: boolean
+          description: Была ли выдана книга
         returned:
           type: boolean
           description: Возвращена ли книга
