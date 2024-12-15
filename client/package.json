@@ -11,8 +11,18 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@vue/compiler-sfc": "^3.5.13",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "canvas": "^2.11.2",
+    "canvas-node": "^0.3.23",
+    "cookies": "^0.9.1",
+    "jquery-csrf-token": "^2.2.1",
+    "lodash": "^4.17.21",
     "pinia": "^2.2.4",
     "vue": "^3.5.12",
+    "vue-cookie": "^1.1.4",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
@@ -21,8 +31,10 @@
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/tsconfig": "^0.5.1",
     "npm-run-all2": "^6.2.3",
+    "sass-embedded": "^1.81.0",
     "typescript": "~5.5.4",
     "vite": "^5.4.8",
+    "vue-language-server": "^0.0.67",
     "vue-tsc": "^2.1.6"
   }
 }
