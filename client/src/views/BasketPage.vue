@@ -1,5 +1,10 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
+import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification'; //хук для уведомлений
+const toast = useToast();
+
+const router = useRouter();
 
 const books = ref([
   { title: "Война и мир", author: "Лев Толстой", imageUrl: null, quantity: 10 },
@@ -26,6 +31,8 @@ const toggleBookSelection = (book) => {
 const selectedCount = computed(() => selectedBooks.value.length);
 
 const removeBook = (book) => {
+  toast.warning('Книга удалена из корзины');
+
   const index = books.value.indexOf(book);
   if (index !== -1) {
     books.value.splice(index, 1);
@@ -37,12 +44,25 @@ const removeBook = (book) => {
 };
 
 const clearBasket = () => {
+  toast.warning('Корзина очищена');
+  books.value = [];
   selectedBooks.value = [];
 };
+
+// Загрузка выбранных книг при монтировании компонента
+onMounted(() => {
+  loadBasket();
+});
+
+const goToOrderPage = () => {
+  router.push({ name: "OrderPage" }); // Переход по имени маршрута
+};
+
 </script>
 
 <template>
   <div class="container-fluid">
+    <h2>Корзина</h2>
     <div class="row">
       <!-- Картинки книг и их описание -->
       <div class="col-9">
@@ -84,7 +104,7 @@ const clearBasket = () => {
         <div class="summary-box">
           <h5 class="summary-title">Итого: {{ selectedCount }} книг</h5>
           <div class="btn-group-vertical w-100">
-            <button class="btn btn-success" :disabled="selectedCount === 0">Оформить заказ</button>
+            <button class="btn btn-success" :disabled="selectedCount.value === 0" @click="goToOrderPage">Оформить заказ</button>
             <button class="btn btn-warning">Сохранить в файл</button>
             <button class="btn btn-danger" @click="clearBasket">Очистить корзину</button>
           </div>
@@ -160,3 +180,5 @@ const clearBasket = () => {
   margin-bottom: 30px;
 }
 </style>
+
+

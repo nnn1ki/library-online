@@ -3,6 +3,8 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router"; // Для работы с параметрами маршрута
 import SearchFilter from "../components/SearchFilter.vue"; // Импорт компонента фильтра
 import Card from "../components/Card.vue"; // Импорт компонента карточки книги
+import { announcesItems } from '@/api/announces.js'
+import Announces from "@/components/Announces.vue";
 
 // Массив всех книг
 const books = ref([
@@ -16,6 +18,9 @@ const books = ref([
   { title: "Властелин колец", author: "Джон Рональд Руэл Толкин", imageUrl: null, quantity: 11 }
 ]);
 
+const {picture, description, link} = announcesItems;
+console.log('announcesItems', announcesItems); 
+
 // Массив фильтруемых книг
 const filteredBooks = ref([...books.value]);
 
@@ -25,39 +30,42 @@ const searchQuery = ref({
   author: ""
 });
 
-// Функция для фильтрации книг на основе значений из формы поиска
-function filterBooks() {
-  filteredBooks.value = books.value.filter(book => {
-    const titleMatch = book.title.toLowerCase().includes(searchQuery.value.title.toLowerCase());
-    const authorMatch = book.author.toLowerCase().includes(searchQuery.value.author.toLowerCase());
-    return titleMatch && authorMatch; // Книга подходит, если совпадает хотя бы одно из условий
-  });
+// Стейт для корзины
+const basket = ref([]);
+
+// Функция для добавления книги в корзину
+function addToBasket(book) {
+  const existingBook = basket.value.find(item => item.title === book.title);
+  if (existingBook) return; // Если книга уже в корзине, ничего не делать
+
+  basket.value.push({ ...book }); // Добавляем книгу в корзину
+  localStorage.setItem('basket', JSON.stringify(basket.value)); // Сохраняем корзину в localStorage
 }
 
-// Функция для сброса фильтра (показывать все книги)
-function resetFilter() {
-  searchQuery.value.title = "";
-  searchQuery.value.author = "";
-  filteredBooks.value = [...books.value]; // Показываем все книги
+// Функция для загрузки корзины из localStorage
+function loadBasket() {
+  const savedBasket = localStorage.getItem('basket');
+  if (savedBasket) {
+    basket.value = JSON.parse(savedBasket); // Загрузите корзину при старте
+  }
 }
 
-// Действие при клике на кнопку поиска
-function onSearchClick() {
-  filterBooks();
-}
+// Загружаем корзину при монтировании компонента
+onMounted(() => {
+  loadBasket();
+});
 
-// Наблюдаем за изменением query параметров в URL, если они есть
-const route = useRoute();
-watch(() => route.query, filterBooks, { immediate: true });
+
 </script>
 
 <template>
   <div class="container mt-4">
     <!-- Компонент фильтра -->
-    <SearchFilter v-model:searchQuery="searchQuery" @search="onSearchClick" @reset="resetFilter" />
-
-    <!-- Сетка книг (Bootstrap grid system) -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
+    <SearchFilter v-model="searchQuery" @search="onSearchClick" @reset="resetFilter" />
+    <!-- список новинок -->
+     <h3>Новинки</h3>
+     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
+      <!-- <Announces/> //нет доступа к данным со стороннего пользователя --> 
       <div 
         v-for="book in filteredBooks"
         :key="book.title"
@@ -71,6 +79,7 @@ watch(() => route.query, filterBooks, { immediate: true });
         />
       </div>
     </div>
+    
   </div>
 </template>
 

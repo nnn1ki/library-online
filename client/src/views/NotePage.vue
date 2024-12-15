@@ -19,7 +19,7 @@
       <h3 class="text-center">Свяжитесь с нами</h3>
       <p class="text-center">
         Если у вас возникли вопросы, пожалуйста, свяжитесь с нашей службой поддержки через email: 
-        <a href="mailto:support@yourservice.com">support@yourservice.com</a>.
+        <a href="mailto:support@yourservice.com">domrachev@conferoom.site</a>.
       </p>
     </div>
   </div>

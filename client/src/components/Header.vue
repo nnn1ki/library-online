@@ -20,9 +20,9 @@
             <li class="nav-item">
               <router-link to="/note" class="nav-link" active-class="active">О проекте</router-link>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <router-link to="/orders" class="nav-link" active-class="active">Заказы</router-link>
-            </li>
+            </li> -->
           </ul>
         </nav>
       </div>
@@ -41,7 +41,7 @@ export default {
   props: {
     logoSrc: {
       type: String,
-      default: '../../public/favicon.ico',
+      default: '../../public/ntb-logo.png',
     },
   },
 }
