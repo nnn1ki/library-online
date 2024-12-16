@@ -27,6 +27,7 @@ class IrbisBook:
     id: str | None
     order: bool
     arrangement: str | None
+    brief: str | None
     description: str | None
     agents: list[str] | None
     additional: str | None
@@ -41,7 +42,8 @@ class IrbisBook:
 def irbis_search(database: str, expression: str) -> list[IrbisBook]:
     payload = {
         "database": database,
-        "expression": expression
+        "expression": expression,
+        "format": "@opac"
     }
 
     r = requests.post(f"{settings.IRBIS_HOSTNAME}/search", json=payload)
