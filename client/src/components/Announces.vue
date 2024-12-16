@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-  </template>
+</template>
   
   <script setup>
   import { ref, onMounted } from 'vue';
@@ -30,8 +30,8 @@
   onMounted(async () => {
     try {
       const data = await announcesItems();
-      console.log('data', data); 
       announces.value = Object.values(data); // Преобразуем объект в массив
+      console.log('data', data); 
     } catch (err) {
       error.value = 'Ошибка загрузки данных';
       console.error(err);

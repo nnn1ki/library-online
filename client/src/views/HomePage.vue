@@ -1,10 +1,8 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router"; // Для работы с параметрами маршрута
 import SearchFilter from "../components/SearchFilter.vue"; // Импорт компонента фильтра
 import Card from "../components/Card.vue"; // Импорт компонента карточки книги
-import { announcesItems } from '@/api/announces.js'
-import Announces from "@/components/Announces.vue";
 
 // Массив всех книг
 const books = ref([
@@ -17,9 +15,6 @@ const books = ref([
   { title: "Гордость и предубеждение", author: "Джейн Остин", imageUrl: null, quantity: 7 },
   { title: "Властелин колец", author: "Джон Рональд Руэл Толкин", imageUrl: null, quantity: 11 }
 ]);
-
-const {picture, description, link} = announcesItems;
-console.log('announcesItems', announcesItems); 
 
 // Массив фильтруемых книг
 const filteredBooks = ref([...books.value]);
@@ -42,6 +37,27 @@ function addToBasket(book) {
   localStorage.setItem('basket', JSON.stringify(basket.value)); // Сохраняем корзину в localStorage
 }
 
+// Функция для фильтрации книг на основе значений из формы поиска
+function filterBooks() {
+  const { title, author } = searchQuery.value;
+  filteredBooks.value = books.value.filter(book => {
+    const titleMatch = book.title.toLowerCase().includes(title.toLowerCase());
+    const authorMatch = book.author.toLowerCase().includes(author.toLowerCase());
+    return titleMatch && authorMatch; // Книга подходит, если совпадает хотя бы одно из условий
+  });
+}
+
+// Функция для сброса фильтра (показывать все книги)
+function resetFilter() {
+  searchQuery.value = { title: "", author: "" };
+  filteredBooks.value = [...books.value]; // Показываем все книги
+}
+
+// Действие при клике на кнопку поиска
+function onSearchClick() {
+  filterBooks();
+}
+
 // Функция для загрузки корзины из localStorage
 function loadBasket() {
   const savedBasket = localStorage.getItem('basket');
@@ -50,22 +66,27 @@ function loadBasket() {
   }
 }
 
+// Наблюдаем за изменением query параметров в URL, если они есть
+const route = useRoute();
+watch(() => route.query, () => {
+  searchQuery.value.title = route.query.title || "";
+  searchQuery.value.author = route.query.author || "";
+  filterBooks();
+}, { immediate: true });
+
 // Загружаем корзину при монтировании компонента
 onMounted(() => {
   loadBasket();
 });
-
-
 </script>
 
 <template>
   <div class="container mt-4">
     <!-- Компонент фильтра -->
     <SearchFilter v-model="searchQuery" @search="onSearchClick" @reset="resetFilter" />
-    <!-- список новинок -->
-     <h3>Новинки</h3>
-     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
-      <!-- <Announces/> //нет доступа к данным со стороннего пользователя --> 
+
+    <!-- Сетка книг (Bootstrap grid system) -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
       <div 
         v-for="book in filteredBooks"
         :key="book.title"
@@ -76,10 +97,11 @@ onMounted(() => {
           :author="book.author"
           :imageUrl="book.imageUrl"
           :quantity="book.quantity"
+          :addToBasket="addToBasket"
+          :isInBasket="basket.some(item => item.title === book.title)"
         />
       </div>
     </div>
-    
   </div>
 </template>
 
