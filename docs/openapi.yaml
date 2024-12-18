@@ -23,23 +23,18 @@ paths:
         - catalog
       summary: Список книг с фильтрами
       parameters:
-        - name: name
-          in: query
-          description: Фильтрация по названию книги
-          schema:
-            type: string
-            example: Война и мир
-        - name: author
-          in: query
-          description: Фильтрация по автору
-          schema:
-            type: string
-            example: Толстой
         - name: library
           in: query
           description: Фильтрация по билблиотекам
           schema:
             $ref: "#/components/schemas/LibraryId"
+        - name: expression
+          in: query
+          required: true
+          description: Фильтрация с использованием сценариев поиска. Передается напрямую в ИРБИС. Символ $ используется для неполного совпадения. Символы + и * используются соответственно как ИЛИ и И.
+          schema:
+            type: string
+            example: (A=Власов$*T=математика$)+A=Пушкин$
       responses:
         '200':
           description: OK
@@ -186,6 +181,19 @@ paths:
                 $ref: '#/components/schemas/Library'
         '404':
           description: Библиотека не найдена
+
+  /api/scenario/:
+    get:
+      tags:
+        - catalog
+      summary: Получить список фильтров для поиска книг
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scenario'
 
   /api/order/:
     get:
@@ -372,6 +380,20 @@ components:
           description: Адрес библиотеки
           type: string
           example: г. Иркутск, ул. Лермонтова, 83
+    
+    Scenario:
+      type: object
+      description: Описывает сценарий фильтра при поиске
+      properties:
+        prefix:
+          type: string
+          description: Префикс
+          example: K=
+        description:
+          type: string
+          nullable: true
+          description: Описание в произвольной форме
+          example: Ключевое слово
 
     Status:
       type: object
