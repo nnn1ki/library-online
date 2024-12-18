@@ -23,23 +23,18 @@ paths:
         - catalog
       summary: Список книг с фильтрами
       parameters:
-        - name: name
-          in: query
-          description: Фильтрация по названию книги
-          schema:
-            type: string
-            example: Война и мир
-        - name: author
-          in: query
-          description: Фильтрация по автору
-          schema:
-            type: string
-            example: Толстой
         - name: library
           in: query
           description: Фильтрация по билблиотекам
           schema:
             $ref: "#/components/schemas/LibraryId"
+        - name: expression
+          in: query
+          required: true
+          description: Фильтрация с использованием сценариев поиска. Передается напрямую в ИРБИС. Символ $ используется для неполного совпадения. Символы + и * используются соответственно как ИЛИ и И.
+          schema:
+            type: string
+            example: (A=Власов$*T=математика$)+A=Пушкин$
       responses:
         '200':
           description: OK
@@ -388,6 +383,7 @@ components:
     
     Scenario:
       type: object
+      description: Описывает сценарий фильтра при поиске
       properties:
         prefix:
           type: string

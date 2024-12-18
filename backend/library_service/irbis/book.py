@@ -30,21 +30,13 @@ class Book:
         self.copies = len(book.exemplars)
         self.can_be_ordered = book.order
 
-def books_list(libraries: Iterable[Library], name: str | None, author: str | None) -> list[Book]:
-    queries = [
-        f"T={name}" if name is not None else None,
-        f"A={author}" if author is not None else None
-    ]
-    queries = [q for q in queries if q is not None]
-
-    query = "&".join(queries) + "$"
-    
+def books_list(libraries: Iterable[Library], expression: str) -> list[Book]:
     result = []
 
     for library in libraries:
         databases: Iterable[LibraryDatabase] = library.databases.all()
         for db in databases:
-            search_result = irbis_search(db.database, query)
+            search_result = irbis_search(db.database, expression)
             result += [Book(book, library.id) for book in search_result]
 
     return result
@@ -52,12 +44,11 @@ def books_list(libraries: Iterable[Library], name: str | None, author: str | Non
 def books_announces_list() -> list[Book]:
     announces = irbis_announces_list()
     
-    istu_library = LibraryDatabase.objects.filter(database="ISTU").first().library
-
-    # Спс за такой классный апи
+    istu_library = LibraryDatabase.objects.filter(database="ISTU").first().library # По идее, все анонсы отсылают на ISTU
+    
     result = []
     for announce in announces:
-        expresssion = announce.link.removeprefix("/opac/index.html?expression=")
+        expresssion = announce.link.removeprefix("/opac/index.html?expression=") # Спс за такой удобный апи
         book = irbis_search("ISTU", expresssion)[0]
         result.append(Book(book, istu_library.id))
 
