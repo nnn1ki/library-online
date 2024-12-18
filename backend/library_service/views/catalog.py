@@ -4,6 +4,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import mixins
 
+from library_service.irbis.api.scenarios import irbis_scenarios
 from library_service.irbis.book import books_announces_list, books_list, Book
 from library_service.serializers.catalog import *
 from library_service.models.catalog import *
@@ -39,3 +40,13 @@ class BookViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewS
 class LibraryViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
     queryset = Library.objects.all()
     serializer_class = LibrarySerializer
+
+class ScenarioViewset(mixins.ListModelMixin, GenericViewSet):
+    serializer_class = ScenarioSerializer
+    query_data: list[IrbisScenario] | None = None
+
+    def get_queryset(self):
+        if self.query_data is None:           
+            self.query_data = irbis_scenarios("ISTU") # TODO: убрать хардкод
+
+        return self.query_data

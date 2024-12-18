@@ -26,7 +26,7 @@ from library_service.views.catalog import *
 router = DefaultRouter()
 router.register("book", BookViewset, basename="book")
 router.register("library", LibraryViewset, basename="library")
-
+router.register("scenario", ScenarioViewset, basename="scenario")
 
 urlpatterns = [
     path('admin/', admin.site.urls),

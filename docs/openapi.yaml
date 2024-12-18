@@ -187,6 +187,19 @@ paths:
         '404':
           description: Библиотека не найдена
 
+  /api/scenario/:
+    get:
+      tags:
+        - catalog
+      summary: Получить список фильтров для поиска книг
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scenario'
+
   /api/order/:
     get:
       tags:
@@ -372,6 +385,19 @@ components:
           description: Адрес библиотеки
           type: string
           example: г. Иркутск, ул. Лермонтова, 83
+    
+    Scenario:
+      type: object
+      properties:
+        prefix:
+          type: string
+          description: Префикс
+          example: K=
+        description:
+          type: string
+          nullable: true
+          description: Описание в произвольной форме
+          example: Ключевое слово
 
     Status:
       type: object
