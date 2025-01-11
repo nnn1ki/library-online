@@ -7,7 +7,7 @@ from rest_framework import mixins
 from rest_framework.exceptions import APIException
 
 from library_service.irbis.api.scenarios import irbis_scenarios
-from library_service.irbis.book import books_announces_list, books_list, Book
+from library_service.irbis.book import book_retrieve, books_announces_list, books_list, Book
 from library_service.serializers.catalog import *
 from library_service.models.catalog import *
 
@@ -32,8 +32,9 @@ class BookViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewS
         return self.query_data
 
     def get_object(self):
-        # TODO: разобраться с этим
-        raise NotImplementedError("В их апи нет возможности получения книги по id 🤗")
+        id = self.kwargs["pk"]
+        book = book_retrieve(id)
+        return book
 
     @action(url_path="announcement", methods=["GET"], detail=False)
     def announcements_list(self, request, *args, **kwargs):

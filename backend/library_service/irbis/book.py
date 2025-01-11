@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Iterable
 from library_service.irbis.api.announces import irbis_announces_list
 from library_service.models.catalog import Library, LibraryDatabase
-from library_service.irbis.api.search import IrbisBook, irbis_search
+from library_service.irbis.api.search import IrbisBook, irbis_book_retrieve, irbis_search
 
 @dataclass
 class BookLink:
@@ -21,7 +21,7 @@ class Book:
     can_be_ordered: bool
 
     def __init__(self, book: IrbisBook, library: int):
-        self.id = book.id
+        self.id = book.id.replace("/", "_")
         self.description = book.description # TODO: opac api возвращает description в отформатированном формате с html тегами, и содержит в себе название книги, автора и т.д. Возможно, стоит это распарсить
         self.year = book.year
         self.cover = book.cover # TODO: тут возвращается ссылка на метод на их сервере ("/api/cover?file=..."). Нужно возвращать на наш (будет проксирование) или приводить к полной ссылке
@@ -53,3 +53,10 @@ def books_announces_list() -> list[Book]:
         result.append(Book(book, istu_library.id))
 
     return result
+
+def book_retrieve(id: str) -> Book:
+    database, mfn = id.split("_")
+    library = LibraryDatabase.objects.filter(database=database).first().library
+    book = irbis_book_retrieve(database, mfn)
+
+    return Book(book, library.id)
