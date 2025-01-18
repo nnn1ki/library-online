@@ -1,19 +1,16 @@
 import axios from "axios";
 import type { Book } from "./types";
 
-const options = { method: "GET", url: "/api/book/" };
-
 export async function searchBooks(
-  library: number,
-  expression: string
+  expression: string,
+  library?: number
 ): Promise<Book[]> {
   try {
-    const { data } = await axios.request({
+    const { data } = await axios.get("/api/book/", {
       params: {
-        library: library,
         expression: expression,
-      },
-      ...options,
+        library: library,
+      }
     });
     console.log("/api/book/", data);
     return data;

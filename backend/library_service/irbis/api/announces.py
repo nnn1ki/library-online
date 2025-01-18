@@ -1,9 +1,9 @@
 import requests
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from dataclasses_json import dataclass_json, Undefined
 from django.conf import settings
 
-@dataclass_json
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class IrbisAnnounce:
     picture: str | None

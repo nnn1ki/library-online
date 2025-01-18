@@ -1,11 +1,9 @@
 import axios from "axios";
 import type { Scenario } from "./types";
 
-const options = {method: 'GET', url: '/api/scenario/'};
-
 export async function scenariosList(): Promise<Scenario[]> {
     try{
-      const { data } = await axios.request(options);
+      const { data } = await axios.get("/api/scenario/");
       console.log("/api/scenario/", data);
       return data;
     }catch (error) {
