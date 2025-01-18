@@ -1,15 +1,15 @@
 import requests
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from dataclasses_json import dataclass_json, Undefined
 from django.conf import settings
 
-@dataclass_json
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class IrbisBookLink:
     url: str | None
     description: str | None
 
-@dataclass_json
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class IrbisBookExemplar:
     number: str | None
@@ -18,13 +18,13 @@ class IrbisBookExemplar:
     status: str | None
     sigla: str | None
 
-@dataclass_json
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class IrbisBookSee:
     url: str
     description: str | None
 
-@dataclass_json
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class IrbisBook:
     db: str | None

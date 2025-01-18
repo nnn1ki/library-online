@@ -1,59 +1,54 @@
 <template>
   <div class="search-filter p-3 border rounded bg-light">
-    <!-- Фильтры -->
-    <div
-      v-for="(condition, index) in conditions"
-      :key="index"
-      class="filter-condition mb-3"
-    >
-      <div class="d-flex align-items-center gap-2">
-        <!-- Операторы AND/OR -->
-        <select
-          v-model="condition.andOrOperator"
-          class="form-select form-select-sm"
-          @change="updateSearchParams"
-        >
-          <option v-for="andOr in andOrFilters" :key="andOr">{{ andOr }}</option>
-        </select>
+    <!-- Библиотеки -->
+    <span>Библиотека</span>
+    <select v-model="library" class="form-select form-select-sm" @change="updateSearchParams">
+      <option :value="undefined"></option>
+      <option v-for="lib in libraries" :key="lib.id" :value="lib.id">{{
+        lib.description }} ({{ lib.address }})
+      </option>
+    </select>
 
-        <!-- Тип фильтра -->
-        <select
-          v-model="condition.filterType"
-          class="form-select form-select-sm"
-          @change="updateSearchParams"
-        >
-          <option v-for="filter in filters" :key="filter">{{ filter }}</option>
-        </select>
+    <form @submit.prevent="search">
+      <!-- Сценарии -->
+      <div v-for="(condition, index) in conditions" :key="index" class="filter-condition mb-3 mt-3">
+        <div class="d-flex align-items-center gap-2">
+          <!-- Операторы И/ИЛИ -->
+          <select v-if="index !== 0" v-model="condition.operator" class="form-select form-select-sm"
+            @change="updateSearchParams">
+            <option v-for="[description, operator] in [['И', '*'], ['ИЛИ', '+']]" :key="operator" :value="operator">{{
+              description }}
+            </option>
+          </select>
 
-        <!-- Значение фильтра -->
-        <input
-          v-model="condition.filterValue"
-          type="text"
-          class="form-control form-control-sm"
-          placeholder="Введите значение"
-          @input="updateSearchParams"
-        />
+          <!-- Тип фильтра -->
+          <select v-model="condition.scenarioPrefix" class="form-select form-select-sm" @change="updateSearchParams">
+            <option v-for="scenario in scenarios" :key="scenario.prefix" :value="scenario.prefix">{{
+              scenario.description
+            }}</option>
+          </select>
 
-        <!-- Удалить условие -->
-        <button
-          v-if="index > 0"
-          class="btn btn-danger btn-sm"
-          @click="removeCondition(index)"
-        >
-          <i class="bi bi-x-square"></i>
+          <!-- Значение фильтра -->
+          <input v-model="condition.value" type="text" class="form-control form-control-sm"
+            placeholder="Введите значение" @input="updateSearchParams" />
+
+          <!-- Удалить условие -->
+          <button v-if="index !== 0" type="button" class="btn btn-danger btn-sm" @click="removeCondition(index)">
+            <i class="bi bi-x-square"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Кнопки -->
+      <div class="actions d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="addCondition">
+          Добавить условие <i class="bi bi-plus-square"></i>
+        </button>
+        <button type="submit" class="btn btn-success btn-sm">
+          Поиск <i class="bi bi-search"></i>
         </button>
       </div>
-    </div>
-
-    <!-- Кнопки -->
-    <div class="actions d-flex justify-content-between">
-      <button class="btn btn-outline-primary btn-sm" @click="addCondition">
-        Добавить условие <i class="bi bi-plus-square"></i>
-      </button>
-      <button class="btn btn-success btn-sm" @click="search">
-        Поиск <i class="bi bi-search"></i>
-      </button>
-    </div>
+    </form>
 
     <!-- Результаты поиска -->
     <div v-if="loading" class="mt-3">Загрузка...</div>
@@ -61,7 +56,7 @@
       <h3>Результаты поиска</h3>
       <ul v-if="results.length" class="list-group">
         <li v-for="book in results" :key="book.id" class="list-group-item">
-          <strong>{{ book.title }}</strong> — {{ book.author }}
+          <strong>{{ book.description }}</strong> ({{ book.year }})
         </li>
       </ul>
       <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
@@ -69,85 +64,74 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { nextTick, onBeforeMount, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { searchBooks } from "@/api/search.js";
+import { searchBooks } from "@/api/search";
+import { scenariosList } from "@/api/scenarios";
+import type { Book, Library, Scenario } from "@/api/types";
+import { librariesList } from "@/api/libraries";
 
 // Состояния
 const router = useRouter();
-const route = useRoute();
 
-const filters = ["Заглавие/Название", "Автор", "Ключевые слова", "УДК", "ББК", 
-    "Инв.N, Штрих-код", "Заглавие - журналы", "Вид/Тип документа", "Характер документа", 
-    "Коллектив/Мероприятие", "Издающая организация", "Место издания", "Год издания", "Предметные рубрики", 
-    "Географические рубрики", "Язык", "Персоналия", "Партия книг (N записи КСУ)", "Партия книг (N Акта ИУ)", 
-    "Инв.N, утерянные", "Номер партии книг выбытия", "Списанные:Инв./ШКод/Шифр выпуска журнала", "ISBN/ISSN",
-    "Шифр документа", "Заглавие - серии", "Целевое назначение", "Физический носитель информации", 
-    "Индекс для СУ", "Диссертация - Код специальности", "Заглавие - Ист.статьи", "Страна издания", 
-    "Журнал за ... (год)", "Другая классификация", "Раздел знаний", "Тематический рубрикатор", 
-    "Автор-сотрудник", "Место работы автора/редактора", "Автограф", 
-    "Наименование коллекции", "Держатель документа", "Редкие книги", "Музыкальные: жанры и средства", 
-    "Нотный инципит", "Цитируемость", "Дата ввода", "Дата поступления экземпляра", "Место хранения экз-ра", 
-    "Канал поступления экз-ра", "Инв.N,сортированные", "Инв.N списанные,сортированные", "Технология", "Периодика, подлежащая списанию",
-    "Период подписки периодики", "Учебная дисциплина", "Электронный ресурс", "Гриф учебной литературы", "Номер карточки комплектования",
-    "Учебный фонд", "Фонд редких книг", "Коллекция", "Библиографическая база", "Раздел указателя", "Статус экземпляра", "Выставка",
-    "Штрих-код экземпляра", "RFID экземпляра", "Количество экземпляров", "Номер КСУ", "Номер акта", "Вид документа", "ПНР", 
-    "ЭБС", "Подразделение/филиал", "Договор, ФИО", "Договор, доступ", "Договор, номер", "Проверка фонда", "Уровень записи", 
-    "Подписка", "Все префиксы", 
-];
-const andOrFilters = ["И", "ИЛИ"];
-const conditions = ref([
+const scenarios = ref<Scenario[]>([]);
+const libraries = ref<Library[]>([]);
+
+const defaultScenario = "T=";
+
+const library = ref<number>();
+const conditions = ref<{
+  scenarioPrefix: string,
+  operator: "+" | "*",
+  value: string
+}[]>([
   {
-    filterType: "Заглавие/Название",
-    filterValue: "",
-    andOrOperator: null,
-  },
+    scenarioPrefix: defaultScenario,
+    operator: "*",
+    value: ""
+  }
 ]);
 
-const results = ref([]);
+const results = ref<Book[]>([]);
 const loading = ref(false);
 
 // Функции для управления фильтрами
 function addCondition() {
   conditions.value.push({
-    filterType: "Заглавие/Название",
-    filterValue: "",
-    andOrOperator: "И",
+    scenarioPrefix: defaultScenario,
+    operator: "*",
+    value: ""
   });
 }
 
-function removeCondition(index) {
+function removeCondition(index: number) {
   conditions.value.splice(index, 1);
+  nextTick(updateSearchParams);
+}
+
+function buildQuery(): string {
+  const query = conditions.value
+    .filter((condition) => condition.value !== "")
+    .map((condition) => `${condition.operator}(${condition.scenarioPrefix}${condition.value}$)`).reduce((a, b) => a + b, "");
+  return query.substring(1);
 }
 
 function updateSearchParams() {
-  const searchParams = {};
-  conditions.value.forEach((condition, index) => {
-    if (condition.filterValue) {
-      searchParams[`filter${index}Type`] = condition.filterType;
-      searchParams[`filter${index}Value`] = condition.filterValue;
-      if (condition.andOrOperator) {
-        searchParams[`filter${index}Operator`] = condition.andOrOperator;
-      }
+  router.push({
+    path: "/", query: {
+      query: buildQuery(),
+      library: library.value
     }
   });
-  router.push({ path: "/", query: searchParams });
 }
 
 // Поиск книг
 async function search() {
   loading.value = true;
   try {
-    const query = conditions.value
-      .filter((condition) => condition.filterValue)
-      .map((condition) => ({
-        type: condition.filterType,
-        value: condition.filterValue,
-        operator: condition.andOrOperator,
-      }));
-    const response = await searchBooks(query);
-    results.value = response.data;
+    const query = buildQuery();
+    results.value = await searchBooks(query, library.value);
   } catch (error) {
     console.error("Ошибка поиска:", error);
     results.value = [];
@@ -155,4 +139,39 @@ async function search() {
     loading.value = false;
   }
 }
+
+onBeforeMount(async () => {
+  const queryParam = router.currentRoute.value.query["query"];
+  const libraryParam = router.currentRoute.value.query["library"];
+
+  if (typeof libraryParam === "string") {
+    const id = parseInt(libraryParam);
+    if (!isNaN(id)) {
+      library.value = id;
+    }
+  }
+
+  if (typeof queryParam === "string") {
+    conditions.value = queryParam.split(")").map((item) => item.replace("(", "").replace("$", "")).filter((item) => item !== "").map((item) => {
+      let operator = item.charAt(0);
+      if (operator == "*" || operator == "+") {
+        item = item.substring(1);
+      } else {
+        operator = "*";
+      }
+
+      const [prefix, value] = item.split("=");
+
+      return {
+        operator: operator as "*" | "+",
+        scenarioPrefix: `${prefix}=`,
+        value: value
+      }
+    });
+
+    search();
+  }
+
+  [scenarios.value, libraries.value] = await Promise.all([scenariosList(), librariesList()]);
+});
 </script>

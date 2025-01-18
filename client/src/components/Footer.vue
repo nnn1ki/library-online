@@ -12,7 +12,8 @@
           <nav>
             <ul class="footer-menu list-unstyled d-flex justify-content-center justify-content-md-end mb-0">
               <li class="ms-3"><a href="/privacy-policy" class="text-white text-decoration-none">Privacy Policy</a></li>
-              <li class="ms-3"><a href="/terms-of-service" class="text-white text-decoration-none">Terms of Service</a></li>
+              <li class="ms-3"><a href="/terms-of-service" class="text-white text-decoration-none">Terms of Service</a>
+              </li>
               <li class="ms-3"><a href="/contact" class="text-white text-decoration-none">Contact</a></li>
             </ul>
           </nav>
@@ -27,10 +28,7 @@
   </footer>
 </template>
 
-<script>
-export default {
-  name: 'Footer',
-}
+<script setup lang="ts">
 </script>
 
 <style scoped>
