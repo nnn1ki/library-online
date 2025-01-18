@@ -19,7 +19,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 
 from library_service.views.catalog import *
 from library_service.views.basket import *
@@ -27,10 +29,14 @@ from library_service.views.basket import *
 router = DefaultRouter()
 router.register("book", BookViewset, basename="book")
 router.register("library", LibraryViewset, basename="library")
+router.register("scenario", ScenarioViewset, basename="scenario")
 router.register("basket", BasketViewset, basename="basket")
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/auth/login/', TokenObtainPairView.as_view()),
+    path('api/auth/refresh/', TokenRefreshView.as_view()),
+    path('api/auth/logout/', TokenBlacklistView.as_view()),
     path("api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

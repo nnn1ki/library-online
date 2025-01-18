@@ -27,14 +27,14 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(History)
 class HistoryAdmin(admin.ModelAdmin):
-    list_display = ["id", "order", "status", "confirmed_at", "staff_id"]
-    list_filter = ["status", "confirmed_at"]
+    list_display = ["id", "order", "status", "date", "staff_id"]
+    list_filter = ["status", "date"]
 
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ["id", "order", "exemplar_id"]
-    list_filter = ["order"]
+    list_display = ["id", "order", "exemplar_id", "returned", "handed"]
+    list_filter = ["order", "returned", "handed"]
 
 @admin.register(Library)
 class LibraryAdmin(admin.ModelAdmin):

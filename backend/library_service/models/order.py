@@ -13,7 +13,7 @@ class Order(models.Model):
 class History(models.Model):
     description = models.TextField()
     status = models.CharField(max_length=255)
-    confirmed_at = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     staff_id = models.ForeignKey(User, on_delete=models.CASCADE)
     class Meta:
@@ -26,6 +26,8 @@ class History(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     exemplar_id = models.CharField(max_length=255)
+    handed = models.BooleanField(default=False)
+    returned = models.BooleanField(default=False)
     
     class Meta:
         verbose_name = "Элемент заказа"

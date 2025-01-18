@@ -20,6 +20,12 @@ class IrbisBookExemplar:
 
 @dataclass_json
 @dataclass
+class IrbisBookSee:
+    url: str
+    description: str | None
+
+@dataclass_json
+@dataclass
 class IrbisBook:
     db: str | None
     selected: bool
@@ -27,24 +33,38 @@ class IrbisBook:
     id: str | None
     order: bool
     arrangement: str | None
+    brief: str | None
     description: str | None
     agents: list[str] | None
     additional: str | None
     cover: str | None
     links: list[IrbisBookLink] | None
     exemplars: list[IrbisBookExemplar]
-    see: list[str] | None
+    see: list[IrbisBookSee] | None
     cards: list[str] | None
     year: int
+    created: str | None
     electronic: bool
+    language: str | None
+    usage: int
+    popularity: int
+    stamp: str | None
+    section: str | None
 
 def irbis_search(database: str, expression: str) -> list[IrbisBook]:
     payload = {
         "database": database,
-        "expression": expression
+        "expression": expression,
+        "format": "@opac"
     }
 
     r = requests.post(f"{settings.IRBIS_HOSTNAME}/search", json=payload)
     r.raise_for_status()
     
     return IrbisBook.schema().load(r.json(), many=True)
+
+def irbis_book_retrieve(database: str, mfn: int) -> IrbisBook:
+    r = requests.get(f"{settings.IRBIS_HOSTNAME}/books/by/mfn/{database}/{mfn}")
+    r.raise_for_status()
+
+    return IrbisBook.schema().load(r.json())
