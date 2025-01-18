@@ -25,7 +25,7 @@
           <select v-model="condition.scenarioPrefix" class="form-select form-select-sm" @change="updateSearchParams">
             <option v-for="scenario in scenarios" :key="scenario.prefix" :value="scenario.prefix">{{
               scenario.description
-              }}</option>
+            }}</option>
           </select>
 
           <!-- Значение фильтра -->
@@ -144,8 +144,14 @@ onBeforeMount(async () => {
   const queryParam = router.currentRoute.value.query["query"];
   const libraryParam = router.currentRoute.value.query["library"];
 
+  if (typeof libraryParam === "string") {
+    const id = parseInt(libraryParam);
+    if (!isNaN(id)) {
+      library.value = id;
+    }
+  }
+
   if (typeof queryParam === "string") {
-    const splitted = queryParam.split(")");
     conditions.value = queryParam.split(")").map((item) => item.replace("(", "").replace("$", "")).filter((item) => item !== "").map((item) => {
       let operator = item.charAt(0);
       if (operator == "*" || operator == "+") {
@@ -162,13 +168,8 @@ onBeforeMount(async () => {
         value: value
       }
     });
-  }
 
-  if (typeof libraryParam === "string") {
-    const id = parseInt(libraryParam);
-    if (!isNaN(id)) {
-      library.value = id;
-    }
+    search();
   }
 
   [scenarios.value, libraries.value] = await Promise.all([scenariosList(), librariesList()]);

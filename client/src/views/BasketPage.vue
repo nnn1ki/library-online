@@ -60,7 +60,7 @@ const bookList = computed(() => {
 });
 
 // Функция для сохранения книг в текстовый файл
-const saveBooks = () => {
+function saveBooks() {
   // Формируем текстовое содержимое
   const content = selectedBooks.value
     .map((bookId) => books.value.find((item) => item.id == bookId))
@@ -135,10 +135,10 @@ const saveBooks = () => {
         <div class="summary-box">
           <h5 class="summary-title">Итого: {{ selectedBooks.length }} книг</h5>
           <div class="btn-group-vertical w-100">
-            <button class="btn btn-success" :disabled="books.length !== 0 || selectedBooks.length === 0">
+            <button class="btn btn-success" :disabled="books.length === 0 || selectedBooks.length === 0">
               Оформить заказ
             </button>
-            <button class="btn btn-warning" :disabled="books.length !== 0 || selectedBooks.length === 0"
+            <button class="btn btn-warning" :disabled="books.length === 0 || selectedBooks.length === 0"
               data-bs-toggle="modal" data-bs-target="#confirmationModal">
               Сохранить в файл
             </button>
