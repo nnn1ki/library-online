@@ -1,8 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router"; // Для работы с параметрами маршрута
 import SearchFilter from "../components/SearchFilter.vue"; // Импорт компонента фильтра
 import Card from "../components/Card.vue"; // Импорт компонента карточки книги
+import { useBasketStore } from "@/stores/basket";
+import type { Book } from "@/api/types";
+
+const basketStore = useBasketStore();
 
 // Массив всех книг
 const books = ref([
@@ -29,12 +33,8 @@ const searchQuery = ref({
 const basket = ref([]);
 
 // Функция для добавления книги в корзину
-function addToBasket(book) {
-  const existingBook = basket.value.find(item => item.title === book.title);
-  if (existingBook) return; // Если книга уже в корзине, ничего не делать
-
-  basket.value.push({ ...book }); // Добавляем книгу в корзину
-  localStorage.setItem('basket', JSON.stringify(basket.value)); // Сохраняем корзину в localStorage
+function addToBasket(book: Book) {
+  basketStore.addBook(book);
 }
 
 // Функция для фильтрации книг на основе значений из формы поиска

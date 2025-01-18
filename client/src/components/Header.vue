@@ -35,16 +35,12 @@
   </header>
 </template>
 
-<script>
-export default {
-  name: 'Header',
-  props: {
-    logoSrc: {
-      type: String,
-      default: '../../public/ntb-logo.png',
-    },
-  },
-}
+<script setup lang="ts">
+const props = withDefaults(defineProps<{
+  logoSrc?: string
+}>(), {
+  logoSrc: "../../public/ntb-logo.png"
+});
 </script>
 
 <style scoped>
@@ -64,7 +60,8 @@ export default {
 }
 
 .nav .nav-link:hover {
-  color: #00bcd4; /* Цвет активной ссылки */
+  color: #00bcd4;
+  /* Цвет активной ссылки */
 }
 
 .header-right {

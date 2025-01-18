@@ -1,11 +1,9 @@
 import axios from "axios";
 import type { Library } from "./types";
 
-const options = {method: 'GET', url: '/api/library/'};
-
 export async function librariesList(): Promise<Library[]> {
     try{
-      const { data } = await axios.request(options);
+      const { data } = await axios.get("/api/library/");
       console.log("/api/library/", data);
       return data;
     }catch (error) {
