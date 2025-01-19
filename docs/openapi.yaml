@@ -98,7 +98,7 @@ paths:
     post:
       tags:
         - basket
-      summary: Добавление книги в корзину
+      summary: Добавление книг в корзину
       requestBody:
         required: true
         content:
