@@ -106,9 +106,7 @@ paths:
             schema:
               type: array
               items:
-                properties:
-                  id:
-                    $ref: "#/components/schemas/BookId"
+                $ref: "#/components/schemas/BookId"
       responses:
         '200':
           description: OK

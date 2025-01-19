@@ -42,7 +42,7 @@ class BasketListSerializer(serializers.Serializer):
         }
 
         for book in books:
-            basket_item_validated_data["book_id"] = book.id
+            basket_item_validated_data["book_id"] = book
             self.basket_item.create(basket_item_validated_data)
 
     def create(self):
