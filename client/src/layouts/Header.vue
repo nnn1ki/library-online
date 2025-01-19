@@ -3,7 +3,7 @@
     <div class="container d-flex justify-content-between align-items-center">
       <!-- Логотип -->
       <div class="header-left d-flex align-items-center">
-        <img :src="logoSrc" alt="Logo" class="logo me-3" />
+        <img :src="Logo" alt="Logo" class="logo me-3" />
 
         <!-- Навигационное меню -->
         <nav>
@@ -36,11 +36,7 @@
 </template>
 
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
-  logoSrc?: string
-}>(), {
-  logoSrc: "../../public/ntb-logo.png"
-});
+import Logo from "@/assets/ntb-logo.png";
 </script>
 
 <style scoped>

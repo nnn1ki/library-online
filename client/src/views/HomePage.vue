@@ -1,17 +1,3 @@
-<script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
-import SearchFilter from "@/components/SearchFilter.vue";
-import BookCard from "@/components/BookCard.vue";
-import type { Book } from "@/api/types";
-import { announcesList } from "@/api/announces";
-
-const announces = ref<Book[]>([]);
-
-onMounted(async () => {
-  announces.value = await announcesList();
-});
-</script>
-
 <template>
   <div class="container mt-4">
     <SearchFilter />
@@ -23,6 +9,20 @@ onMounted(async () => {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref, watch, onMounted } from "vue";
+import SearchFilter from "@/layouts/BooksSearch.vue";
+import BookCard from "@/components/BookCard.vue";
+import type { Book } from "@/api/types";
+import { announcesList } from "@/api/announces";
+
+const announces = ref<Book[]>([]);
+
+onMounted(async () => {
+  announces.value = await announcesList();
+});
+</script>
 
 <style scoped>
 /* Убираем паддинг у контейнера */

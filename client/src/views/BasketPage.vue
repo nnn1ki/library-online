@@ -1,92 +1,3 @@
-<script setup lang="ts">
-import type { Book } from "@/api/types";
-import { useBasketStore } from "@/stores/basket";
-import { computed, ref, onMounted } from "vue";
-
-const basketStore = useBasketStore();
-
-const books = ref<Book[]>([]);
-const selectedBooks = ref<string[]>([]);
-
-function toggleBookSelection(bookId: string) {
-  const index = selectedBooks.value.indexOf(bookId);
-  if (index === -1) {
-    selectedBooks.value.push(bookId);
-  } else {
-    selectedBooks.value.splice(index, 1);
-  }
-};
-
-function toggleSelectAll() {
-  if (allSelected.value) {
-    selectedBooks.value = [];
-  } else {
-    selectedBooks.value = books.value.map((b) => b.id);
-  }
-};
-
-// Вычисляемое свойство для проверки, выбраны ли все книги
-const allSelected = computed(() => {
-  return (
-    books.value.length > 0 && selectedBooks.value.length === books.value.length
-  );
-});
-
-async function removeBook(book: Book) {
-  await basketStore.removeBook(book);
-  await updateBasket();
-};
-
-async function clearBasket() {
-  await basketStore.clearBooks();
-  await updateBasket();
-};
-
-async function updateBasket() {
-  books.value = await basketStore.loadBooks();
-  selectedBooks.value = selectedBooks.value.filter((item) => books.value.filter((b) => b.id === item).length !== 0);
-}
-
-onMounted(async () => {
-  await updateBasket();
-});
-
-// Расчитываемое свойство для книг в модальном окне
-const bookList = computed(() => {
-  return selectedBooks.value
-    .map((bookId) => books.value.find((item) => item.id == bookId))
-    .map((book, index) => `${index + 1}. ${book?.description} (${book?.year})`)
-    .join("<br>");
-});
-
-// Функция для сохранения книг в текстовый файл
-function saveBooks() {
-  // Формируем текстовое содержимое
-  const content = selectedBooks.value
-    .map((bookId) => books.value.find((item) => item.id == bookId))
-    .map((book, index) => `${index + 1}. ${book?.description} (${book?.year})`)
-    .join("\n"); // Используем \n для переноса строк
-
-  // Создаём имя файла по умолчанию
-  const today = new Date();
-  const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.txt`;
-
-  // Запрашиваем имя файла у пользователя
-  const fileName = prompt("Введите имя файла:", defaultFileName) || defaultFileName;
-
-  const blob = new Blob([content], { type: 'text/plain' }); // Создаём Blob с типом текст
-  const url = URL.createObjectURL(blob); // Создаём URL для Blob
-
-  const a = document.createElement('a'); // Создаём элемент <a>
-  a.href = url; // Устанавливаем href как URL Blob
-  a.download = fileName; // Устанавливаем имя файла для скачивания
-  document.body.appendChild(a); // Добавляем элемент в DOM
-  a.click(); // Эмулируем клик для скачивания
-  document.body.removeChild(a); // Удаляем элемент из DOM
-  URL.revokeObjectURL(url); // Освобождаем память
-};
-</script>
-
 <template>
   <div class="container-fluid">
     <div class="row">
@@ -110,23 +21,24 @@ function saveBooks() {
                 @change="toggleBookSelection(book.id)" aria-label="Выбрать книгу" />
             </div>
             <div class="col-auto">
-              <img :src="book.cover || 'https://via.placeholder.com/150'" :alt="book.description"
-                class="book-image img-fluid" />
+              <img :src="book.cover ? 'https://library.istu.edu/opac/' + book.cover : 'https://via.placeholder.com/150'"
+                :alt="book.description" class="book-image img-fluid" />
             </div>
             <div class="col">
               <div class="book-info">
                 <h6 class="book-title">{{ book.description }}</h6>
                 <p class="book-author">{{ book.year }}</p>
                 <div class="btn-group">
-                  <button class="btn btn-secondary" @click="removeBook(book)">
+                  <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
                     Удалить
                   </button>
-                  <button class="btn btn-info">Подробнее</button>
+                  <button class="btn btn-info" @click="modalBook = book; isModalVisible = true">Подробнее</button>
                   <button class="btn btn-primary">Читать онлайн</button>
                 </div>
               </div>
             </div>
           </div>
+          <AboutBookDialog v-if="modalBook == book" :book="book" v-model="isModalVisible" />
         </div>
       </div>
 
@@ -142,7 +54,7 @@ function saveBooks() {
               data-bs-toggle="modal" data-bs-target="#confirmationModal">
               Сохранить в файл
             </button>
-            <button class="btn btn-danger" :disabled="books.length === 0" @click="clearBasket">
+            <button class="btn btn-danger" :disabled="books.length === 0" @click="basketStore.clearBooks()">
               Очистить корзину
             </button>
           </div>
@@ -181,6 +93,85 @@ function saveBooks() {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { Book } from "@/api/types";
+import AboutBookDialog from "@/components/AboutBookDialog.vue";
+import { useBasketStore } from "@/stores/basket";
+import { storeToRefs } from "pinia";
+import { computed, ref, onMounted, watch } from "vue";
+
+const basketStore = useBasketStore();
+
+const { books } = storeToRefs(basketStore);
+const selectedBooks = ref<string[]>([]);
+
+const isModalVisible = ref(false);
+const modalBook = ref<Book>();
+
+function toggleBookSelection(bookId: string) {
+  const index = selectedBooks.value.indexOf(bookId);
+  if (index === -1) {
+    selectedBooks.value.push(bookId);
+  } else {
+    selectedBooks.value.splice(index, 1);
+  }
+};
+
+function toggleSelectAll() {
+  if (allSelected.value) {
+    selectedBooks.value = [];
+  } else {
+    selectedBooks.value = books.value.map((b) => b.id);
+  }
+};
+
+// Вычисляемое свойство для проверки, выбраны ли все книги
+const allSelected = computed(() => {
+  return (
+    books.value.length > 0 && selectedBooks.value.length === books.value.length
+  );
+});
+
+watch(books, () => {
+  selectedBooks.value = selectedBooks.value.filter((item) => books.value.filter((b) => b.id === item).length !== 0);
+});
+
+// Расчитываемое свойство для книг в модальном окне
+const bookList = computed(() => {
+  return selectedBooks.value
+    .map((bookId) => books.value.find((item) => item.id == bookId))
+    .map((book, index) => `${index + 1}. ${book?.description} (${book?.year})`)
+    .join("<br>");
+});
+
+// Функция для сохранения книг в текстовый файл
+function saveBooks() {
+  // Формируем текстовое содержимое
+  const content = selectedBooks.value
+    .map((bookId) => books.value.find((item) => item.id == bookId))
+    .map((book, index) => `${index + 1}. ${book?.description} (${book?.year})`)
+    .join("\n"); // Используем \n для переноса строк
+
+  // Создаём имя файла по умолчанию
+  const today = new Date();
+  const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.txt`;
+
+  // Запрашиваем имя файла у пользователя
+  const fileName = prompt("Введите имя файла:", defaultFileName) || defaultFileName;
+
+  const blob = new Blob([content], { type: 'text/plain' }); // Создаём Blob с типом текст
+  const url = URL.createObjectURL(blob); // Создаём URL для Blob
+
+  const a = document.createElement('a'); // Создаём элемент <a>
+  a.href = url; // Устанавливаем href как URL Blob
+  a.download = fileName; // Устанавливаем имя файла для скачивания
+  document.body.appendChild(a); // Добавляем элемент в DOM
+  a.click(); // Эмулируем клик для скачивания
+  document.body.removeChild(a); // Удаляем элемент из DOM
+  URL.revokeObjectURL(url); // Освобождаем память
+};
+</script>
 
 <style scoped>
 /* Основной контейнер для карточек */

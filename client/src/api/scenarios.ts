@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Scenario } from "./types";
+import type { Scenario } from "@/api/types";
 
 export async function scenariosList(): Promise<Scenario[]> {
     try{
