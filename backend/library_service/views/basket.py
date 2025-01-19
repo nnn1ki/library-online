@@ -12,6 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from library_service.irbis.book import book_retrieve
 
+from rest_framework.exceptions import APIException
+
 class BasketViewset(
     mixins.ListModelMixin, 
     mixins.CreateModelMixin,
@@ -19,23 +21,40 @@ class BasketViewset(
     mixins.DestroyModelMixin,
     GenericViewSet
 ):
-    queryset = BasketItem.objects.all()
-    serializer_class = BasketItemSerializer
+    serializer_class = BasketListSerializer
+    query_data: list[int] | None = None
 
     @action(methods=["GET"], detail = False,  permission_classes = [IsAuthenticated])
     def get_queryset(self):
-        user_id = self.request.user.id
-        return user_id
+        user = self.request.user
+
+        book_list = []
+
+        if (user.is_authenticated):
+            self.query_data = BasketListSerializer.get_basket(self)
+
+            if (self.query_data.count() > 0):
+                for book_id in self.query_data:
+                    book = book_retrieve(book_id)
+                    book_list.append(book)
+
+        else:
+            raise APIException("Unauthorized", code=401)
+
+        return book_list
     
-    
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-    
+    @action(methods=["POST"], detail = False,  permission_classes = [IsAuthenticated])
+    def add_books(self):
+        user = self.request.user
+
+        if (user.is_authenticated):
+            BasketListSerializer.add_books(self.request.data)
+        else:
+            raise APIException("Unauthorized", code=401)    
     
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
     
     @action(methods=["DELETE"], url_path="<book_id>", detail = False,  permission_classes = [IsAuthenticated])
     def delete_book(self, request, *args, **kwargs):
-        #TODO
         return True

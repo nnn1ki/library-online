@@ -23,10 +23,39 @@ class BasketItemSerializer(serializers.ModelSerializer):
     
 class BasketListSerializer(serializers.Serializer):
     basket = BasketSerializer
-    items_list = BasketItemSerializer(many = True)
+    basket_item = BasketItemSerializer
 
-    def create(self, validated_data):
-        return super().create(validated_data)
+    def get_basket(self):
+        basket_id = Basket.objects.filter(user = self.context["request"].user).values_list('id', flat = True).first()
+        books_list = BasketItem.objects.filter(basket = basket_id).values_list('book_id', flat = True)
+        return books_list
+    
+    def add_books(self, books):
+        basket = Basket.objects.filter(user = self.context["request"].user).first()
+
+        if (basket is None):
+            basket = self.create()
+
+        basket_item_validated_data = {
+            "basket": basket,
+            "book_id": 0
+        }
+
+        for book in books:
+            basket_item_validated_data["book_id"] = book.id
+            self.basket_item.create(basket_item_validated_data)
+
+    def create(self):
+        basket_validated_data = {
+            "user": self.context["request"].user
+        }
+
+        created_basket_data = self.basket.create(basket_validated_data)
+
+        return created_basket_data
+    
+    def delete_book(self, book):
+        return True
     
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)

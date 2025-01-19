@@ -104,10 +104,11 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                id:
-                  $ref: "#/components/schemas/BookId"
+              type: array
+              items:
+                properties:
+                  id:
+                    $ref: "#/components/schemas/BookId"
       responses:
         '200':
           description: OK
