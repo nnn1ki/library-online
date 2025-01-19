@@ -56,7 +56,7 @@
       <h3>Результаты поиска</h3>
       <ul v-if="results.length" class="list-group">
         <li v-for="book in results" :key="book.id" class="list-group-item">
-          <strong>{{ book.description }}</strong> ({{ book.year }})
+          <BookCard :book="book" />
         </li>
       </ul>
       <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
@@ -71,6 +71,7 @@ import { searchBooks } from "@/api/search";
 import { scenariosList } from "@/api/scenarios";
 import type { Book, Library, Scenario } from "@/api/types";
 import { librariesList } from "@/api/libraries";
+import BookCard from "@/components/BookCard.vue";
 
 // Состояния
 const router = useRouter();
