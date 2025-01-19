@@ -3,7 +3,7 @@
     <div class="container d-flex justify-content-between align-items-center">
       <!-- Логотип -->
       <div class="header-left d-flex align-items-center">
-        <img :src="logoSrc" alt="Logo" class="logo me-3" />
+        <img :src="Logo" alt="Logo" class="logo me-3" />
 
         <!-- Навигационное меню -->
         <nav>
@@ -35,16 +35,8 @@
   </header>
 </template>
 
-<script>
-export default {
-  name: 'Header',
-  props: {
-    logoSrc: {
-      type: String,
-      default: '../../public/ntb-logo.png',
-    },
-  },
-}
+<script setup lang="ts">
+import Logo from "@/assets/ntb-logo.png";
 </script>
 
 <style scoped>
@@ -64,7 +56,8 @@ export default {
 }
 
 .nav .nav-link:hover {
-  color: #00bcd4; /* Цвет активной ссылки */
+  color: #00bcd4;
+  /* Цвет активной ссылки */
 }
 
 .header-right {

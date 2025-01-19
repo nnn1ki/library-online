@@ -1,37 +1,128 @@
-<script setup>
-import { computed, ref, onMounted } from "vue";
+<template>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Картинки книг и их описание -->
+      <div class="col-9">
+        <div v-if="books.length !== 0" class="row align-items-center select-all">
+          <div class="col-auto">
+            <input class="form-check-input" type="checkbox" :checked="allSelected" @change="toggleSelectAll"
+              aria-label="Выбрать все книги" />
+          </div>
+          <div class="col">
+            <button class="btn btn-primary" @click="toggleSelectAll">
+              {{ allSelected ? "Снять выделение" : "Выбрать все" }}
+            </button>
+          </div>
+        </div>
+        <div v-for="book in books" :key="book.description" class="book-card">
+          <div class="row align-items-center">
+            <div class="col-auto">
+              <input class="form-check-input" type="checkbox" :value="book" :checked="selectedBooks.includes(book.id)"
+                @change="toggleBookSelection(book.id)" aria-label="Выбрать книгу" />
+            </div>
+            <div class="col-auto">
+              <img :src="book.cover ? 'https://library.istu.edu/opac/' + book.cover : 'https://via.placeholder.com/150'"
+                :alt="book.description" class="book-image img-fluid" />
+            </div>
+            <div class="col">
+              <div class="book-info">
+                <h6 class="book-title">{{ book.description }}</h6>
+                <p class="book-author">{{ book.year }}</p>
+                <div class="btn-group">
+                  <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
+                    Удалить
+                  </button>
+                  <button class="btn btn-info" @click="modalBook = book; isModalVisible = true">Подробнее</button>
+                  <button class="btn btn-primary">Читать онлайн</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <AboutBookDialog v-if="modalBook == book" :book="book" v-model="isModalVisible" />
+        </div>
+      </div>
 
-const books = ref([]);
-const selectedBooks = ref([]);
+      <!-- Блок с итогами и действиями -->
+      <div class="col-3">
+        <div class="summary-box">
+          <h5 class="summary-title">Итого: {{ selectedBooks.length }} книг</h5>
+          <div class="btn-group-vertical w-100">
+            <button class="btn btn-success" :disabled="books.length === 0 || selectedBooks.length === 0">
+              Оформить заказ
+            </button>
+            <button class="btn btn-warning" :disabled="books.length === 0 || selectedBooks.length === 0"
+              data-bs-toggle="modal" data-bs-target="#confirmationModal">
+              Сохранить в файл
+            </button>
+            <button class="btn btn-danger" :disabled="books.length === 0" @click="basketStore.clearBooks()">
+              Очистить корзину
+            </button>
+          </div>
+        </div>
+      </div>
 
-// Вычисляемое свойство для проверки, пуста ли корзина
-const isBasketEmpty = computed(() => {
-  return books.value.length === 0; // Возвращает true, если корзина пуста
-});
+      <!-- Модальное окно для подтверждения сохранения -->
+      <div>
+        <div class="modal fade" id="confirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+          aria-labelledby="confirmationModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">
+                  Подтверждение сохранения
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+              </div>
+              <div class="modal-body">
+                <p>Вы хотите распечатать книги:</p>
+                <p v-html="bookList"></p>
+                <p>Всего книг: {{ selectedBooks.length }}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                  Отмена
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveBooks">
+                  Сохранить
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
-// Функция для загрузки выбранных книг из localStorage
-const loadBasket = () => {
-  const basket = localStorage.getItem("basket");
-  if (basket) {
-    books.value = JSON.parse(basket);
-  }
-};
+<script setup lang="ts">
+import type { Book } from "@/api/types";
+import AboutBookDialog from "@/components/AboutBookDialog.vue";
+import { useBasketStore } from "@/stores/basket";
+import { storeToRefs } from "pinia";
+import { computed, ref, onMounted, watch } from "vue";
 
-const toggleBookSelection = (book) => {
-  const index = selectedBooks.value.indexOf(book);
+const basketStore = useBasketStore();
+
+const { books } = storeToRefs(basketStore);
+const selectedBooks = ref<string[]>([]);
+
+const isModalVisible = ref(false);
+const modalBook = ref<Book>();
+
+function toggleBookSelection(bookId: string) {
+  const index = selectedBooks.value.indexOf(bookId);
   if (index === -1) {
-    selectedBooks.value.push(book);
+    selectedBooks.value.push(bookId);
   } else {
     selectedBooks.value.splice(index, 1);
   }
 };
 
-// Функция для выбора/снятия выбора всех книг
-const toggleSelectAll = () => {
+function toggleSelectAll() {
   if (allSelected.value) {
     selectedBooks.value = [];
   } else {
-    selectedBooks.value = [...books.value];
+    selectedBooks.value = books.value.map((b) => b.id);
   }
 };
 
@@ -42,44 +133,24 @@ const allSelected = computed(() => {
   );
 });
 
-const selectedCount = computed(() => selectedBooks.value.length);
-
-const removeBook = (book) => {
-  const index = books.value.indexOf(book);
-  if (index !== -1) {
-    books.value.splice(index, 1); // Удалить книгу из списка книг
-  }
-  const selectedIndex = selectedBooks.value.indexOf(book);
-  if (selectedIndex !== -1) {
-    selectedBooks.value.splice(selectedIndex, 1); // Удалить книгу из выбранных
-  }
-  // Обновление localStorage после удаления книги
-  localStorage.setItem("basket", JSON.stringify(books.value)); // Сохраняем оставшиеся книги
-};
-
-const clearBasket = () => {
-  books.value = [];
-  selectedBooks.value = [];
-  localStorage.removeItem("basket");
-};
-
-// Загрузка выбранных книг при монтировании компонента
-onMounted(() => {
-  loadBasket();
+watch(books, () => {
+  selectedBooks.value = selectedBooks.value.filter((item) => books.value.filter((b) => b.id === item).length !== 0);
 });
 
 // Расчитываемое свойство для книг в модальном окне
 const bookList = computed(() => {
   return selectedBooks.value
-    .map((book, index) => `${index + 1}. ${book.title} — ${book.author}`)
+    .map((bookId) => books.value.find((item) => item.id == bookId))
+    .map((book, index) => `${index + 1}. ${book?.description} (${book?.year})`)
     .join("<br>");
 });
 
 // Функция для сохранения книг в текстовый файл
-const saveBooks = () => {
+function saveBooks() {
   // Формируем текстовое содержимое
   const content = selectedBooks.value
-    .map((book, index) => `${index + 1}. ${book.title} — ${book.author}`)
+    .map((bookId) => books.value.find((item) => item.id == bookId))
+    .map((book, index) => `${index + 1}. ${book?.description} (${book?.year})`)
     .join("\n"); // Используем \n для переноса строк
 
   // Создаём имя файла по умолчанию
@@ -101,147 +172,6 @@ const saveBooks = () => {
   URL.revokeObjectURL(url); // Освобождаем память
 };
 </script>
-
-<template>
-  <div class="container-fluid">
-    <div class="row">
-      <!-- Картинки книг и их описание -->
-      <div class="col-9">
-        <div v-if="!isBasketEmpty" class="row align-items-center select-all">
-          <div class="col-auto">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              :checked="allSelected"
-              @change="toggleSelectAll"
-              aria-label="Выбрать все книги"
-            />
-          </div>
-          <div class="col">
-            <button class="btn btn-primary" @click="toggleSelectAll">
-              {{ allSelected ? "Снять выделение" : "Выбрать все" }}
-            </button>
-          </div>
-        </div>
-        <div v-for="book in books" :key="book.title" class="book-card">
-          <div class="row align-items-center">
-            <div class="col-auto">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                :value="book"
-                :checked="selectedBooks.includes(book)"
-                @change="toggleBookSelection(book)"
-                aria-label="Выбрать книгу"
-              />
-            </div>
-            <div class="col-auto">
-              <img
-                :src="book.imageUrl || 'https://via.placeholder.com/150'"
-                :alt="book.title"
-                class="book-image img-fluid"
-              />
-            </div>
-            <div class="col">
-              <div class="book-info">
-                <h6 class="book-title">{{ book.title }}</h6>
-                <p class="book-author">{{ book.author }}</p>
-                <div class="btn-group">
-                  <button class="btn btn-secondary" @click="removeBook(book)">
-                    Удалить
-                  </button>
-                  <button class="btn btn-info">Подробнее</button>
-                  <button class="btn btn-primary">Читать онлайн</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Блок с итогами и действиями -->
-      <div class="col-3">
-        <div class="summary-box">
-          <h5 class="summary-title">Итого: {{ selectedCount }} книг</h5>
-          <div class="btn-group-vertical w-100">
-            <button
-              class="btn btn-success"
-              :disabled="isBasketEmpty || selectedCount === 0"
-            >
-              Оформить заказ
-            </button>
-            <button
-              class="btn btn-warning"
-              :disabled="isBasketEmpty || selectedCount === 0"
-              data-bs-toggle="modal"
-              data-bs-target="#confirmationModal"
-            >
-              Сохранить в файл
-            </button>
-            <button
-              class="btn btn-danger"
-              :disabled="isBasketEmpty"
-              @click="clearBasket"
-            >
-              Очистить корзину
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Модальное окно для подтверждения сохранения -->
-      <div>
-        <div
-          class="modal fade"
-          id="confirmationModal"
-          data-bs-backdrop="static"
-          data-bs-keyboard="false"
-          tabindex="-1"
-          aria-labelledby="confirmationModalLabel"
-          aria-hidden="true"
-        >
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">
-                  Подтверждение сохранения
-                </h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Закрыть"
-                ></button>
-              </div>
-              <div class="modal-body">
-                <p>Вы хотите распечатать книги:</p>
-                <p v-html="bookList"></p>
-                <p>Всего книг: {{ selectedCount }}</p>
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-primary"
-                  data-bs-dismiss="modal"
-                  @click="saveBooks"
-                >
-                  Сохранить
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 /* Основной контейнер для карточек */
