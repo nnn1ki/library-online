@@ -41,9 +41,12 @@ class BasketListSerializer(serializers.Serializer):
             "book_id": 0
         }
 
+        basket_list = self.get_basket()
+
         for book in books:
-            basket_item_validated_data["book_id"] = book
-            self.basket_item.create(basket_item_validated_data)
+            if (book not in basket_list):
+                basket_item_validated_data["book_id"] = book
+                self.basket_item.create(basket_item_validated_data)
 
     def create(self):
         basket_validated_data = {
@@ -53,9 +56,3 @@ class BasketListSerializer(serializers.Serializer):
         created_basket_data = self.basket.create(basket_validated_data)
 
         return created_basket_data
-    
-    def delete_book(self, book):
-        return True
-    
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)

@@ -16,7 +16,6 @@ from rest_framework.exceptions import APIException
 
 class BasketViewset(
     mixins.ListModelMixin, 
-    mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     GenericViewSet
@@ -52,9 +51,33 @@ class BasketViewset(
         else:
             raise APIException("Unauthorized", code=401)    
     
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+    @action(methods=["PUT"], detail = False,  permission_classes = [IsAuthenticated])
+    def update_basket(self):
+        user = self.request.user
+
+        if (user.is_authenticated):
+            basket_list = self.get_queryset()
+            books_to_delete = self.request.data
+
+            for book in basket_list:
+                if (book in books_to_delete):
+                    self.request.data = book.id
+                    BasketItemViewset.destroy(self.request)
+        else:
+            raise APIException("Unauthorized", code=401)    
     
-    @action(methods=["DELETE"], url_path="<book_id>", detail = False,  permission_classes = [IsAuthenticated])
-    def delete_book(self, request, *args, **kwargs):
-        return True
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+
+        if (user.is_authenticated):
+            BasketItemViewset.destroy(request, *args, **kwargs)
+        else:
+            raise APIException("Unauthorized", code=401)    
+    
+class BasketItemViewset(
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet
+):
+    serializer_class = BasketItemSerializer
+    queryset = BasketItem.objects.all()
