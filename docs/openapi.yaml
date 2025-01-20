@@ -104,9 +104,12 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/BookId"
+              type: object
+              properties:
+                books:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/BookId"
       responses:
         '200':
           description: OK
@@ -123,9 +126,12 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/BookId"
+              type: object
+              properties:
+                books:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/BookId"
       responses:
         '401':
             description: Unauthorized

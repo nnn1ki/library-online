@@ -4,65 +4,72 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import mixins
 
-from library_service.irbis.book import Book
 from library_service.serializers.basket import *
 from library_service.models.catalog import *
-
-from rest_framework.permissions import IsAuthenticated
 
 from library_service.irbis.book import book_retrieve
 
 from rest_framework.exceptions import APIException
 
+from rest_framework import status
+
 class BasketViewset(
     mixins.ListModelMixin, 
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
-    GenericViewSet
+    GenericViewSet,
+    mixins.CreateModelMixin
 ):
     serializer_class = BasketListSerializer
-    query_data: list[int] | None = None
 
-    @action(methods=["GET"], detail = False,  permission_classes = [IsAuthenticated])
     def get_queryset(self):
         user = self.request.user
 
-        book_list = []
-
         if (user.is_authenticated):
-            self.query_data = BasketListSerializer.get_basket(self)
+            book_list = []
 
-            if (self.query_data.count() > 0):
-                for book_id in self.query_data:
-                    book = book_retrieve(book_id)
+            basket = Basket.objects.filter(user = self.request.user).first()
+            books = BasketItem.objects.filter(basket = basket).values_list("book_id", flat = True).all()
+
+            if (books.count() > 0):
+                for book in books:
+                    book = book_retrieve(book)
                     book_list.append(book)
+
+            return book_list
 
         else:
             raise APIException("Unauthorized", code=401)
-
-        return book_list
     
-    @action(methods=["POST"], detail = False,  permission_classes = [IsAuthenticated])
-    def add_books(self):
-        user = self.request.user
+    def create(self, request, *args, **kwargs):
+        user = request.user
 
         if (user.is_authenticated):
-            BasketListSerializer.add_books(self.request.data)
+            BasketListSerializer.add_books(self, request.data["books"])
+
+            return Response(status = status.HTTP_200_OK)
         else:
             raise APIException("Unauthorized", code=401)    
     
-    @action(methods=["PUT"], detail = False,  permission_classes = [IsAuthenticated])
-    def update_basket(self):
-        user = self.request.user
+    def update(self, request, *args, **kwargs):
+        user = request.user
 
         if (user.is_authenticated):
             basket_list = self.get_queryset()
-            books_to_delete = self.request.data
+            update_list = list(request.data["books"])
 
             for book in basket_list:
-                if (book in books_to_delete):
+                if (book not in update_list):
                     self.request.data = book.id
-                    BasketItemViewset.destroy(self.request)
+                    BasketViewset.destroy(request, *args, **kwargs)
+                else:
+                    update_list.remove(book)
+
+            for book in update_list:
+                BasketListSerializer.add_books(book)
+
+            return Response(status=status.HTTP_200_OK)
+                
         else:
             raise APIException("Unauthorized", code=401)    
     
@@ -70,14 +77,8 @@ class BasketViewset(
         user = request.user
 
         if (user.is_authenticated):
-            BasketItemViewset.destroy(request, *args, **kwargs)
+            id = kwargs["pk"]
+            BasketListSerializer.delete_book(self, id)
+            return Response(status=status.HTTP_200_OK)
         else:
             raise APIException("Unauthorized", code=401)    
-    
-class BasketItemViewset(
-    mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
-    GenericViewSet
-):
-    serializer_class = BasketItemSerializer
-    queryset = BasketItem.objects.all()
