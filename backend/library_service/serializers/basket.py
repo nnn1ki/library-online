@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework_dataclasses.serializers import DataclassSerializer
 
-from library_service.irbis.api.scenarios import IrbisScenario
 from library_service.irbis.book import Book
 from library_service.models.user import Basket, BasketItem
 
@@ -61,3 +60,7 @@ class BasketListSerializer(serializers.Serializer):
         basket_item = BasketItem.objects.filter(basket = basket, book_id = book_id).first()
 
         BasketListSerializer.basket_item.delete(basket_item.id)
+
+class BookListSerializer(DataclassSerializer):
+    class Meta:
+        dataclass = Book

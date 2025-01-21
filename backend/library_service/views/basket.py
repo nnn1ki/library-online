@@ -20,7 +20,11 @@ class BasketViewset(
     GenericViewSet,
     mixins.CreateModelMixin
 ):
-    serializer_class = BasketListSerializer
+    def get_serializer_class(self):
+        if (self.action == "list"):
+            return BookListSerializer
+        else:
+            return BasketListSerializer
 
     def get_queryset(self):
         user = self.request.user
