@@ -23,8 +23,3 @@ class AddBasketSerializer(serializers.Serializer):
         return {
             "books": books_current
         }
-
-class BasketItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BasketItem
-        fields = ["book_id"]

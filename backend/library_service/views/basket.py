@@ -21,8 +21,6 @@ class BasketViewset(
             return BookSerializer
         elif self.action in ["create", "replace"]:
             return AddBasketSerializer
-        else:
-            return BasketItemSerializer
     
     def get_queryset(self):
         basket = Basket.objects.filter(user=self.request.user).first()
