@@ -2,10 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile")
     library_card = models.CharField(verbose_name="Номер читательского билета", max_length=255)
-    campus_id = models.CharField(verbose_name="ID кампуса",max_length=255)
-    mira_id = models.CharField(verbose_name="ID mira",max_length=255)
+    campus_id = models.CharField(verbose_name="ID кампуса", max_length=255)
+    mira_id = models.CharField(verbose_name="ID mira", max_length=255)
     
     class Meta:
         verbose_name = "Профиль"
@@ -27,7 +27,7 @@ class Basket(models.Model):
 
 class BasketItem(models.Model):
     book_id = models.CharField(verbose_name="ID книги", max_length=255)
-    basket = models.ForeignKey(Basket, on_delete=models.CASCADE)
+    basket = models.ForeignKey(Basket, on_delete=models.CASCADE, related_name="items")
 
     class Meta:
         verbose_name = "Элемент корзины"

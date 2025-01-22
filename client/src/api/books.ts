@@ -19,3 +19,14 @@ export async function searchBooks(
     throw error;
   }
 }
+
+export async function getBook(bookId: string): Promise<Book> {
+  try {
+    const { data } = await axios.get(`/api/book/${bookId}`);
+    console.log(`/api/book/${bookId}`, data);
+    return data;
+  } catch (error) {
+    console.error("Ошибка при получении книги по айди", error);
+    throw error;
+  }
+}
