@@ -107,6 +107,7 @@ paths:
               type: object
               properties:
                 books:
+                  description: Список книг, которые надо добавить в корзину
                   type: array
                   items:
                     $ref: "#/components/schemas/BookId"
@@ -117,6 +118,7 @@ paths:
           description: Unauthorized
         '404':
           description: Книга не найдена
+  /api/basket/replace/:
     put:
       tags:
         - basket
@@ -129,6 +131,7 @@ paths:
               type: object
               properties:
                 books:
+                  description: Новый список книгкорзины
                   type: array
                   items:
                     $ref: "#/components/schemas/BookId"

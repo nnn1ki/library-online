@@ -55,7 +55,7 @@ def irbis_search(database: str, expression: str) -> list[IrbisBook]:
     payload = {
         "database": database,
         "expression": expression,
-        "format": "@opac"
+        "format": "@opac_plain"
     }
 
     r = requests.post(f"{settings.IRBIS_HOSTNAME}/search", json=payload)
@@ -64,7 +64,11 @@ def irbis_search(database: str, expression: str) -> list[IrbisBook]:
     return IrbisBook.schema().load(r.json(), many=True)
 
 def irbis_book_retrieve(database: str, mfn: int) -> IrbisBook:
-    r = requests.get(f"{settings.IRBIS_HOSTNAME}/books/by/mfn/{database}/{mfn}")
+    params = {
+        "format": "@opac_plain"
+    }
+
+    r = requests.get(f"{settings.IRBIS_HOSTNAME}/books/by/mfn/{database}/{mfn}", params=params)
     r.raise_for_status()
 
     return IrbisBook.schema().load(r.json())
