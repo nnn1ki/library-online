@@ -98,7 +98,7 @@ paths:
     post:
       tags:
         - basket
-      summary: Добавление книги в корзину
+      summary: Добавление книг в корзину
       requestBody:
         required: true
         content:
@@ -106,8 +106,11 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  $ref: "#/components/schemas/BookId"
+                books:
+                  description: Список книг, которые надо добавить в корзину
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/BookId"
       responses:
         '200':
           description: OK
@@ -115,6 +118,7 @@ paths:
           description: Unauthorized
         '404':
           description: Книга не найдена
+  /api/basket/replace/:
     put:
       tags:
         - basket
@@ -124,9 +128,13 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/BookId"
+              type: object
+              properties:
+                books:
+                  description: Новый список книгкорзины
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/BookId"
       responses:
         '401':
             description: Unauthorized

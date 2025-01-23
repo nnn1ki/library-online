@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import { nextTick, onBeforeMount, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { searchBooks } from "@/api/search";
+import { searchBooks } from "@/api/books";
 import { scenariosList } from "@/api/scenarios";
 import type { Book, Library, Scenario } from "@/api/types";
 import { librariesList } from "@/api/libraries";
