@@ -2,6 +2,9 @@ import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { ref } from "vue";
+import type { ProfileInfo } from "@/api/types";
+import { profileInfo } from "@/api/profile";
 
 export const useAuthStore = defineStore("auth", () => {
   type Token = string | undefined;
@@ -21,6 +24,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   const access = useLocalStorage<Token>("accessToken", undefined);
   const refresh = useLocalStorage<Token>("refreshToken", undefined);
+  const currentUser = ref<ProfileInfo>();
 
   async function refreshTokens() {
     const simpleAxios = axios.create();
@@ -36,6 +40,7 @@ export const useAuthStore = defineStore("auth", () => {
     if (!isTokenValid(refresh.value)) {
       refresh.value = undefined;
       access.value = undefined;
+      currentUser.value = undefined;
       return false;
     } else if (!isTokenValid(access.value)) {
       await refreshTokens();
@@ -43,7 +48,19 @@ export const useAuthStore = defineStore("auth", () => {
     return true;
   }
 
-  // TODO: полноценная авторизация
+  async function updateProfileInfo() {
+    if (await updateTokens()) {
+      try {
+        currentUser.value = await profileInfo();
+      } catch (_) {
+        // TODO: check if the error is actually related to the tokens
+        refresh.value = undefined;
+        access.value = undefined;
+        currentUser.value = undefined;
+      }
+    }
+  }
+
   async function login(username: string, password: string): Promise<boolean> {
     try {
       const simpleAxios = axios.create();
@@ -53,6 +70,7 @@ export const useAuthStore = defineStore("auth", () => {
       });
       refresh.value = data.refresh;
       access.value = data.access;
+      await updateProfileInfo();
       return true;
     } catch (_) {
       return false;
@@ -70,11 +88,12 @@ export const useAuthStore = defineStore("auth", () => {
     });
   }
 
-  // TODO: возвращать currentUser
   return {
+    currentUser,
     access,
     refresh,
     updateTokens,
+    updateProfileInfo,
     login,
     logout,
   };

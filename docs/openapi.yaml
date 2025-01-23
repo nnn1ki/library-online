@@ -7,8 +7,8 @@ servers:
 tags:
   - name: auth
     description: Методы, связанные с аутентификацией
-  - name: client
-    description: Методы, связанные с клиентом
+  - name: profile
+    description: Методы, связанные с профилем
   - name: catalog
     description: Методы, связанные с каталогом и поиском книг
   - name: basket
@@ -17,6 +17,90 @@ tags:
     description: Методы, связанные с заказами
 
 paths:
+  /api/auth/login/:
+    post:
+      tags: 
+        - auth
+      summary: Получение пары токенов по имени пользователя и паролю. В будущем будет заменено на читательский билет и другие способы авторизации
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '401':
+          description: Unauthorized
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+  /api/auth/refresh/:
+    post:
+      tags: 
+        - auth
+      summary: Получение новой пары токенов по refresh токену. Старый refresh токен станет невалиден
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh:
+                  type: string
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+  /api/auth/logout/:
+    post:
+      tags: 
+        - auth
+      summary: Инвалидация refresh токена
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh:
+                  type: string
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: OK
+
+  /api/profile/self-info/:
+    get:
+      tags:
+        - profile
+      security:
+        - bearer: []
+      responses:
+        '401':
+          description: Unauthorized
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileInfo'
+
   /api/book/:
     get:
       tags:
@@ -83,6 +167,8 @@ paths:
     get:
       tags:
         - basket
+      security:
+        - bearer: []
       summary: Получение списка книг в корзине
       responses:
         '401':
@@ -98,6 +184,8 @@ paths:
     post:
       tags:
         - basket
+      security:
+        - bearer: []
       summary: Добавление книг в корзину
       requestBody:
         required: true
@@ -122,6 +210,8 @@ paths:
     put:
       tags:
         - basket
+      security:
+        - bearer: []
       summary: Редактирование списка книг в корзине
       requestBody:
         required: true
@@ -146,6 +236,8 @@ paths:
     delete:
       tags:
         - basket
+      security:
+        - bearer: []
       summary: Удаление книги из корзины    
       responses:
         '401':
@@ -207,6 +299,8 @@ paths:
     get:
       tags:
         - order
+      security:
+        - bearer: []
       summary: Получение списка заказов на пользователя
       responses:
         '200':
@@ -222,6 +316,8 @@ paths:
     post:
       tags:
         - order
+      security:
+        - bearer: []
       summary: Создание нового заказа
       requestBody:
         required: true
@@ -254,6 +350,8 @@ paths:
     put:
       tags: 
         - order
+      security:
+        - bearer: []
       summary: Изменение заказа. Возможно только лишь сразу же после того, как заказ был создан
       parameters:
         - name: id
@@ -293,6 +391,8 @@ paths:
     delete:
       tags: 
         - order
+      security:
+        - bearer: []
       summary: Отмена заказа. Возможно только пока заказ не был выдан
       parameters:
         - name: id
@@ -314,6 +414,8 @@ paths:
     get:
       tags:
         - order
+      security:
+        - bearer: []
       summary: Получение списка взятых книг с автоматическим фильтром по тем, которые были выданы, но не возвращены (долги)
       responses:
         '200':
@@ -328,7 +430,33 @@ paths:
           description: Unauthorized
 
 components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer токен, помещаемый в заголовок Authorization
+
   schemas:
+    Tokens:
+      type: object
+      description: Пара токенов access и refresh
+      properties:
+        access:
+          description: Токен, помещаемый в заголовок Authorization
+          type: string
+        refresh:
+          description: Токен, использующийся для получения новой пары токенов
+          type: string
+    
+    ProfileInfo:
+      type: object
+      description: Информация о пользователе
+      properties:
+        username:
+          description: username пользователя
+          type: string
+
     BookId:
       type: string
       description: ID книги
