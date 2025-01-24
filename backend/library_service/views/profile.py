@@ -9,9 +9,10 @@ from library_service.serializers.profile import *
 class ProfileViewset(GenericViewSet):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
+    queryset = UserProfile.objects.all()
 
     def get_queryset(self):
-        return UserProfile.objects.all().filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
 
     @action(detail=False, url_path="self-info", methods=["get"])
     def get_self(self, request, *args, **kwargs):
