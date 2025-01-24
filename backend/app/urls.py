@@ -25,13 +25,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from library_service.views.catalog import *
 from library_service.views.basket import *
+from library_service.views.profile import *
 
 router = DefaultRouter()
 router.register("book", BookViewset, basename="book")
 router.register("library", LibraryViewset, basename="library")
 router.register("scenario", ScenarioViewset, basename="scenario")
 router.register("basket", BasketViewset, basename="basket")
-
+router.register("profile", ProfileViewset, basename="profile")
 
 urlpatterns = [
     path('admin/', admin.site.urls),

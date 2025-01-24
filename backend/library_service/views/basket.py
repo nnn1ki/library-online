@@ -15,6 +15,7 @@ class BasketViewset(
     GenericViewSet
 ):
     permission_classes = [IsAuthenticated]
+    queryset = BasketItem.objects.all()
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -24,7 +25,7 @@ class BasketViewset(
     
     def get_queryset(self):
         basket = Basket.objects.filter(user=self.request.user).first()
-        return BasketItem.objects.filter(basket=basket)
+        return super().get_queryset().filter(basket=basket)
 
     def get_object(self):
         id = self.kwargs["pk"]

@@ -1,3 +1,7 @@
+export type ProfileInfo = {
+  username: string;
+};
+
 export type Library = {
   id: number;
   description: string;
