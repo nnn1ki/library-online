@@ -1,4 +1,10 @@
-import { addBasketBook, deleteBasketBook, getBasketBooks, replaceBasketBooks } from "@/api/basket";
+import {
+  addBasketBook,
+  addBasketBooks,
+  deleteBasketBook,
+  getBasketBooks,
+  replaceBasketBooks,
+} from "@/api/basket";
 import type { Book } from "@/api/types";
 import { useAuthentication } from "@/composables/auth";
 import { useLocalStorage } from "@vueuse/core";
@@ -13,7 +19,7 @@ export const useBasketStore = defineStore("basket", () => {
 
   const { isAuthenticated } = storeToRefs(authStore);
   const localBooks = useLocalStorage<Book[]>("basketBooks", []);
-  const books = ref<Book[]>([]);;
+  const books = ref<Book[]>([]);
 
   async function updateBooks() {
     if (isAuthenticated.value) {
@@ -27,7 +33,7 @@ export const useBasketStore = defineStore("basket", () => {
     if (isAuthenticated.value) {
       await addBasketBook(book.id);
     } else {
-      if (localBooks.value.filter((b) => b.id === book.id).length === 0) { 
+      if (localBooks.value.filter((b) => b.id === book.id).length === 0) {
         localBooks.value.push(book);
       }
     }
@@ -47,14 +53,19 @@ export const useBasketStore = defineStore("basket", () => {
 
   async function clearBooks() {
     if (isAuthenticated.value) {
-      await replaceBasketBooks([])
+      await replaceBasketBooks([]);
     } else {
       localBooks.value = [];
     }
     updateBooks();
   }
 
-  useAuthentication(() => {
+  useAuthentication(async (auth) => {
+    if (auth) {
+      await addBasketBooks(localBooks.value.map((book) => book.id));
+      localBooks.value = [];
+    }
+
     updateBooks();
   });
 
@@ -63,6 +74,6 @@ export const useBasketStore = defineStore("basket", () => {
     updateBooks,
     addBook,
     removeBook,
-    clearBooks
-  }
+    clearBooks,
+  };
 });

@@ -12,7 +12,8 @@
               <router-link to="/" class="nav-link" active-class="active">Главная страница</router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/users" class="nav-link" active-class="active">Вход</router-link>
+              <router-link to="/profile" class="nav-link" active-class="active">{{ isAuthenticated ? "Профиль" : "Вход"
+                }}</router-link>
             </li>
             <li class="nav-item">
               <router-link to="/basket" class="nav-link" active-class="active">Корзина</router-link>
@@ -37,6 +38,11 @@
 
 <script setup lang="ts">
 import Logo from "@/assets/ntb-logo.png";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+
+const authStore = useAuthStore();
+const { isAuthenticated } = storeToRefs(authStore);
 </script>
 
 <style scoped>
