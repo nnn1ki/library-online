@@ -2,7 +2,7 @@ import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import type { ProfileInfo } from "@/api/types";
 import { profileInfo } from "@/api/profile";
 
@@ -24,6 +24,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   const access = useLocalStorage<Token>("accessToken", undefined);
   const refresh = useLocalStorage<Token>("refreshToken", undefined);
+  const isAuthenticated = computed(() => refresh.value !== undefined);
   const currentUser = ref<ProfileInfo>();
 
   async function refreshTokens() {
@@ -89,6 +90,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   return {
+    isAuthenticated,
     currentUser,
     access,
     refresh,

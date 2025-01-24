@@ -1,35 +1,60 @@
+import { addBasketBook, deleteBasketBook, getBasketBooks, replaceBasketBooks } from "@/api/basket";
 import type { Book } from "@/api/types";
+import { useAuthentication } from "@/composables/auth";
 import { useLocalStorage } from "@vueuse/core";
-import { defineStore } from "pinia";
-import { onMounted } from "vue";
+import { defineStore, storeToRefs } from "pinia";
+import { ref } from "vue";
 import { useToast } from "vue-toastification";
+import { useAuthStore } from "./auth";
 
-// TODO: useAuthStore. Если авторизованы, используем api
 export const useBasketStore = defineStore("basket", () => {
   const toast = useToast();
-  const books = useLocalStorage<Book[]>("basketBooks", []);
+  const authStore = useAuthStore();
 
-  async function updateBooks() {}
+  const { isAuthenticated } = storeToRefs(authStore);
+  const localBooks = useLocalStorage<Book[]>("basketBooks", []);
+  const books = ref<Book[]>([]);;
+
+  async function updateBooks() {
+    if (isAuthenticated.value) {
+      books.value = await getBasketBooks();
+    } else {
+      books.value = localBooks.value;
+    }
+  }
 
   async function addBook(book: Book) {
-    if (books.value.filter((b) => b.id === book.id).length === 0) { 
-      books.value.push(book);
+    if (isAuthenticated.value) {
+      await addBasketBook(book.id);
+    } else {
+      if (localBooks.value.filter((b) => b.id === book.id).length === 0) { 
+        localBooks.value.push(book);
+      }
     }
+
     toast.success(book.description + " добавлен(a) в корзину");
     updateBooks();
   }
 
   async function removeBook(book: Book) {
-    books.value = books.value.filter((b) => b.id !== book.id);
+    if (isAuthenticated.value) {
+      await deleteBasketBook(book.id);
+    } else {
+      localBooks.value = localBooks.value.filter((b) => b.id !== book.id);
+    }
     updateBooks();
   }
 
   async function clearBooks() {
-    books.value = [];
+    if (isAuthenticated.value) {
+      await replaceBasketBooks([])
+    } else {
+      localBooks.value = [];
+    }
     updateBooks();
   }
 
-  onMounted(() => {
+  useAuthentication(() => {
     updateBooks();
   });
 

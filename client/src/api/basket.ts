@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { Book } from "@/api/types";
 
-export async function getBasketBooks(): Promise<Book> {
+export async function getBasketBooks(): Promise<Book[]> {
   try {
     const { data } = await axios.get("/api/basket/");
     console.log("/api/basket/", data);
