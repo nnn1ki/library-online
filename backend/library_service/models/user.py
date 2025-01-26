@@ -12,7 +12,7 @@ class UserProfile(models.Model):
         verbose_name_plural = "Профили"
 
     def __str__(self):
-        return f"Profile for {self.user.username} ({self.role.name})"
+        return f"Profile for {self.user.username}"
     
 class Basket(models.Model):
     created_at = models.DateTimeField(verbose_name="Дата создания", auto_now_add=True)

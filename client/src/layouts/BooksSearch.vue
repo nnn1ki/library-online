@@ -25,7 +25,7 @@
           <select v-model="condition.scenarioPrefix" class="form-select form-select-sm" @change="updateSearchParams">
             <option v-for="scenario in scenarios" :key="scenario.prefix" :value="scenario.prefix">{{
               scenario.description
-            }}</option>
+              }}</option>
           </select>
 
           <!-- Значение фильтра -->

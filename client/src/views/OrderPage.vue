@@ -52,12 +52,7 @@ const placeOrder = () => {
       <!-- Поле для ввода email (опционально) -->
       <div class="email-input">
         <label for="email">Email (необязательно)</label>
-        <input
-          id="email"
-          type="email"
-          v-model="email"
-          placeholder="Введите ваш email для получения уведомлений"
-        />
+        <input id="email" type="email" v-model="email" placeholder="Введите ваш email для получения уведомлений" />
       </div>
 
       <!-- Кнопка оформления заказа -->

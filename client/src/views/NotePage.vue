@@ -18,7 +18,7 @@
     <div class="important-info bg-light p-4 mt-5 rounded border">
       <h3 class="text-center">Свяжитесь с нами</h3>
       <p class="text-center">
-        Если у вас возникли вопросы, пожалуйста, свяжитесь с нашей службой поддержки через email: 
+        Если у вас возникли вопросы, пожалуйста, свяжитесь с нашей службой поддержки через email:
         <a href="mailto:support@yourservice.com">domrachev@conferoom.site</a>.
       </p>
     </div>
