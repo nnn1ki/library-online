@@ -338,7 +338,7 @@ paths:
                   description: Список долгов, которые будут принесены
                   nullable: true
                   items:
-                    $ref: "#/components/schemas/BorrowedBookId"
+                    $ref: "#/components/schemas/OrderBookId"
       responses:
         '200':
           description: OK
@@ -378,7 +378,7 @@ paths:
                     description: Список долгов, которые будут принесены
                     nullable: true
                     items:
-                      $ref: "#/components/schemas/BorrowedBookId"
+                      $ref: "#/components/schemas/OrderBookId"
       responses:
         '200':
           description: OK
@@ -531,7 +531,7 @@ components:
           description: Описание в произвольной форме
           example: Ключевое слово
 
-    Status:
+    OrderStatus:
       type: object
       properties:
         status:
@@ -553,6 +553,22 @@ components:
         description:
           type: string
           description: Описание статуса
+    OrderBookId:
+      type: number
+      description: ID взятой книги
+    OrderBook:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/OrderBookId"
+        book:
+          $ref: "#/components/schemas/Book"
+        handed:
+          type: boolean
+          description: Была ли выдана книга
+        returned:
+          type: boolean
+          description: Возвращена ли книга
     OrderId:
       type: number
       description: ID заказа
@@ -565,30 +581,21 @@ components:
           description: Список заказанных книг
           type: array
           items:
-            $ref: "#/components/schemas/BorrowedBook"
+            $ref: "#/components/schemas/OrderBook"
         statuses:
           description: Список статусов заказа
           type: array
           items:
-            $ref: "#/components/schemas/Status"
+            $ref: "#/components/schemas/OrderStatus"
         library:
           $ref: "#/components/schemas/Library"
     
-    BorrowedBookId:
-      type: number
-      description: ID взятой книги
     BorrowedBook:
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/BorrowedBookId"
+          $ref: "#/components/schemas/OrderBookId"
         book:
           $ref: "#/components/schemas/Book"
         order:
           $ref: "#/components/schemas/OrderId"
-        handed:
-          type: boolean
-          description: Была ли выдана книга
-        returned:
-          type: boolean
-          description: Возвращена ли книга

@@ -36,7 +36,7 @@ erDiagram
     User ||--|| Basket : has
     UserProfile }|--|| UserRole : has
     Order ||--|{ OrderItem : contains
-    Order ||--|{ History : has
+    Order ||--|{ OrderHistory : has
     Basket ||--o{ BasketItem : contains
     
     LibraryDatabase }|--|| Library : includes
@@ -54,7 +54,7 @@ erDiagram
       int role_id FK
     }
 
-    UserRole{
+    UserRole {
         int id PK
         varchar user_role 
     }
@@ -65,18 +65,18 @@ erDiagram
         int user_id FK
     }
 
-    BasketItem{
+    BasketItem {
         int id PK
         varchar book_id
         int basket_id FK
     }
 
-    Order{
+    Order {
         int id PK  
         int user_id FK
     }
 
-    History{
+    OrderHistory {
         int id PK
         varchar description
         varchar status
@@ -84,7 +84,7 @@ erDiagram
         int order_id FK 
     }
 
-    OrderItem{
+    OrderItem {
         int id PK
         int order_id FK
         varchar exemplar_id

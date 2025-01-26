@@ -27,7 +27,6 @@ from library_service.views.catalog import *
 from library_service.views.basket import *
 from library_service.views.profile import *
 from library_service.views.order import *
-from library_service.views.borrowed import *
 
 router = DefaultRouter()
 router.register("book", BookViewset, basename="book")

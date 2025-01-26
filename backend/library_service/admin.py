@@ -25,7 +25,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ["user",]
 
 
-@admin.register(History)
+@admin.register(OrderHistory)
 class HistoryAdmin(admin.ModelAdmin):
     list_display = ["id", "order", "status", "date", "staff_id"]
     list_filter = ["status", "date"]

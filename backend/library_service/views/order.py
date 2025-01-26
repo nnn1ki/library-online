@@ -1,19 +1,28 @@
-from django.http import Http404
-from rest_framework.decorators import action
-from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import mixins
 
-from library_service.serializers.catalog import BookSerializer
-from library_service.irbis.book import book_retrieve
+from library_service.serializers.order import *
 
 class OrderViewset(
     mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
     GenericViewSet
 ):
     permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+    queryset = Order.objects.all()
 
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+class BorrowedViewset (
+    mixins.ListModelMixin,
+    GenericViewSet
+):
+    permission_classes = [IsAuthenticated]
+    serializer_class = BorrowedBookSerializer
+    queryset = OrderItem.objects.all()
+
+    def get_queryset(self):
+        return super().get_queryset().filter(order__user=self.request.user, handed=True, returned=False)
+    
