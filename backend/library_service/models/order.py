@@ -28,7 +28,7 @@ class OrderHistory(models.Model):
     status = models.CharField(max_length=255, choices=Status.choices)
     date = models.DateTimeField(auto_now_add=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="statuses")
-    staff_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    staff_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name = "История"

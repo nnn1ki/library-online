@@ -1,7 +1,11 @@
 from rest_framework import serializers
 
+from rest_framework_dataclasses.serializers import DataclassSerializer
+
 from library_service.models.order import *
 from library_service.serializers.catalog import LibrarySerializer
+
+from library_service.models.catalog import Library
 
 class OrderStatusSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,3 +34,23 @@ class BorrowedBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ["id", "book", "order"]
+
+class CreateOrderSerializer(serializers.Serializer):
+    library = serializers.IntegerField()
+    books = serializers.ListField(child = serializers.CharField())
+    borrowed = serializers.ListField(child = serializers.IntegerField())
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        library = Library.objects.get(pk = validated_data["library"])
+
+        order = Order.objects.create(user = user, library = library)
+
+        exemplars: list[str] = validated_data["books"]
+
+        for exemplar in exemplars:
+            OrderItem.objects.create(order = order, exemplar_id = exemplar)
+
+        order_status = OrderHistory.objects.create(order = order, status = OrderHistory.Status.NEW)
+        
+        return order
