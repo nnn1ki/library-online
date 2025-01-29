@@ -39,7 +39,8 @@ class OrderHistory(models.Model):
     
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="books")
-    exemplar_id = models.CharField(max_length=255)
+    exemplar_id = models.CharField(max_length=25, blank=True) # TODO: убрать потом blank=True
+    book_id = models.CharField(max_length=255)
     handed = models.BooleanField(default=False)
     returned = models.BooleanField(default=False)
     order_to_return = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)

@@ -1,27 +1,31 @@
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
+from library_service.irbis.book import book_retrieve
 from library_service.models.order import *
 from library_service.models.catalog import Library
 
-from library_service.serializers.catalog import LibrarySerializer
+from library_service.serializers.catalog import BookSerializer, LibrarySerializer
 
 class OrderStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderHistory
         fields = ["description", "status", "date"]
 
-class OrderBookSerializer(serializers.ModelSerializer):
-    book = serializers.CharField(source="exemplar_id") # TODO: retrieve_book
-
+class OrderItemSerializer(serializers.ModelSerializer):
+    book = serializers.SerializerMethodField()
+    
     class Meta:
         model = OrderItem
         fields = ["id", "book", "handed", "returned"]
 
+    def get_book(self, obj: OrderItem):
+        return BookSerializer(book_retrieve(obj.book_id)).data
+
 class OrderSerializer(serializers.ModelSerializer):
     library = LibrarySerializer()
     statuses = OrderStatusSerializer(many=True)
-    books = OrderBookSerializer(many=True)
+    books = OrderItemSerializer(many=True)
     
     class Meta:
         model = Order
@@ -34,9 +38,10 @@ class CreateUpdateOrderSerializer(serializers.Serializer):
     borrowed = serializers.ListField(child=serializers.IntegerField())
 
     def configure_order(self, order: Order, validated_data):
-        exemplars: list[str] = validated_data["books"] # TODO: book_id -> examplar_id
-        for exemplar in exemplars:
-            OrderItem.objects.create(order=order, exemplar_id=exemplar)
+        books: list[str] = validated_data["books"]
+        for book in books:
+            # TODO: exemplar_id
+            OrderItem.objects.create(order=order, book_id=book)
 
         borrowed_books: list[str] = validated_data["borrowed"] # Здесь список айдишников из OrderItem
         for book in borrowed_books:
@@ -77,8 +82,11 @@ class CreateUpdateOrderSerializer(serializers.Serializer):
 
 
 class BorrowedBookSerializer(serializers.ModelSerializer):
-    book = serializers.CharField(source="exemplar_id") # TODO: retrieve_book
+    book = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
         fields = ["id", "book", "order"]
+    
+    def get_book(self, obj: OrderItem):
+        return BookSerializer(book_retrieve(obj.book_id)).data

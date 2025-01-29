@@ -88,6 +88,7 @@ erDiagram
         int id PK
         int order_id FK
         varchar exemplar_id
+        varchar book_id
         bool handed
         bool returned
         int order_id_to_return FK
