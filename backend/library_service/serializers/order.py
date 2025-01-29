@@ -1,11 +1,10 @@
 from rest_framework import serializers
-
-from rest_framework_dataclasses.serializers import DataclassSerializer
+from rest_framework.exceptions import APIException
 
 from library_service.models.order import *
-from library_service.serializers.catalog import LibrarySerializer
-
 from library_service.models.catalog import Library
+
+from library_service.serializers.catalog import LibrarySerializer
 
 class OrderStatusSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,38 +27,58 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ["id", "library", "statuses", "books"]
 
+
+class CreateUpdateOrderSerializer(serializers.Serializer):
+    library = serializers.IntegerField()
+    books = serializers.ListField(child=serializers.CharField())
+    borrowed = serializers.ListField(child=serializers.IntegerField())
+
+    def configure_order(self, order: Order, validated_data):
+        exemplars: list[str] = validated_data["books"] # TODO: book_id -> examplar_id
+        for exemplar in exemplars:
+            OrderItem.objects.create(order=order, exemplar_id=exemplar)
+
+        borrowed_books: list[str] = validated_data["borrowed"] # Здесь список айдишников из OrderItem
+        for book in borrowed_books:
+            order_item = OrderItem.objects.get(pk=book)
+            if order_item is not None and order_item.handed and not order_item.returned:
+                order_item.order_to_return = order
+                order_item.save()
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+
+        order = Order.objects.create(user=user, library=Library.objects.get(pk=validated_data["library"]))
+        self.configure_order(order, validated_data)
+
+        OrderHistory.objects.create(order=order, status=OrderHistory.Status.NEW)
+        return validated_data
+
+    def update(self, instance: Order, validated_data):
+        order_statuses = OrderHistory.objects.filter(order=instance).all()
+        
+        # Когда статус new, то в истории статусов заказа будет только одна запись
+        if (order_statuses.count() > 1):
+            raise APIException("Order status is not new", code=400)
+        
+        OrderItem.objects.filter(order=instance).all().delete()
+
+        old_borrowed_books = OrderItem.objects.filter(order_to_return=instance).all()
+        for order_item in old_borrowed_books:
+            order_item.order_to_return = None
+            order_item.save()
+        
+        instance.library = Library.objects.get(pk=validated_data["library"])
+        instance.save()
+
+        self.configure_order(instance, validated_data)
+        # TODO: как-то помечать, что заказ был изменен?
+        return validated_data
+
+
 class BorrowedBookSerializer(serializers.ModelSerializer):
     book = serializers.CharField(source="exemplar_id") # TODO: retrieve_book
 
     class Meta:
         model = OrderItem
         fields = ["id", "book", "order"]
-
-class CreateOrderSerializer(serializers.Serializer):
-    library = serializers.IntegerField()
-    books = serializers.ListField(child = serializers.CharField())
-    borrowed = serializers.ListField(child = serializers.IntegerField())
-
-    def create(self, validated_data):
-        user = self.context["request"].user
-        library = Library.objects.get(pk = validated_data["library"])
-
-        order = Order.objects.create(user = user, library = library)
-
-        exemplars: list[str] = validated_data["books"]
-
-        for exemplar in exemplars:
-            OrderItem.objects.create(order = order, exemplar_id = exemplar)
-
-        order_status = OrderHistory.objects.create(order=order, status=OrderHistory.Status.NEW)
-
-        borrowed_books: list[str] = validated_data["borrowed"] #Здесь список айдишников из Orderitem
-
-        if (borrowed_books.count() > 0):
-            for book in borrowed_books:
-                order_item = OrderItem.objects.get(pk=book)
-                if (order_item is not None):
-                    order_item.order_to_return = order
-                    order_item.save()
-        
-        return order

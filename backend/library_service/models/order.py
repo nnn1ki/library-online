@@ -28,7 +28,7 @@ class OrderHistory(models.Model):
     status = models.CharField(max_length=255, choices=Status.choices)
     date = models.DateTimeField(auto_now_add=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="statuses")
-    staff_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    staff = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = "История"
@@ -42,7 +42,7 @@ class OrderItem(models.Model):
     exemplar_id = models.CharField(max_length=255)
     handed = models.BooleanField(default=False)
     returned = models.BooleanField(default=False)
-    order_to_return = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    order_to_return = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         verbose_name = "Элемент заказа"
