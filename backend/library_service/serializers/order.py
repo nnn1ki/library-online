@@ -51,6 +51,15 @@ class CreateOrderSerializer(serializers.Serializer):
         for exemplar in exemplars:
             OrderItem.objects.create(order = order, exemplar_id = exemplar)
 
-        order_status = OrderHistory.objects.create(order = order, status = OrderHistory.Status.NEW)
+        order_status = OrderHistory.objects.create(order=order, status=OrderHistory.Status.NEW)
+
+        borrowed_books: list[str] = validated_data["borrowed"] #Здесь список айдишников из Orderitem
+
+        if (borrowed_books.count() > 0):
+            for book in borrowed_books:
+                order_item = OrderItem.objects.get(pk=book)
+                if (order_item is not None):
+                    order_item.order_to_return = order
+                    order_item.save()
         
         return order
