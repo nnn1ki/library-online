@@ -16,9 +16,9 @@ class OrderViewset(
     queryset = Order.objects.all()
 
     def get_serializer_class(self):
-        if self.action in ["list", "destroy", "update"]:
+        if self.action in ["list", "destroy"]:
             return OrderSerializer
-        elif self.action in ["create"]:
+        elif self.action in ["create", "update"]:
             return CreateOrderSerializer
 
     def get_queryset(self):
@@ -39,7 +39,7 @@ class OrderViewset(
         
         OrderItem.objects.filter(order=order).all().delete()
 
-        self.create(request)
+        
     
     def destroy(self, request, *args, **kwargs):
         order_id = kwargs["pk"]

@@ -42,6 +42,7 @@ class OrderItem(models.Model):
     exemplar_id = models.CharField(max_length=255)
     handed = models.BooleanField(default=False)
     returned = models.BooleanField(default=False)
+    order_to_return = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     
     class Meta:
         verbose_name = "Элемент заказа"

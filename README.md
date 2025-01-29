@@ -90,6 +90,7 @@ erDiagram
         varchar exemplar_id
         bool handed
         bool returned
+        int order_id_to_return FK
     }
 
     Library {
