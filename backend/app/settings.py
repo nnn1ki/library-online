@@ -144,4 +144,4 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(seconds=86400),
 }
 
-IRBIS_HOSTNAME = "https://library.istu.edu/opac/api"
+OPAC_HOSTNAME = "https://library.istu.edu/opac/api"

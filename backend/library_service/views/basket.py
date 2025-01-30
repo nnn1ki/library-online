@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from library_service.serializers.basket import *
 from library_service.serializers.catalog import BookSerializer
-from library_service.irbis.book import book_retrieve
+from library_service.opac.book import book_retrieve
 
 class BasketViewset(
     mixins.CreateModelMixin,

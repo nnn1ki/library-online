@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Iterable
-from library_service.irbis.api.announces import irbis_announces_list
+from library_service.opac.api.announces import opac_announces_list
 from library_service.models.catalog import Library, LibraryDatabase
-from library_service.irbis.api.search import IrbisBook, irbis_book_retrieve, irbis_search
+from library_service.opac.api.book import OpacBook, opac_book_retrieve, opac_search
 
 @dataclass
 class BookLink:
@@ -20,7 +20,7 @@ class Book:
     copies: int
     can_be_ordered: bool
 
-    def __init__(self, book: IrbisBook, library: int):
+    def __init__(self, book: OpacBook, library: int):
         self.id = book.id.replace("/", "_")
         self.description = book.description # TODO: opac api возвращает description в отформатированном формате с html тегами, и содержит в себе название книги, автора и т.д. Возможно, стоит это распарсить
         self.year = book.year
@@ -36,20 +36,20 @@ def books_list(libraries: Iterable[Library], expression: str) -> list[Book]:
     for library in libraries:
         databases: Iterable[LibraryDatabase] = library.databases.all()
         for db in databases:
-            search_result = irbis_search(db.database, expression)
+            search_result = opac_search(db.database, expression)
             result += [Book(book, library.id) for book in search_result]
 
     return result
 
 def books_announces_list() -> list[Book]:
-    announces = irbis_announces_list()
+    announces = opac_announces_list()
     
     istu_library = LibraryDatabase.objects.filter(database="ISTU").first().library # По идее, все анонсы отсылают на ISTU
     
     result = []
     for announce in announces:
         expresssion = announce.link.removeprefix("/opac/index.html?expression=") # Спс за такой удобный апи
-        book = irbis_search("ISTU", expresssion)[0]
+        book = opac_search("ISTU", expresssion)[0]
         result.append(Book(book, istu_library.id))
 
     return result
@@ -57,6 +57,6 @@ def books_announces_list() -> list[Book]:
 def book_retrieve(id: str) -> Book:
     database, mfn = id.split("_")
     library = LibraryDatabase.objects.filter(database=database).first().library
-    book = irbis_book_retrieve(database, mfn)
+    book = opac_book_retrieve(database, mfn)
 
     return Book(book, library.id)

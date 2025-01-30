@@ -1,6 +1,6 @@
 from app.settings import *
 
-IRBIS_HOSTNAME = "https://library.istu.edu/opac/api"
+OPAC_HOSTNAME = "https://library.istu.edu/opac/api"
 
 #for SQLite
 DATABASES = {

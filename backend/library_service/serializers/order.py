@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
-from library_service.irbis.book import book_retrieve
+from library_service.opac.book import book_retrieve
 from library_service.models.order import *
 from library_service.models.catalog import Library
 

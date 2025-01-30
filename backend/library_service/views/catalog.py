@@ -6,8 +6,8 @@ from rest_framework import mixins
 
 from rest_framework.exceptions import APIException
 
-from library_service.irbis.api.scenarios import irbis_scenarios
-from library_service.irbis.book import book_retrieve, books_announces_list, books_list, Book
+from library_service.opac.api.scenarios import opac_scenarios
+from library_service.opac.book import book_retrieve, books_announces_list, books_list, Book
 from library_service.serializers.catalog import *
 from library_service.models.catalog import *
 
@@ -48,10 +48,10 @@ class LibraryViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericVi
 
 class ScenarioViewset(mixins.ListModelMixin, GenericViewSet):
     serializer_class = ScenarioSerializer
-    query_data: list[IrbisScenario] | None = None
+    query_data: list[OpacScenario] | None = None
 
     def get_queryset(self):
         if self.query_data is None:           
-            self.query_data = irbis_scenarios("ISTU") # TODO: по идее, сценарии сильно не отличаются между БД, но лучше все же убрать хардкод
+            self.query_data = opac_scenarios("ISTU") # TODO: по идее, сценарии сильно не отличаются между БД, но лучше все же убрать хардкод
 
         return self.query_data

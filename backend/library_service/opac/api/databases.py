@@ -5,13 +5,13 @@ from django.conf import settings
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
-class IrbisDatabase:
+class OpacDatabase:
     name: str | None
     description: str | None
     order: bool
 
-def irbis_databases() -> list[IrbisDatabase]:
-    r = requests.get(f"{settings.IRBIS_HOSTNAME}/databases")
+def opac_databases() -> list[OpacDatabase]:
+    r = requests.get(f"{settings.OPAC_HOSTNAME}/databases")
     r.raise_for_status()
     
-    return IrbisDatabase.schema().load(r.json(), many=True)
+    return OpacDatabase.schema().load(r.json(), many=True)
