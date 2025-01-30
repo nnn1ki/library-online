@@ -47,7 +47,7 @@ class CreateUpdateOrderSerializer(serializers.Serializer):
         borrowed_books: list[str] = validated_data["borrowed"] # Здесь список айдишников из OrderItem
         for book in borrowed_books:
             order_item = OrderItem.objects.get(pk=book)
-            if order_item is not None and order_item.handed and not order_item.returned:
+            if order_item is not None and order_item.order == order and order_item.handed and not order_item.returned:
                 order_item.order_to_return = order
                 order_item.save()
 

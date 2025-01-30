@@ -2,7 +2,7 @@ import {
   addBasketBook,
   addBasketBooks,
   deleteBasketBook,
-  getBasketBooks,
+  basketBooksList,
   replaceBasketBooks,
 } from "@/api/basket";
 import type { Book } from "@/api/types";
@@ -23,7 +23,7 @@ export const useBasketStore = defineStore("basket", () => {
 
   async function updateBooks() {
     if (isAuthenticated.value) {
-      books.value = await getBasketBooks();
+      books.value = await basketBooksList();
     } else {
       books.value = localBooks.value;
     }
