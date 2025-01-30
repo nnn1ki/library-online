@@ -25,15 +25,15 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ["user",]
 
 
-@admin.register(History)
+@admin.register(OrderHistory)
 class HistoryAdmin(admin.ModelAdmin):
-    list_display = ["id", "order", "status", "date", "staff_id"]
+    list_display = ["id", "order", "status", "date", "staff"]
     list_filter = ["status", "date"]
 
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ["id", "order", "exemplar_id", "returned", "handed"]
+    list_display = ["id", "order", "book_id", "exemplar_id", "returned", "handed"]
     list_filter = ["order", "returned", "handed"]
 
 @admin.register(Library)

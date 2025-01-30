@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile")
     library_card = models.CharField(verbose_name="Номер читательского билета", max_length=255)
-    campus_id = models.CharField(verbose_name="ID кампуса", max_length=255)
-    mira_id = models.CharField(verbose_name="ID mira", max_length=255)
+    campus_id = models.CharField(verbose_name="ID кампуса", max_length=255, null=True, blank=True)
+    mira_id = models.CharField(verbose_name="ID mira", max_length=255, null=True, blank=True)
     
     class Meta:
         verbose_name = "Профиль"
