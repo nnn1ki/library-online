@@ -48,16 +48,3 @@ class BorrowedViewset (
 
     def get_queryset(self):
         return super().get_queryset().filter(order__user=self.request.user, handed=True, returned=False)
-    
-    # Если это для retrieve, то можно просто /api/order/{id}/ вызвать
-    # def get_object(self):
-    #     order_id = self.kwargs["pk"]
-    #     order = Order.objects.get(pk=order_id)
-    #     if (order is None):
-    #         raise APIException("order not found", code=404)
-        
-    #     borrowed_books = self.get_queryset().filter(order=order)
-    #     if (borrowed_books.count() == 0):
-    #         raise APIException("borroweds not found", code=404)
-
-    #     return borrowed_books    

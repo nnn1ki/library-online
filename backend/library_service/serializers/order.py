@@ -40,6 +40,7 @@ class CreateUpdateOrderSerializer(serializers.Serializer):
     def configure_order(self, order: Order, validated_data):
         books: list[str] = validated_data["books"]
         for book in books:
+            # TODO: проверка валидности айдишников
             # TODO: exemplar_id
             OrderItem.objects.create(order=order, book_id=book)
 

@@ -16,7 +16,7 @@ class AddBasketSerializer(serializers.Serializer):
         books_add: list[str] = validated_data["books"]
         for book in books_add:
             if book not in books_current:
-                # TODO: проверка валидности айдишников?
+                # TODO: проверка валидности айдишников
                 BasketItem.objects.create(book_id=book, basket=basket)
                 books_current.append(book)
 
