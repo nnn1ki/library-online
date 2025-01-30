@@ -18,7 +18,7 @@ class AddBasketSerializer(serializers.Serializer):
         books_add: list[str] = validated_data["books"]
         for book in books_add:
             if book not in books_current:
-                if not book_validate(book):
+                if book_validate(book) is None:
                     raise APIException(f"Invalid book id {book}", code=400)
 
                 BasketItem.objects.create(book_id=book, basket=basket)

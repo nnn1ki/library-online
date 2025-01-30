@@ -42,13 +42,18 @@ class CreateUpdateOrderSerializer(serializers.Serializer):
         if len(books) == 0:
             raise APIException(f"Can't make an empty order", code=400)
 
-        for book in set(books):
-            if not book_validate(book, order.library):
-                raise APIException(f"Invalid book id {book}", code=400)
+        for book_id in set(books):
+            book = book_validate(book_id, order.library)
+
+            if book is None:
+                raise APIException(f"Invalid book id {book_id}", code=400)
             
+            if not book.can_be_ordered:
+                raise APIException(f"Can't order book {book_id}", code=400)
+
             # TODO: проверять, что у клиента нет такой книги
             # TODO: exemplar_id
-            OrderItem.objects.create(order=order, book_id=book)
+            OrderItem.objects.create(order=order, book_id=book_id)
 
         borrowed_books: list[str] = validated_data["borrowed"]
         for book in borrowed_books:
