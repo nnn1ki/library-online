@@ -21,13 +21,13 @@
                 @change="toggleBookSelection(book.id)" aria-label="Выбрать книгу" />
             </div>
             <div class="col-auto">
-              <img :src="book.cover ? 'https://library.istu.edu/opac/' + book.cover : 'https://via.placeholder.com/150'"
-                :alt="book.description" class="book-image img-fluid" />
+              <img v-if="book.cover !== null" :src="book.cover" class="book-image img-fluid" />
+              <i v-else class="book-image bi bi-image"></i>
             </div>
             <div class="col">
               <div class="book-info">
-                <h6 class="book-title">{{ book.description }}</h6>
-                <p class="book-author">{{ book.year }}</p>
+                <h6 class="book-title">{{ book.title[0] }} ({{ book.year }})</h6>
+                <p class="book-author">{{ book.author.join(", ") }}</p>
                 <div class="btn-group">
                   <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
                     Удалить
@@ -187,6 +187,8 @@ function saveBooks() {
   max-height: 160px;
   object-fit: cover;
   border-radius: 8px;
+  font-size: 120px;
+  text-align: center;
 }
 
 /* Информация о книге */
