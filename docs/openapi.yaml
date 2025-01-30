@@ -477,6 +477,14 @@ components:
         username:
           description: username пользователя
           type: string
+        groups:
+          description: Группы пользователя
+          type: array
+          items:
+            type: string
+            enum:
+              - Reader
+              - Librarian
 
     BookId:
       type: string
