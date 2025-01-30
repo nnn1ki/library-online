@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
-from library_service.opac.book import book_retrieve
+from library_service.opac.book import book_retrieve, book_validate
 from library_service.models.order import *
 from library_service.models.catalog import Library
 
@@ -39,12 +39,18 @@ class CreateUpdateOrderSerializer(serializers.Serializer):
 
     def configure_order(self, order: Order, validated_data):
         books: list[str] = validated_data["books"]
-        for book in books:
-            # TODO: проверка валидности айдишников
+        if len(books) == 0:
+            raise APIException(f"Can't make an empty order", code=400)
+
+        for book in set(books):
+            if not book_validate(book, order.library):
+                raise APIException(f"Invalid book id {book}", code=400)
+            
+            # TODO: проверять, что у клиента нет такой книги
             # TODO: exemplar_id
             OrderItem.objects.create(order=order, book_id=book)
 
-        borrowed_books: list[str] = validated_data["borrowed"] # Здесь список айдишников из OrderItem
+        borrowed_books: list[str] = validated_data["borrowed"]
         for book in borrowed_books:
             order_item = OrderItem.objects.get(pk=book)
             if order_item is not None and order_item.order == order and order_item.handed and not order_item.returned:

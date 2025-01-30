@@ -1,6 +1,8 @@
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 
 from library_service.models.user import Basket, BasketItem
+from library_service.opac.book import book_validate
 
 class AddBasketSerializer(serializers.Serializer):
     books = serializers.ListField(child=serializers.CharField())
@@ -16,7 +18,9 @@ class AddBasketSerializer(serializers.Serializer):
         books_add: list[str] = validated_data["books"]
         for book in books_add:
             if book not in books_current:
-                # TODO: проверка валидности айдишников
+                if not book_validate(book):
+                    raise APIException(f"Invalid book id {book}", code=400)
+
                 BasketItem.objects.create(book_id=book, basket=basket)
                 books_current.append(book)
 

@@ -56,6 +56,10 @@ class Book:
         self.brief = book.brief
         self.created = book.created
 
+# Obtain database name and mfn id
+def split_book_id(book_id: str) -> tuple[str, str]:
+    return book_id.split("_")
+
 def books_list(libraries: Iterable[Library], expression: str) -> list[Book]:
     result = []
 
@@ -80,9 +84,20 @@ def books_announces_list() -> list[Book]:
 
     return result
 
-def book_retrieve(id: str) -> Book:
-    database, mfn = id.split("_")
+def book_retrieve(book_id: str) -> Book:
+    database, mfn = split_book_id(book_id)
     library = LibraryDatabase.objects.filter(database=database).first().library
     book = opac_book_retrieve(database, mfn)
 
     return Book(book, library.id)
+
+def book_validate(book_id: str, library: Library | None = None) -> bool:
+    database, _ = split_book_id(book_id)
+    if library is not None and not any([database == db.database for db in library.databases.all()]):
+        return False
+    
+    try:
+        book_retrieve(book_id)
+        return True
+    except:
+        return False
