@@ -7,10 +7,10 @@ from django.conf import settings
 @dataclass
 class OpacScenario:
     prefix: str
-    description: str | None
+    description: str | None = None
 
 def opac_scenarios(database: str) -> list[OpacScenario]:
-    r = requests.get(f"{settings.OPAC_HOSTNAME}/scenarios/${database}")
+    r = requests.get(f"{settings.OPAC_HOSTNAME}/api/scenarios/${database}")
     r.raise_for_status()
     
     return OpacScenario.schema().load(r.json(), many=True)

@@ -4,31 +4,57 @@ from library_service.opac.api.announces import opac_announces_list
 from library_service.models.catalog import Library, LibraryDatabase
 from library_service.opac.api.book import OpacBook, opac_book_retrieve, opac_search
 
+from django.conf import settings
+
 @dataclass
 class BookLink:
     url: str
-    description: str
+    description: str | None
 
 @dataclass
 class Book:
     id: str
+    library: int
     description: str
     year: int
-    cover: str | None
-    links: list[BookLink]
-    library: int
     copies: int
     can_be_ordered: bool
+    links: list[BookLink]
+    author: list[str]
+    collective: list[str]
+    title: list[str]
+    isbn: list[str]
+    language: list[str]
+    country: list[str]
+    city: list[str]
+    publisher: list[str]
+    subject: list[str]
+    keyword: list[str]
+    cover: str | None
+    brief: str | None
+    created: str | None
 
     def __init__(self, book: OpacBook, library: int):
         self.id = book.id.replace("/", "_")
-        self.description = book.description # TODO: opac api возвращает description в отформатированном формате с html тегами, и содержит в себе название книги, автора и т.д. Возможно, стоит это распарсить
-        self.year = book.year
-        self.cover = book.cover # TODO: тут возвращается ссылка на метод на их сервере ("/api/cover?file=..."). Нужно возвращать на наш (будет проксирование) или приводить к полной ссылке
-        self.links = [BookLink(link.url, link.description) for link in (book.links or [])]
         self.library = library
-        self.copies = len(book.exemplars)
+        self.description = book.description
+        self.year = book.year
+        self.copies = len(book.exemplars) 
         self.can_be_ordered = book.order
+        self.links = [BookLink(link.url, link.description) for link in (book.links or [])]
+        self.author = book.info.author
+        self.collective = book.info.collective
+        self.title = book.info.title
+        self.isbn = book.info.isbn
+        self.language = book.info.language
+        self.country = book.info.country
+        self.city = book.info.city
+        self.publisher = book.info.publisher
+        self.subject = book.info.subject
+        self.keyword = book.info.keyword
+        self.cover = settings.OPAC_HOSTNAME + "/" + book.cover if book.cover else None # TODO: по идее, лучше проксировать
+        self.brief = book.brief
+        self.created = book.created
 
 def books_list(libraries: Iterable[Library], expression: str) -> list[Book]:
     result = []

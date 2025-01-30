@@ -20,36 +20,31 @@ class OpacBookExemplar:
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
-class OpacBookSee:
-    url: str
-    description: str | None
+class OpacBookInfo:
+    author: list[str]
+    collective: list[str]
+    title: list[str]
+    isbn: list[str]
+    language: list[str]
+    country: list[str]
+    city: list[str]
+    publisher: list[str]
+    subject: list[str]
+    keyword: list[str]
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class OpacBook:
-    db: str
-    selected: bool
-    mfn: int
     id: str
     description: str
+    info: OpacBookInfo
     order: bool
     year: int
-    electronic: bool
-    usage: int
     exemplars: list[OpacBookExemplar]
-    popularity: int
-    arrangement: str | None = None
     brief: str | None = None
-    agents: list[str] | None = None
-    additional: str | None = None
     cover: str | None = None
     links: list[OpacBookLink] | None = None
-    see: list[OpacBookSee] | None = None
-    cards: list[str] | None = None
     created: str | None = None
-    language: str | None = None
-    stamp: str | None = None
-    section: str | None = None
 
 def opac_search(database: str, expression: str) -> list[OpacBook]:
     payload = {
@@ -58,17 +53,22 @@ def opac_search(database: str, expression: str) -> list[OpacBook]:
         "format": "@opac_plain"
     }
 
-    r = requests.post(f"{settings.OPAC_HOSTNAME}/search", json=payload)
+    params = {
+        "extended": True
+    }
+
+    r = requests.post(f"{settings.OPAC_HOSTNAME}/api/search", json=payload, params=params)
     r.raise_for_status()
     
     return OpacBook.schema().load(r.json(), many=True)
 
 def opac_book_retrieve(database: str, mfn: int) -> OpacBook:
     params = {
-        "format": "@opac_plain"
+        "format": "@opac_plain",
+        "extended": True
     }
 
-    r = requests.get(f"{settings.OPAC_HOSTNAME}/books/by/mfn/{database}/{mfn}", params=params)
+    r = requests.get(f"{settings.OPAC_HOSTNAME}/api/books/by/mfn/{database}/{mfn}", params=params)
     r.raise_for_status()
 
     return OpacBook.schema().load(r.json())
