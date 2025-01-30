@@ -1,13 +1,16 @@
 <template>
   <div class="card shadow-sm border-0">
     <!-- Картинка -->
-    <img :src="book.cover ? 'https://library.istu.edu/opac/' + book.cover : 'https://via.placeholder.com/250x200'"
-      class="card-img-top" :alt="book.description" />
+    <div v-if="book.cover !== null" class="book-image">
+      <img :src="book.cover" />
+    </div>
+    <i v-else class="book-image bi bi-image"></i>
 
     <div class="card-body">
       <!-- Заголовок книги и автор -->
-      <h5 class="card-title">{{ book.description }}</h5>
-      <h6 class="card-subtitle text-muted">{{ book.year }}</h6>
+      <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
+      <h6 v-if="book.author.length > 0" class="card-subtitle text-muted">{{ book.author.join(", ") }}</h6>
+      <h6 v-else-if="book.collective.length > 0" class="card-subtitle text-muted">{{ book.collective.join(", ") }}</h6>
 
       <div class="d-flex justify-content-between align-items-center">
         <!-- Кнопка добавления в корзину -->
@@ -81,5 +84,10 @@ const isModalVisible = ref(false);
 .card-text {
   font-size: 1rem;
   color: #888;
+}
+
+.book-image {
+  font-size: 50px;
+  text-align: center;
 }
 </style>

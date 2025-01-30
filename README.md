@@ -20,10 +20,10 @@ graph TD
     psql(PostgreSQL) <--> listener
 
     subgraph django сервер
-    listener <--> cacher(Прослойка над ирбисом)
+    listener <--> cacher(Прослойка над opac)
     end
     
-    cacher <--> irbis(Внутренняя система ИРБИС)
+    cacher <--> opac(Внутренняя система opac)
     cacher <--> psql
 ```
 

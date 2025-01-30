@@ -8,19 +8,22 @@
         </div>
         <div class="modal-body d-flex">
           <!-- Левая часть: картинка -->
-          <div class="book-image">
-            <img
-              :src="book.cover ? 'https://library.istu.edu/opac/' + book.cover : 'https://via.placeholder.com/250x200'"
-              alt="Книга" />
+          <div v-if="book.cover !== null" class="book-image">
+            <img :src="book.cover" />
           </div>
+          <i v-else class="book-image bi bi-image"></i>
           <!-- Правая часть: информация -->
           <div class="book-details ms-3">
-            <h5>{{ book.description }}</h5>
+            <h5 v-for="title in book.title">{{ title }}</h5>
             <h6 class="text-muted">Год: {{ book.year }}</h6>
+            <h6 v-if="book.author.length > 0" class="text-muted">Авторы: {{ book.author.join(", ") }}</h6>
+            <h6 v-else-if="book.collective.length > 0" class="text-muted">Коллективы: {{ book.collective.join(", ") }}
+            </h6>
             <p>Количество: {{ book.copies }}</p>
             <button class="btn btn-info btn-sm" type="button" @click="basketStore.addBook(book)" :disabled="isInBasket">
               <i class="bi bi-cart3"></i> В Корзину
             </button>
+            <h6 class="text-muted pt-4">{{ book.keyword.join(", ") }}</h6>
           </div>
         </div>
         <div class="modal-footer">
@@ -83,5 +86,9 @@ const visible = defineModel<boolean>();
 
 .modal-footer {
   text-align: right;
+}
+
+.book-image {
+  font-size: 200px;
 }
 </style>

@@ -6,7 +6,7 @@ ALLOWED_HOSTS = ["*"]
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
-IRBIS_HOSTNAME = os.environ.get("IRBIS_HOSTNAME")
+OPAC_HOSTNAME = os.environ.get("OPAC_HOSTNAME")
 
 DATABASES = {
     "default": {

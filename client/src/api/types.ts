@@ -22,18 +22,30 @@ export type Scenario = {
 
 export type BookLink = {
   url: string;
-  description: string;
+  description: string | null;
 };
 
 export type Book = {
   id: string;
+  library: number;
   description: string;
   year: number;
-  cover: string | null;
-  links: BookLink[];
-  library: number;
   copies: number;
   can_be_ordered: boolean;
+  links: BookLink[];
+  author: string[];
+  collective: string[];
+  title: string[];
+  isbn: string[];
+  language: string[];
+  country: string[];
+  city: string[];
+  publisher: string[];
+  subject: string[];
+  keyword: string[];
+  cover: string | null;
+  brief: string | null;
+  created: string | null;
 };
 
 export const statuses = {

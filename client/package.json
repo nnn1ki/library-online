@@ -16,8 +16,6 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "canvas": "^2.11.2",
-    "canvas-node": "^0.3.23",
     "cookies": "^0.9.1",
     "jquery-csrf-token": "^2.2.1",
     "jwt-decode": "^4.0.0",

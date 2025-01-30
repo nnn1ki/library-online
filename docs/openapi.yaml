@@ -495,20 +495,24 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/BookId"
+        library:
+          description: Библиотека, в которой находятся книги
+          $ref: "#/components/schemas/LibraryId"
         description:
-          description: Описание книги
+          description: Полное библиографическое описание книги
           type: string
         year:
           description: Год издания книги
           type: number
-        cover:
-          description: Обложка книги
-          type: string
-          nullable: true
+        copies:
+          description: Количество доступных к заказу экземпляров
+          type: number
+        can_be_ordered:
+          description: Можно ли заказать книгу
+          type: boolean
         links:
           description: Ссылки, сопровождающие книгу
           type: array
-          nullable: true
           items:
             type: object
             properties:
@@ -518,15 +522,60 @@ components:
               description:
                 description: Описание ссылки
                 type: string
-        library:
-          description: Библиотека, в которой находятся книги
-          $ref: "#/components/schemas/LibraryId"
-        copies:
-          description: Количество доступных к заказу экземпляров
-          type: number
-        can_be_ordered:
-          description: Можно ли заказать книгу
-          type: boolean
+        author:
+          description: Авторы
+          type: array
+          items:
+            type: string
+        collective:
+          description: Коллективы
+          type: array
+          items:
+            type: string
+        title:
+          description: Заглавия
+          type: array
+          items:
+            type: string
+        isbn:
+          description: ISBN
+          type: array
+          items:
+            type: string
+        language:
+          description: Язык основного текста
+          type: array
+          items:
+            type: string
+        country:
+          description: Страна
+          type: array
+          items:
+            type: string
+        city:
+          description: Место издания (город)
+          type: array
+          items:
+            type: string
+        publisher:
+          description: Издательство
+          type: array
+          items:
+            type: string
+        subject:
+          description: Тематические рубрики
+          type: array
+          items:
+            type: string
+        keyword:
+          description: Ключевые слова
+          type: array
+          items:
+            type: string
+        cover:
+          description: Обложка книги
+          type: string
+          nullable: true
     
     LibraryId:
       type: number

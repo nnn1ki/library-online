@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from rest_framework_dataclasses.serializers import DataclassSerializer
 
-from library_service.irbis.api.scenarios import IrbisScenario
-from library_service.irbis.book import Book
+from library_service.opac.api.scenarios import OpacScenario
+from library_service.opac.book import Book
 from library_service.models.catalog import *
 
 class LibrarySerializer(serializers.ModelSerializer):
@@ -16,4 +16,4 @@ class BookSerializer(DataclassSerializer):
 
 class ScenarioSerializer(DataclassSerializer):
     class Meta:
-        dataclass = IrbisScenario
+        dataclass = OpacScenario

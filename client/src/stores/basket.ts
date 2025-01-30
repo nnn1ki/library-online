@@ -38,7 +38,7 @@ export const useBasketStore = defineStore("basket", () => {
       }
     }
 
-    toast.success(book.description + " добавлен(a) в корзину");
+    toast.success(book.title[0] + " добавлен(a) в корзину");
     updateBooks();
   }
 
