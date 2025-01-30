@@ -92,11 +92,11 @@ def book_retrieve(book_id: str) -> Book:
     return Book(book, library.id)
 
 def book_validate(book_id: str, library: Library | None = None) -> bool:
-    database, _ = split_book_id(book_id)
-    if library is not None and not any([database == db.database for db in library.databases.all()]):
-        return False
-    
     try:
+        database, _ = split_book_id(book_id)
+        if library is not None and not any([database == db.database for db in library.databases.all()]):
+            return False
+        
         book_retrieve(book_id)
         return True
     except:
