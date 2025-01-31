@@ -1,43 +1,37 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import { useRouter } from "vue-router";
-import { useToast } from "vue-toastification";
 import { useOrderStore } from "@/stores/orderStore";
 
-const router = useRouter();
-const toast = useToast();
-const orderStore = useOrderStore();
+import { borrowedList } from '@/api/order'
+import borrowedBooks  from "@/components/BorrowedBooks.vue"
 
-const selectedBooks = ref([
-  { title: "Война и мир", author: "Лев Толстой", quantity: 1 },
-  { title: "Гарри Поттер и философский камень", author: "Джоан Роулинг", quantity: 1 },
-]);
+const router = useRouter();
+const orderStore = useOrderStore();
 
 // Поле для ввода email (опционально)
 const email = ref("");
 
-// Подсчитываем общее количество книг
 const totalBooks = computed(() => {
   return selectedBooks.value.reduce((total, book) => total + book.quantity, 0);
 });
 
-// Функция для оформления заказа
 const placeOrder = async () => {
-
-  const bookIds = orderStore.selectedBooks.map((book) => book.id);
-  await orderStore.handleCreateOrder(1, bookIds, []);
-  toast.success('Заказ успешно отправлен!');
-  toast.info('Ожидайте сообщения на почту о готовности');
+  await orderStore.handleCreateOrder();
   router.push({ name: "home" }); //возвращаем в начало пользовательского пути
 };
+
+onBeforeMount(async () => {
+  orderStore.borrowedBooks = await borrowedList();
+});
 
 </script>
 
 <template>
   <div class="container">
+    <borrowedBooks v-if="orderStore.borrowedBooks.length > 0"/>
     <div class="order-summary">
       <h2>Оформление заказа</h2>
-
       <!-- Список книг -->
       <div class="book-list">
         <h5>Список книг:</h5>
