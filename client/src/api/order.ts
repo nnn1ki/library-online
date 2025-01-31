@@ -48,11 +48,9 @@ export async function editOrder(
 ) {
   try {
     await axios.put(`/api/order/${orderId}`, {
-      data: {
         library: libraryId,
         books: bookIds,
         borrowed: borrowedBookIds,
-      },
     });
   } catch (error) {
     console.error("Ошибка при редактировании заказа", error);
