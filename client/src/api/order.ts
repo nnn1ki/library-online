@@ -30,11 +30,9 @@ export async function createOrder(
 ) {
   try {
     await axios.post("/api/order/", {
-      data: {
         library: libraryId,
         books: bookIds,
         borrowed: borrowedBookIds,
-      },
     });
   } catch (error) {
     console.error("Ошибка при создании заказа", error);
