@@ -14,7 +14,7 @@
 
       <div class="d-flex justify-content-between align-items-center">
         <!-- Кнопка добавления в корзину -->
-        <button class="btn btn-info btn-sm" type="button" @click="basketStore.addBook(book)" :disabled="isInBasket">
+        <button class="btn btn-info btn-sm" type="button" @click="addBook(book)" :disabled="isAdding || isInBasket">
           <i class="bi bi-cart3"></i> В Корзину
         </button>
 
@@ -45,6 +45,21 @@ const { books: basketBooks } = storeToRefs(basketStore);
 const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.value.id));
 
 const isModalVisible = ref(false);
+
+const isAdding = ref(false);
+
+async function addBook(book: Book) {
+  if (isInBasket.value || isAdding.value) return;
+  isAdding.value = true;
+
+  await basketStore.addBook(book).catch((error) => {
+    console.error("Ошибка при добавлении книги:", error);
+  }).finally(() => {
+    if (!isInBasket.value) isAdding.value = false;
+  });
+
+}
+
 </script>
 
 <style scoped>

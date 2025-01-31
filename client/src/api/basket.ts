@@ -15,9 +15,7 @@ export async function basketBooksList(): Promise<Book[]> {
 export async function addBasketBooks(bookIds: string[]) {
   try {
     await axios.post("/api/basket/", {
-      data: {
         books: bookIds,
-      },
     });
   } catch (error) {
     console.error("Ошибка при добавлении книг в корзину", error);
@@ -32,9 +30,7 @@ export async function addBasketBook(bookId: string) {
 export async function replaceBasketBooks(bookIds: string[]) {
   try {
     await axios.put("/api/basket/replace/", {
-      data: {
         books: bookIds,
-      },
     });
   } catch (error) {
     console.error("Ошибка при изменении книг в корзине", error);
