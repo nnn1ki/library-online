@@ -42,6 +42,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tokens'
+  /api/auth/bitrix-login/:
+    post:
+      tags: 
+        - auth
+      summary: Получение пары токенов по oauth на https://int.istu.edu/
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  description: Код авторизации от системы OAuth.
+                  type: string
+      responses:
+        '401':
+          description: Unauthorized
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
   /api/auth/refresh/:
     post:
       tags: 
