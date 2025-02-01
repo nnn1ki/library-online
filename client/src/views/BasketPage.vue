@@ -26,7 +26,11 @@
             </div>
             <div class="col">
               <div class="book-info">
-                <h6 class="book-title">{{ book.title[0] }} ({{ book.year }})</h6>
+                <h6 class="book-title">
+                  {{ book.title[0] }} 
+                  <span class="other-titles" v-if="book.title.length > 1">({{ book.title.slice(1).join(", ") }})</span>
+                  ({{ book.year }})
+                </h6>
                 <p class="book-author">{{ book.author.join(", ") }}</p>
                 <div class="btn-group">
                   <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
@@ -64,27 +68,31 @@
       <!-- Модальное окно для подтверждения сохранения -->
       <div>
         <div class="modal fade" id="confirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-          aria-labelledby="confirmationModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
+            aria-labelledby="confirmationModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">
-                  Подтверждение сохранения
-                </h5>
+                <h5 class="modal-title" id="confirmationModalLabel">Подтверждение сохранения</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
               </div>
               <div class="modal-body">
                 <p>Вы хотите распечатать книги:</p>
-                <p v-html="bookList"></p>
+                <hr/> <!-- Разделительная полоска -->
+                <div v-html="bookList"></div>
+                <hr/> <!-- Разделительная полоска -->
                 <p>Всего книг: {{ selectedBooks.length }}</p>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                  Отмена
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveBooks">
-                  Сохранить
-                </button>
+                <label>
+                  <input type="radio" value="text" v-model="fileFormat" checked />
+                  Текстовый файл (.txt)
+                </label>
+                <label>
+                  <input type="radio" value="word" v-model="fileFormat" />
+                  Word файл (.docx)
+                </label>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveBooks">Сохранить</button>
               </div>
             </div>
           </div>
@@ -141,36 +149,62 @@ watch(books, () => {
 const bookList = computed(() => {
   return selectedBooks.value
     .map((bookId) => books.value.find((item) => item.id == bookId))
-    .map((book, index) => `${index + 1}. ${book?.description} (${book?.year})`)
-    .join("<br>");
+    .map((book, index) => {
+      const mainTitle = book?.title[0];
+      const otherTitles = book?.title.slice(1).join(", ");
+      const formattedOtherTitles = otherTitles ? `(${otherTitles})` : '';
+      
+      // Форматирование авторов
+      const authors = book?.author || [];
+      const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
+
+      return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book?.year})<br>${authorText}`;
+    })
+    .join("<hr>"); // Используем <hr> для разделителей
 });
 
 // Функция для сохранения книг в текстовый файл
 function saveBooks() {
-  // Формируем текстовое содержимое
-  const content = selectedBooks.value
-    .map((bookId) => books.value.find((item) => item.id == bookId))
-    .map((book, index) => `${index + 1}. ${book?.description} (${book?.year})`)
-    .join("\n"); // Используем \n для переноса строк
+    // Формируем текстовое содержимое
+    const content = selectedBooks.value
+      .map((bookId) => books.value.find((item) => item.id == bookId))
+      .map((book, index) => {
+        const mainTitle = book?.title[0];
+        const otherTitles = book?.title.slice(1).join(", ");
+        const formattedOtherTitles = otherTitles ? `(${otherTitles})` : '';
+        
+        // Форматирование авторов
+        const authors = book?.author || [];
+        const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
 
-  // Создаём имя файла по умолчанию
-  const today = new Date();
-  const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.txt`;
+        return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book?.year})\n${authorText}`;
+      })
+      .join("\n"); // Используем \n для переноса строк
 
-  // Запрашиваем имя файла у пользователя
-  const fileName = prompt("Введите имя файла:", defaultFileName) || defaultFileName;
+    // Создаём имя файла по умолчанию
+    const today = new Date();
+    const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.txt`;
 
-  const blob = new Blob([content], { type: 'text/plain' }); // Создаём Blob с типом текст
-  const url = URL.createObjectURL(blob); // Создаём URL для Blob
+    // Запрашиваем имя файла у пользователя
+    const fileName = prompt("Введите имя файла:", defaultFileName);
 
-  const a = document.createElement('a'); // Создаём элемент <a>
-  a.href = url; // Устанавливаем href как URL Blob
-  a.download = fileName; // Устанавливаем имя файла для скачивания
-  document.body.appendChild(a); // Добавляем элемент в DOM
-  a.click(); // Эмулируем клик для скачивания
-  document.body.removeChild(a); // Удаляем элемент из DOM
-  URL.revokeObjectURL(url); // Освобождаем память
-};
+    // Если пользователь нажал "Отмена" или оставил поле пустым, выходим из функции
+    if (fileName === null || fileName.trim() === "") {
+      return; // Прерываем выполнение функции
+    }
+
+    const blob = new Blob([content], { type: 'text/plain' }); // Создаём Blob с типом текст
+    const url = URL.createObjectURL(blob); // Создаём URL для Blob
+
+    const a = document.createElement('a'); // Создаём элемент <a>
+    a.href = url; // Устанавливаем href как URL Blob
+    a.download = fileName; // Устанавливаем имя файла для скачивания
+    document.body.appendChild(a); // Добавляем элемент в DOM
+    a.click(); // Эмулируем клик для скачивания
+    document.body.removeChild(a); // Удаляем элемент из DOM
+    URL.revokeObjectURL(url); // Освобождаем память
+  }
+}
 </script>
 
 <style scoped>
@@ -200,6 +234,16 @@ function saveBooks() {
   font-size: 1.1rem;
   font-weight: bold;
   margin-bottom: 5px;
+}
+
+hr {
+  margin: 10px 0; /* Отступы сверху и снизу */
+  border-width: 3px; /* Установите нужную толщину */
+  border-color: #000000; /* Цвет границы (черный) */
+}
+
+.book-title .other-titles {
+  font-style: italic;
 }
 
 .book-author {
