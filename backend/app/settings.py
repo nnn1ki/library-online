@@ -145,3 +145,4 @@ SIMPLE_JWT = {
 }
 
 OPAC_HOSTNAME = "https://library.istu.edu/opac"
+SERVICE_HOSTNAME = "http://localhost:5173"
