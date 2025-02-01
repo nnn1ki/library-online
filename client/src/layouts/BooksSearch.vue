@@ -120,7 +120,7 @@ function buildQuery(): string {
 
 function updateSearchParams() {
   router.push({
-    path: "/", query: {
+    path: "", query: {
       query: buildQuery(),
       library: library.value
     }
