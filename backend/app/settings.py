@@ -141,7 +141,7 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "ACCESS_TOKEN_LIFETIME": timedelta(seconds=3600),
-    "REFRESH_TOKEN_LIFETIME": timedelta(seconds=86400),
+    "REFRESH_TOKEN_LIFETIME": timedelta(seconds=86400), # TODO: возможность настройки времени жизни токенов
 }
 
 OPAC_HOSTNAME = "https://library.istu.edu/opac"
