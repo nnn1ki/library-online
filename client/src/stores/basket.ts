@@ -37,9 +37,8 @@ export const useBasketStore = defineStore("basket", () => {
         localBooks.value.push(book);
       }
     }
-
     toast.success(book.title[0] + " добавлен(a) в корзину");
-    updateBooks();
+    await updateBooks();
   }
 
   async function removeBook(book: Book) {
@@ -48,7 +47,7 @@ export const useBasketStore = defineStore("basket", () => {
     } else {
       localBooks.value = localBooks.value.filter((b) => b.id !== book.id);
     }
-    updateBooks();
+    await updateBooks();
   }
 
   async function clearBooks() {
@@ -57,7 +56,7 @@ export const useBasketStore = defineStore("basket", () => {
     } else {
       localBooks.value = [];
     }
-    updateBooks();
+    await updateBooks();
   }
 
   useAuthentication(async (auth) => {
@@ -66,7 +65,7 @@ export const useBasketStore = defineStore("basket", () => {
       localBooks.value = [];
     }
 
-    updateBooks();
+    await updateBooks();
   });
 
   return {

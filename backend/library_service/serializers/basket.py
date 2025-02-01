@@ -23,7 +23,8 @@ class AddBasketSerializer(serializers.Serializer):
 
                 BasketItem.objects.create(book_id=book, basket=basket)
                 books_current.append(book)
-
+            
         return {
             "books": books_current
         }
+        

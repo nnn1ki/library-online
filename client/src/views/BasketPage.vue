@@ -109,6 +109,8 @@ const selectedBooks = ref<string[]>([]);
 const isModalVisible = ref(false);
 const modalBook = ref<Book>();
 
+
+
 function toggleBookSelection(bookId: string) {
   const index = selectedBooks.value.indexOf(bookId);
   if (index === -1) {
@@ -171,6 +173,7 @@ function saveBooks() {
   document.body.removeChild(a); // Удаляем элемент из DOM
   URL.revokeObjectURL(url); // Освобождаем память
 };
+
 </script>
 
 <style scoped>
