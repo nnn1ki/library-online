@@ -30,9 +30,9 @@ export async function createOrder(
 ) {
   try {
     await axios.post("/api/order/", {
-        library: libraryId,
-        books: bookIds,
-        borrowed: borrowedBookIds,
+      library: libraryId,
+      books: bookIds,
+      borrowed: borrowedBookIds,
     });
   } catch (error) {
     console.error("Ошибка при создании заказа", error);
@@ -48,9 +48,9 @@ export async function editOrder(
 ) {
   try {
     await axios.put(`/api/order/${orderId}`, {
-        library: libraryId,
-        books: bookIds,
-        borrowed: borrowedBookIds,
+      library: libraryId,
+      books: bookIds,
+      borrowed: borrowedBookIds,
     });
   } catch (error) {
     console.error("Ошибка при редактировании заказа", error);
