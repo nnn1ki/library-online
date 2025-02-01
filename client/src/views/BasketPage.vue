@@ -183,11 +183,8 @@ async function onCreateOrderClick() {
   orderStore.selectedBooks = basketStore.books.filter((b) => { 
     return selectedBooks.value.some((selectedBook) => selectedBook === b.id)
   });
-  console.log(orderStore.selectedBooks);
-
-  console.log(orderStore.selectedBooks);
+  
   router.push("/orders");
-
 }
 
 </script>

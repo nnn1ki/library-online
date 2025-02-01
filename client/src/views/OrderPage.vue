@@ -1,12 +1,11 @@
 <script setup>
 import { ref, computed, onBeforeMount } from "vue";
-import { useRouter } from "vue-router";
 import { useOrderStore } from "@/stores/orderStore";
 
 import { borrowedList } from '@/api/order'
 import borrowedBooks  from "@/components/BorrowedBooks.vue"
+import { storeToRefs } from "pinia";
 
-const router = useRouter();
 const orderStore = useOrderStore();
 
 // Поле для ввода email (опционально)
@@ -16,9 +15,13 @@ const totalBooks = computed(() => {
   return selectedBooks.value.reduce((total, book) => total + book.quantity, 0);
 });
 
+const { selectedBooks } = storeToRefs(orderStore);
+const loading = ref(false);
 const placeOrder = async () => {
+  loading.value = true;
+  console.log(orderStore.selectedBooks);
   await orderStore.handleCreateOrder();
-  router.push({ name: "home" }); //возвращаем в начало пользовательского пути
+  loading.value = false;
 };
 
 onBeforeMount(async () => {
@@ -56,7 +59,7 @@ onBeforeMount(async () => {
 
       <!-- Кнопка оформления заказа -->
       <div class="order-button">
-        <button class="btn btn-success" @click="placeOrder">Оформить заказ</button>
+        <button class="btn btn-success" @click="placeOrder" :disabled="loading">Оформить заказ</button>
       </div>
     </div>
   </div>

@@ -25,7 +25,7 @@ export async function getOrder(orderId: number): Promise<Order> {
 
 export async function createOrder(
   libraryId: number,
-  bookIds: number[],
+  bookIds: string[],
   borrowedBookIds: number[]
 ) {
   try {
