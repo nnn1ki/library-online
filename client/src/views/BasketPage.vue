@@ -108,6 +108,8 @@ import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import { computed, ref, onMounted, watch } from "vue";
+// импорты для работы с docx
+import { Document, Packer, Paragraph, TextRun } from "docx";
 
 const basketStore = useBasketStore();
 
@@ -116,6 +118,8 @@ const selectedBooks = ref<string[]>([]);
 
 const isModalVisible = ref(false);
 const modalBook = ref<Book>();
+
+const fileFormat = ref('text'); // По умолчанию текстовый файл
 
 function toggleBookSelection(bookId: string) {
   const index = selectedBooks.value.indexOf(bookId);
@@ -163,8 +167,10 @@ const bookList = computed(() => {
     .join("<hr>"); // Используем <hr> для разделителей
 });
 
-// Функция для сохранения книг в текстовый файл
+// Функция для сохранения книг
 function saveBooks() {
+  // Сохранение в текстовый файл
+  if (fileFormat.value === 'text') {
     // Формируем текстовое содержимое
     const content = selectedBooks.value
       .map((bookId) => books.value.find((item) => item.id == bookId))
@@ -174,7 +180,7 @@ function saveBooks() {
         const formattedOtherTitles = otherTitles ? `(${otherTitles})` : '';
         
         // Форматирование авторов
-        const authors = book?.author || [];
+        const authors = book?.author;
         const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
 
         return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book?.year})\n${authorText}`;
@@ -203,6 +209,80 @@ function saveBooks() {
     a.click(); // Эмулируем клик для скачивания
     document.body.removeChild(a); // Удаляем элемент из DOM
     URL.revokeObjectURL(url); // Освобождаем память
+
+  } else if (fileFormat.value === 'word') {
+    // Код для сохранения в .docx файл
+    const content = []
+    // Заполнение массива content данными о книгах
+    selectedBooks.value.forEach((bookId, index) => {
+      const book = books.value.find((item) => item.id == bookId);
+      const mainTitle = book?.title[0];
+      let otherTitles = []
+      if (book.title.length > 1) {
+        otherTitles = book?.title.slice(1).join(", ");
+      }
+      const authors = book?.author;
+      const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
+      const year = book?.year;
+      // Форматирование строки для добавления в массив content
+      let bookInfo = ""
+      if (otherTitles.length === 0) {
+        bookInfo = `${index + 1}. ${mainTitle} (${year})`;
+      } else {
+        bookInfo = `${index + 1}. ${mainTitle} (${otherTitles}) (${year})`;
+      }
+      // Добавление названия книги и авторов в массив content
+      content.push({
+        title: bookInfo,
+        authors: authorText
+      });
+    });
+
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: [
+          new Paragraph({
+            children: [
+              new TextRun("Список литературы:"),
+            ],
+          }),
+          // Добавляем каждую книгу как отдельный параграф
+          ...content.map(item => [
+            new Paragraph({
+              children: [
+                new TextRun(item.title),
+              ],
+            }),
+            // Добавляем к книге авторов как отдельный параграф
+            new Paragraph({
+              children: [
+                new TextRun(item.authors),
+              ],
+            }),
+          ]).flat(), // Используем flat() для объединения массивов
+        ],
+      }],
+    });
+
+    Packer.toBlob(doc).then((blob) => {
+      const today = new Date();
+      const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.docx`;
+      const fileName = prompt("Введите имя файла:", defaultFileName);
+
+      if (fileName === null || fileName.trim() === "") {
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
   }
 }
 </script>
