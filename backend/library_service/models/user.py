@@ -32,6 +32,7 @@ class BasketItem(models.Model):
     class Meta:
         verbose_name = "Элемент корзины"
         verbose_name_plural = "Элементы корзины"
-
+        unique_together = ("basket", "book_id")
+        
     def __str__(self):
         return f"Book ID {self.book_id} in Basket {self.basket.id}"
