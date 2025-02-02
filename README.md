@@ -138,15 +138,19 @@ python manage.py runserver
 ```sh
 python manage.py runserver --settings local_settings
 ```
+Это, в частности, необходимо сделать, если нужно протестировать работу oauth. Тогда в файле `local_settings.py` нужно заполнить поля `OAUTH_CLIENT_ID` и `OAUTH_CLIENT_SECRET`.  
 
 #### Запуск на проде
 
-В корне необходимо создать два файла: `prod_settings.py` и `.env`. Рекомендуется скопировать в них текст из соответствующих им .example файлов: `prod_settings.py.example` и `.env.example`.  
+В корне необходимо создать два файла: `prod_settings.py` и `.env`, скопировав в них текст из соответствующих .example файлов: `prod_settings.py.example` и `.env.example`.  
 
 После этого требуется дополнительное заполнение созданных файлов. Файл `prod_settings.py` можно оставить как есть, однако в некоторых случаях все же могут потребоваться дополнительные специфические для django настройки. Обязательным является заполнение в файле `.env` следующих полей:
  - `POSTGRES_PASSWORD` (пароль СУБД)
  - `LIBRARY_PORT` (на каком порте будет хоститься сервис)
  - `DJANGO_SECRET_KEY` (секретный ключ для Django).  
+ - `SERVICE_HOSTNAME` (адрес сервиса, например: http://localhost:8000)  
+ - `OAUTH_CLIENT_ID` (публичная часть oauth ключа для int.istu.edu)
+ - `OAUTH_CLIENT_SECRET` (приватная часть oauth ключа для int.istu.edu)
 
 Пароль для БД рекомендуется генерировать случайно:
 ```sh
@@ -158,6 +162,8 @@ openssl rand -hex 32 | tr -d '\n'
 from django.core.management.utils import get_random_secret_key
 print(get_random_secret_key())
 ```  
+
+При получении пары ключей oauth, для redirect_uri нужно указать значение, равное `${SERVICE_HOSTNAME}/bitrix-auth`, соотввественно, подставив ранее указанное значение вместо `${SERVICE_HOSTNAME}`.  
 
 После того, как данные файлы были заполнены, можно приступать к запуску сервиса с использованием docker compose или podman compose:
 ```sh

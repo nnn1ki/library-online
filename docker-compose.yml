@@ -20,6 +20,9 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY}"
+      SERVICE_HOSTNAME: "${SERVICE_HOSTNAME}"
+      OAUTH_CLIENT_ID: "${OAUTH_CLIENT_ID}"
+      OAUTH_CLIENT_SECRET: "${OAUTH_CLIENT_SECRET}"
     volumes:
       - media:/app/media
       - django-static:/app/staticfiles
@@ -30,8 +33,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.nginx
-      # args:
-        # VITE_SOMETHING: "${VITE_SOMETHING}"
+      args:
+        VITE_SERVICE_HOSTNAME: "${SERVICE_HOSTNAME}"
+        VITE_OAUTH_CLIENT_ID: "${OAUTH_CLIENT_ID}"
     restart: unless-stopped
     ports:
       - "${LIBRARY_PORT}:80"

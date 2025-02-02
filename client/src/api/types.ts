@@ -6,6 +6,8 @@ export type Group = keyof typeof groups;
 
 export type ProfileInfo = {
   username: string;
+  first_name: string;
+  last_name: string;
   groups: Group[];
 };
 
