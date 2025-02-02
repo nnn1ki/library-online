@@ -22,7 +22,7 @@ class BitrixAuthView(APIView):
         scope = serializers.CharField(required=False)
         server_domain = serializers.CharField(required=False)
 
-    def auth_login(request, user):
+    def auth_login(user):
         tokens = TokenObtainPairSerializer.get_token(user)
         parse_token = {
             'refresh': str(tokens),
@@ -90,6 +90,6 @@ class BitrixAuthView(APIView):
             user.userprofile.mira_id = mira_id
 
         user.userprofile.save()
-        self.auth_login(self.request, user)
+        self.auth_login(user)
 
         return redirect("/")
