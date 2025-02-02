@@ -1,5 +1,8 @@
 FROM node as build-frontend
 
+ARG VITE_SERVICE_HOSTNAME
+ARG VITE_OAUTH_CLIENT_ID
+
 WORKDIR /app
 COPY client/. /app/
 RUN --mount=type=cache,target=/app/.npm npm set cache /app/.npm && npm install && npm run build
