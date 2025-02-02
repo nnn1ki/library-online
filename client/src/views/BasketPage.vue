@@ -27,11 +27,12 @@
             <div class="col">
               <div class="book-info">
                 <h6 class="book-title">
-                  {{ book.title[0] }} 
+                  {{ book.title[0] }}
                   <span class="other-titles" v-if="book.title.length > 1">({{ book.title.slice(1).join(", ") }})</span>
                   ({{ book.year }})
                 </h6>
-                <p class="book-author">{{ book.author.join(", ") }}</p>
+                <p v-if="book.author.length > 0" class="book-author">{{ book.author.join(", ") }}</p>
+                <p v-else class="book-author">{{ book.collective.join(", ") }}</p>
                 <div class="btn-group">
                   <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
                     Удалить
@@ -68,7 +69,7 @@
       <!-- Модальное окно для подтверждения сохранения -->
       <div>
         <div class="modal fade" id="confirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="confirmationModalLabel" aria-hidden="true">
+          aria-labelledby="confirmationModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-lg">
             <div class="modal-content">
               <div class="modal-header">
@@ -77,22 +78,27 @@
               </div>
               <div class="modal-body">
                 <p>Вы хотите распечатать книги:</p>
-                <hr/> <!-- Разделительная полоска -->
+                <hr /> <!-- Разделительная полоска -->
                 <div v-html="bookList"></div>
-                <hr/> <!-- Разделительная полоска -->
+                <hr /> <!-- Разделительная полоска -->
                 <p>Всего книг: {{ selectedBooks.length }}</p>
               </div>
               <div class="modal-footer">
                 <label>
-                  <input type="radio" value="text" v-model="fileFormat" checked />
+                  <input type="radio" value="txt" v-model="fileFormat" checked />
                   Текстовый файл (.txt)
                 </label>
                 <label>
-                  <input type="radio" value="word" v-model="fileFormat" />
+                  <input type="radio" value="docx" v-model="fileFormat" />
                   Word файл (.docx)
                 </label>
+                <label>
+                  <input disabled="true" type="radio" value="pdf" v-model="fileFormat" />
+                  PDF файл (.pdf)
+                </label>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveBooks">Сохранить</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                  @click="saveBooks">Сохранить</button>
               </div>
             </div>
           </div>
@@ -108,7 +114,6 @@ import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import { computed, ref, onMounted, watch } from "vue";
-// импорты для работы с docx
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
 const basketStore = useBasketStore();
@@ -119,7 +124,7 @@ const selectedBooks = ref<string[]>([]);
 const isModalVisible = ref(false);
 const modalBook = ref<Book>();
 
-const fileFormat = ref('text'); // По умолчанию текстовый файл
+const fileFormat = ref<"txt" | "docx" | "pdf">("txt");
 
 function toggleBookSelection(bookId: string) {
   const index = selectedBooks.value.indexOf(bookId);
@@ -152,17 +157,17 @@ watch(books, () => {
 // Расчитываемое свойство для книг в модальном окне
 const bookList = computed(() => {
   return selectedBooks.value
-    .map((bookId) => books.value.find((item) => item.id == bookId))
+    .map((bookId) => books.value.find((item) => item.id == bookId)!)
     .map((book, index) => {
-      const mainTitle = book?.title[0];
-      const otherTitles = book?.title.slice(1).join(", ");
-      const formattedOtherTitles = otherTitles ? `(${otherTitles})` : '';
-      
+      const mainTitle = book.title[0];
+      const otherTitles = book.title.slice(1).join(", ");
+      const formattedOtherTitles = otherTitles ? `(${otherTitles})` : "";
+
       // Форматирование авторов
-      const authors = book?.author || [];
+      const authors = book.author.length > 0 ? book.author : book.collective;
       const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
 
-      return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book?.year})<br>${authorText}`;
+      return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book.year})<br>${authorText}`;
     })
     .join("<hr>"); // Используем <hr> для разделителей
 });
@@ -170,60 +175,44 @@ const bookList = computed(() => {
 // Функция для сохранения книг
 function saveBooks() {
   // Сохранение в текстовый файл
-  if (fileFormat.value === 'text') {
+  if (fileFormat.value === "txt") {
     // Формируем текстовое содержимое
     const content = selectedBooks.value
-      .map((bookId) => books.value.find((item) => item.id == bookId))
+      .map((bookId) => books.value.find((item) => item.id == bookId)!)
       .map((book, index) => {
-        const mainTitle = book?.title[0];
-        const otherTitles = book?.title.slice(1).join(", ");
-        const formattedOtherTitles = otherTitles ? `(${otherTitles})` : '';
-        
+        const mainTitle = book.title[0];
+        const otherTitles = book.title.slice(1).join(", ");
+        const formattedOtherTitles = otherTitles ? `(${otherTitles})` : "";
+
         // Форматирование авторов
-        const authors = book?.author;
+        const authors = book.author.length > 0 ? book.author : book.collective;
         const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
 
-        return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book?.year})\n${authorText}`;
+        return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book.year})\n${authorText}`;
       })
       .join("\n"); // Используем \n для переноса строк
 
+    const blob = new Blob([content], { type: "text/plain" }); // Создаём Blob с типом текст
+
     // Создаём имя файла по умолчанию
     const today = new Date();
-    const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.txt`;
+    const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}.txt`;
 
-    // Запрашиваем имя файла у пользователя
-    const fileName = prompt("Введите имя файла:", defaultFileName);
-
-    // Если пользователь нажал "Отмена" или оставил поле пустым, выходим из функции
-    if (fileName === null || fileName.trim() === "") {
-      return; // Прерываем выполнение функции
-    }
-
-    const blob = new Blob([content], { type: 'text/plain' }); // Создаём Blob с типом текст
-    const url = URL.createObjectURL(blob); // Создаём URL для Blob
-
-    const a = document.createElement('a'); // Создаём элемент <a>
-    a.href = url; // Устанавливаем href как URL Blob
-    a.download = fileName; // Устанавливаем имя файла для скачивания
-    document.body.appendChild(a); // Добавляем элемент в DOM
-    a.click(); // Эмулируем клик для скачивания
-    document.body.removeChild(a); // Удаляем элемент из DOM
-    URL.revokeObjectURL(url); // Освобождаем память
-
-  } else if (fileFormat.value === 'word') {
+    downloadBlob(blob, defaultFileName);
+  } else if (fileFormat.value === "docx") {
     // Код для сохранения в .docx файл
-    const content = []
+    const content: { title: string, authors: string }[] = []
     // Заполнение массива content данными о книгах
     selectedBooks.value.forEach((bookId, index) => {
-      const book = books.value.find((item) => item.id == bookId);
-      const mainTitle = book?.title[0];
-      let otherTitles = []
+      const book = books.value.find((item) => item.id == bookId)!;
+      const mainTitle = book.title[0];
+      let otherTitles = "";
       if (book.title.length > 1) {
-        otherTitles = book?.title.slice(1).join(", ");
+        otherTitles = book.title.slice(1).join(", ");
       }
-      const authors = book?.author;
+      const authors = book.author.length > 0 ? book.author : book.collective;
       const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
-      const year = book?.year;
+      const year = book.year;
       // Форматирование строки для добавления в массив content
       let bookInfo = ""
       if (otherTitles.length === 0) {
@@ -267,23 +256,37 @@ function saveBooks() {
 
     Packer.toBlob(doc).then((blob) => {
       const today = new Date();
-      const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.docx`;
+      const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}.docx`;
       const fileName = prompt("Введите имя файла:", defaultFileName);
 
       if (fileName === null || fileName.trim() === "") {
         return;
       }
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      downloadBlob(blob, fileName);
     });
+  } else if (fileFormat.value === "pdf") {
+    throw Error("TODO");
   }
+}
+
+function downloadBlob(blob: Blob, defaultFilename: string) {
+  // Запрашиваем имя файла у пользователя
+  const filename = prompt("Введите имя файла:", defaultFilename);
+
+  // Если пользователь нажал "Отмена" или оставил поле пустым, выходим из функции
+  if (filename === null || filename.trim() === "") {
+    return; // Прерываем выполнение функции
+  }
+
+  const url = URL.createObjectURL(blob); // Создаём URL для Blob
+  const a = document.createElement("a"); // Создаём элемент <a>
+  a.href = url; // Устанавливаем href как URL Blob
+  a.download = filename; // Устанавливаем имя файла для скачивания
+  document.body.appendChild(a); // Добавляем элемент в DOM
+  a.click(); // Эмулируем клик для скачивания
+  document.body.removeChild(a); // Удаляем элемент из DOM
+  URL.revokeObjectURL(url); // Освобождаем память
 }
 </script>
 
@@ -317,9 +320,12 @@ function saveBooks() {
 }
 
 hr {
-  margin: 10px 0; /* Отступы сверху и снизу */
-  border-width: 3px; /* Установите нужную толщину */
-  border-color: #000000; /* Цвет границы (черный) */
+  margin: 10px 0;
+  /* Отступы сверху и снизу */
+  border-width: 3px;
+  /* Установите нужную толщину */
+  border-color: #000000;
+  /* Цвет границы (черный) */
 }
 
 .book-title .other-titles {
