@@ -89,8 +89,7 @@ erDiagram
         int order_id FK
         varchar exemplar_id
         varchar book_id
-        bool handed
-        bool returned
+        varchar status
         int order_id_to_return FK
     }
 

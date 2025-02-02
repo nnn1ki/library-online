@@ -641,12 +641,14 @@ components:
           $ref: "#/components/schemas/OrderBookId"
         book:
           $ref: "#/components/schemas/Book"
-        handed:
-          type: boolean
-          description: Была ли выдана книга
-        returned:
-          type: boolean
-          description: Возвращена ли книга
+        status:
+          type: string
+          description: Статус книги
+          enum:
+            - ordered
+            - handed
+            - returned
+            - cancelled
     OrderId:
       type: number
       description: ID заказа
