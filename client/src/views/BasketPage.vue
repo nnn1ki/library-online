@@ -31,7 +31,8 @@
                   <span class="other-titles" v-if="book.title.length > 1">({{ book.title.slice(1).join(", ") }})</span>
                   ({{ book.year }})
                 </h6>
-                <p class="book-author">{{ book.author.join(", ") }}</p>
+                <p v-if="book.author.length > 0" class="book-author">{{ book.author.join(", ") }}</p>
+                <p v-else class="book-author">{{ book.collective.join(", ") }}</p>
                 <div class="btn-group">
                   <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
                     Удалить
@@ -84,15 +85,20 @@
               </div>
               <div class="modal-footer">
                 <label>
-                  <input type="radio" value="text" v-model="fileFormat" checked />
+                  <input type="radio" value="txt" v-model="fileFormat" checked />
                   Текстовый файл (.txt)
                 </label>
                 <label>
-                  <input type="radio" value="word" v-model="fileFormat" />
+                  <input type="radio" value="docx" v-model="fileFormat" />
                   Word файл (.docx)
                 </label>
+                <label>
+                  <input disabled="true" type="radio" value="pdf" v-model="fileFormat" />
+                  PDF файл (.pdf)
+                </label>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveBooks">Сохранить</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                  @click="saveBooks">Сохранить</button>
               </div>
             </div>
           </div>
@@ -120,7 +126,7 @@ const selectedBooks = ref<string[]>([]);
 const isModalVisible = ref(false);
 const modalBook = ref<Book>();
 
-const fileFormat = ref('text'); // По умолчанию текстовый файл
+const fileFormat = ref<"txt" | "docx" | "pdf">("txt");
 
 function toggleBookSelection(bookId: string) {
   const index = selectedBooks.value.indexOf(bookId);
@@ -155,7 +161,7 @@ const bookList = computed(() => {
   // Разъединяем книги на русском от книг на английском и фильтруем по алфавиту
   const sortBooks = (language) => {
     const filteredBooks = selectedBooks.value
-      .map((bookId) => books.value.find((item) => item.id == bookId))
+      .map((bookId) => books.value.find((item) => item.id == bookId!))
       .filter((book) => book?.language[0] === language);
 
     return filteredBooks.sort((a, b) => {
@@ -177,16 +183,16 @@ const bookList = computed(() => {
 
   // Формируем список литературы
   return combinedBooks.map((book, index) => {
-    // const mainTitle = book?.title[0];
-    // const authors = book?.author;
-    // const year = book?.year;
-    // const city = book?.city;
-    // const publisher = book?.publisher;
-    // const subject = book?.subject;
+    // const mainTitle = book.title[0];
+    // const authors = book.author;
+    // const year = book.year;
+    // const city = book.city;
+    // const publisher = book.publisher;
+    // const subject = book.subject;
     // return `${index + 1}. ${authors[0]} ${mainTitle} : ${subject} / ${authors.join(', ')} - ${city} : ${publisher}, ${year}.`;
 
     // Используем brief, т.к. он содержит нужную информацию
-    const brief = book?.brief;
+    const brief = book.brief;
     // Извлекаем часть до разделителя ": ил. –" или "– ISBN"
     const endIndex1 = brief.indexOf(": ил. –");
     const endIndex2 = brief.indexOf("– ISBN");
@@ -204,31 +210,21 @@ const bookList = computed(() => {
 
 // Функция для сохранения книг
 function saveBooks() {
-  if (fileFormat.value === 'text') {
+  if (fileFormat.value === 'txt') {
     // Сохранение в текстовый файл
     // Получаем текстовое содержимое из уже сформированного bookList
     const content = bookList.value.split("<hr>").join("\n"); // Разбиваем текст по "<hr>" и объединяем строки с новой строки
+
+    // Создаём имя файла по умолчанию
+    const blob = new Blob([content], { type: "text/plain" }); // Создаём Blob с типом текст
+
     // Создаём имя файла по умолчанию
     const today = new Date();
-    const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.txt`;
-    // Запрашиваем имя файла у пользователя
-    const fileName = prompt("Введите имя файла:", defaultFileName);
-    // Если пользователь нажал "Отмена" или оставил поле пустым, выходим из функции
-    if (fileName === null || fileName.trim() === "") {
-      return;
-    }
+    const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}.txt`;
 
-    const blob = new Blob([content], { type: 'text/plain' }); // Создаём Blob с типом текст
-    const url = URL.createObjectURL(blob); // Создаём URL для Blob
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadBlob(blob, defaultFileName);
 
-  } else if (fileFormat.value === 'word') {
+  } else if (fileFormat.value === 'docx') {
     // Сохранение в .docx файл
     // Получаем текстовое содержимое из уже сформированного bookList
     const content = bookList.value.split("<hr>"); // Разбиваем текст по "<hr>"
@@ -253,7 +249,7 @@ function saveBooks() {
         ],
       }],
     });
-    
+
     Packer.toBlob(doc).then((blob) => {
       const today = new Date();
       const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.docx`;
@@ -263,16 +259,30 @@ function saveBooks() {
         return;
       }
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      downloadBlob(blob, fileName);
     });
+  } else if (fileFormat.value === "pdf") {
+    throw Error("TODO");
   }
+}
+
+function downloadBlob(blob: Blob, defaultFilename: string) {
+  // Запрашиваем имя файла у пользователя
+  const filename = prompt("Введите имя файла:", defaultFilename);
+
+  // Если пользователь нажал "Отмена" или оставил поле пустым, выходим из функции
+  if (filename === null || filename.trim() === "") {
+    return; // Прерываем выполнение функции
+  }
+
+  const url = URL.createObjectURL(blob); // Создаём URL для Blob
+  const a = document.createElement("a"); // Создаём элемент <a>
+  a.href = url; // Устанавливаем href как URL Blob
+  a.download = filename; // Устанавливаем имя файла для скачивания
+  document.body.appendChild(a); // Добавляем элемент в DOM
+  a.click(); // Эмулируем клик для скачивания
+  document.body.removeChild(a); // Удаляем элемент из DOM
+  URL.revokeObjectURL(url); // Освобождаем память
 }
 </script>
 
