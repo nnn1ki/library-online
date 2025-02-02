@@ -1,9 +1,8 @@
 <script setup>
 import { ref, computed, onBeforeMount } from "vue";
 import { useOrderStore } from "@/stores/orderStore";
-
 import { borrowedList } from '@/api/order'
-import borrowedBooks  from "@/components/BorrowedBooks.vue"
+import borrowedBooks from "@/components/BorrowedBooks.vue"
 import { storeToRefs } from "pinia";
 
 const orderStore = useOrderStore();
@@ -32,17 +31,24 @@ onBeforeMount(async () => {
 
 <template>
   <div class="container">
-    <borrowedBooks v-if="orderStore.borrowedBooks.length > 0"/>
+    <borrowedBooks v-if="orderStore.borrowedBooks.length > 0" />
     <div class="order-summary">
       <h2>Оформление заказа</h2>
       <!-- Список книг -->
       <div class="book-list">
         <h5>Список книг:</h5>
-        <ul>
-          <li v-for="(book, i) in orderStore.selectedBooks" :key="book.title">
-            <strong> {{ i + 1 }}</strong> - {{ book.description }}
-          </li>
-        </ul>
+        <div v-for="(book, i) in orderStore.selectedBooks" :key="book.id" class="book-item">
+            <div class="book">
+              <strong>{{ i + 1 }}</strong>
+            <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
+            <h6 v-if="book.author.length > 0" class="card-subtitle text-muted">
+              {{ book.author.join(", ") }}
+            </h6>
+            <h6 v-else-if="item.book.collective.length > 0" class="card-subtitle text-muted">
+              {{ book.collective.join(", ") }}
+            </h6>
+          </div>
+        </div>
       </div>
 
       <!-- Информация о заказе -->
@@ -59,7 +65,10 @@ onBeforeMount(async () => {
 
       <!-- Кнопка оформления заказа -->
       <div class="order-button">
-        <button class="btn btn-success" @click="placeOrder" :disabled="loading">Оформить заказ</button>
+        <button class="btn btn-success" @click="placeOrder" :disabled="loading">
+          <span v-if="!loading">Оформить заказ</span>
+          <span v-else>Обработка...</span>
+          <span v-if="loading" class="spinner"></span></button>
       </div>
     </div>
   </div>
@@ -72,6 +81,7 @@ onBeforeMount(async () => {
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
 
 .order-summary h2 {
   margin-bottom: 20px;
@@ -112,5 +122,19 @@ onBeforeMount(async () => {
   padding: 12px;
   font-size: 1.1rem;
   border-radius: 8px;
+}
+.book { 
+  margin-bottom: 15px;
+}
+
+.spinner {
+  display: inline-block;
+  margin-left: 8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
 }
 </style>

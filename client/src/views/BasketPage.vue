@@ -184,7 +184,7 @@ async function onCreateOrderClick() {
     return selectedBooks.value.some((selectedBook) => selectedBook === b.id)
   });
   
-  router.push("/orders");
+  router.push("/order");
 }
 
 </script>
