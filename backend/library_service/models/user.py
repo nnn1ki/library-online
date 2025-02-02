@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from django.dispatch.dispatcher import receiver
+
 class UserProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile")
     library_card = models.CharField(verbose_name="Номер читательского билета", max_length=255)
@@ -13,6 +15,20 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Profile for {self.user.username}"
+    
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            UserProfile.objects.create(user=instance)
+
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+        try:
+            instance.userprofile.save()
+        except User.userprofile.RelatedObjectDoesNotExist as ex:
+            UserProfile.objects.create(user=instance)
+
+
     
 class Basket(models.Model):
     created_at = models.DateTimeField(verbose_name="Дата создания", auto_now_add=True)

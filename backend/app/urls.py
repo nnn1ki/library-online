@@ -27,6 +27,7 @@ from library_service.views.catalog import *
 from library_service.views.basket import *
 from library_service.views.profile import *
 from library_service.views.order import *
+from library_service.views.bitrix import BitrixAuthView
 
 router = DefaultRouter()
 router.register("book", BookViewset, basename="book")
@@ -43,5 +44,6 @@ urlpatterns = [
     path('api/auth/login/', TokenObtainPairView.as_view()),
     path('api/auth/refresh/', TokenRefreshView.as_view()),
     path('api/auth/logout/', TokenBlacklistView.as_view()),
+    path('/api/auth/bitrix-login', BitrixAuthView.as_view()),
     path("api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
