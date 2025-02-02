@@ -44,9 +44,9 @@ class BitrixAuthView(APIView):
             profile__campus_id=campus_id,
             defaults={
                 "username": email,
-                "last_name": result["last_name"] or "",
+                "email": email,
                 "first_name": result["name"] or "",
-                "email": result["email"],
+                "last_name": result["last_name"] or ""
             }
         )
 

@@ -2,7 +2,7 @@
     <form @submit.prevent="login" class="w-50 mx-auto">
         <h1 class="text-center">Вход</h1>
         <div class="mb-3">
-            <label for="username" class="form-label">Электронная почта:</label>
+            <label for="username" class="form-label">Имя пользователя:</label>
             <input type="text" class="form-control" id="username" v-model="username" required />
         </div>
         <div class="mb-3">

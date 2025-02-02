@@ -2,8 +2,10 @@
   <div class="container mt-5">
     <Login v-if="!isAuthenticated" />
     <div v-else class="w-50 mx-auto">
-      <h1 class="text-center mb-2">{{ currentUser?.username }}</h1>
-      <h2 class="text-center mb-2">{{ currentUser?.groups.map((group) => groups[group]).join(", ") }}</h2>
+      <h1 class="text-center mb-2">{{ currentUser?.first_name }} {{ currentUser?.last_name }}</h1>
+      <h2 class="text-center mb-2">{{ currentUser?.username }}</h2>
+      <h3 class="text-center mb-2">{{ currentUser?.groups.map((group) => groups[group]).join(", ") }}
+      </h3>
       <button class="btn btn-danger w-100" @click="authStore.logout">Выйти</button>
     </div>
   </div>

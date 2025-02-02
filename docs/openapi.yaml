@@ -501,6 +501,12 @@ components:
         username:
           description: username пользователя
           type: string
+        first_name:
+          description: Имя 
+          type: string
+        last_name:
+          description: Фамилия
+          type: string
         groups:
           description: Группы пользователя
           type: array
