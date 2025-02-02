@@ -27,7 +27,7 @@
             <div class="col">
               <div class="book-info">
                 <h6 class="book-title">
-                  {{ book.title[0] }} 
+                  {{ book.title[0] }}
                   <span class="other-titles" v-if="book.title.length > 1">({{ book.title.slice(1).join(", ") }})</span>
                   ({{ book.year }})
                 </h6>
@@ -69,7 +69,7 @@
       <!-- Модальное окно для подтверждения сохранения -->
       <div>
         <div class="modal fade" id="confirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="confirmationModalLabel" aria-hidden="true">
+          aria-labelledby="confirmationModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-lg">
             <div class="modal-content">
               <div class="modal-header">
@@ -78,9 +78,9 @@
               </div>
               <div class="modal-body">
                 <p>Вы хотите распечатать книги:</p>
-                <hr/> <!-- Разделительная полоска -->
+                <hr /> <!-- Разделительная полоска -->
                 <div v-html="bookList"></div>
-                <hr/> <!-- Разделительная полоска -->
+                <hr /> <!-- Разделительная полоска -->
                 <p>Всего книг: {{ selectedBooks.length }}</p>
               </div>
               <div class="modal-footer">
@@ -114,7 +114,6 @@ import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import { computed, ref, onMounted, watch } from "vue";
-// импорты для работы с docx
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { todo } from "node:test";
 
@@ -158,19 +157,17 @@ watch(books, () => {
 
 // Расчитываемое свойство для книг в модальном окне
 const bookList = computed(() => {
-  // Разъединяем книги на русском от книг на английском и фильтруем по алфавиту
+  // Разъединяем книги на русском от книг на английском и фильтруем по названиям по алфавиту
   const sortBooks = (language) => {
     const filteredBooks = selectedBooks.value
       .map((bookId) => books.value.find((item) => item.id == bookId!))
       .filter((book) => book?.language[0] === language);
 
     return filteredBooks.sort((a, b) => {
-      const authorA = a.author[0].split(" ")[0];
-      const authorB = b.author[0].split(" ")[0];
       const titleA = a.title[0];
       const titleB = b.title[0];
 
-      return authorA.localeCompare(authorB) || titleA.localeCompare(titleB);
+      return titleA.localeCompare(titleB);
     });
   };
 
@@ -252,14 +249,9 @@ function saveBooks() {
 
     Packer.toBlob(doc).then((blob) => {
       const today = new Date();
-      const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.docx`;
-      const fileName = prompt("Введите имя файла:", defaultFileName);
+      const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}.docx`;
 
-      if (fileName === null || fileName.trim() === "") {
-        return;
-      }
-
-      downloadBlob(blob, fileName);
+      downloadBlob(blob, defaultFileName);
     });
   } else if (fileFormat.value === "pdf") {
     throw Error("TODO");
