@@ -8,7 +8,7 @@ import requests
 
 from django.conf import settings
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 from rest_framework.exceptions import APIException
 
@@ -18,7 +18,7 @@ class BitrixAuthView(APIView):
     class InnerSerializer(serializers.Serializer):
         code = serializers.CharField()
 
-    def auth_login(user):
+    def auth_login(self, user):
         tokens = TokenObtainPairSerializer.get_token(user)
         parse_token = {
             'refresh': str(tokens),
@@ -30,7 +30,7 @@ class BitrixAuthView(APIView):
         self.auth_login(user)
 
     def post(self, request, *args, **kwargs):
-        serializer = self.InnerSerializer(data=self.request.query_params)
+        serializer = self.InnerSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
 
         HTTP_REFERER = request.META.get('HTTP_REFERER') or "/"
@@ -46,7 +46,7 @@ class BitrixAuthView(APIView):
         data = r.json()
         if (r.status_code != 200):
             # messages.add_message(request, messages.WARNING, data['error_description'])
-            raise APIException(data['error_desription'], code=401)
+            raise APIException(data['error_description'], code=401)
 
         data = r.json()
         r = requests.get(data['client_endpoint'] + 'user.info.json', {
@@ -55,15 +55,15 @@ class BitrixAuthView(APIView):
         if (r.status_code != 200):
             response_data['result'] = 'Failed'
             response_data['message'] = data['error_description']
-            raise APIException(data['error_desription'], code=401)
+            raise APIException(data['error_description'], code=401)
 
         data = r.json()
         result = data['result']
 
-        bitrix_user_id = result['id']
+        campus_id = result['id']
         email = result['email']
         user, created = User.objects.get_or_create(
-            userprofile__bitrix_user_id=bitrix_user_id,
+            profile__campus_id=campus_id,
             defaults={
                 "username": email,
                 "last_name": result['last_name'] or "",
@@ -73,16 +73,17 @@ class BitrixAuthView(APIView):
         )
 
         if created:
-            user.userprofile.bitrix_user_id = bitrix_user_id
-            user.userprofile.save()
+            user.groups.add(Group.objects.get(name="Reader"))
+            user.profile.campus_id = campus_id
+            user.save()
 
-        user.userprofile.is_teacher = bool(result['is_teacher'])
-        user.userprofile.is_student = bool(result['is_student'])
-        user.userprofile.full_name = " ".join(i for i in [result['last_name'], result['name'], result['second_name']] if i)
+        # user.profile.is_teacher = bool(result['is_teacher'])
+        # user.profile.is_student = bool(result['is_student'])
+        # user.profile.full_name = " ".join(i for i in [result['last_name'], result['name'], result['second_name']] if i)
 
         mira_id = int(result['mira_id'][0] if result['mira_id'] or 0 else 0)
         if mira_id > 2:
-            user.userprofile.mira_id = mira_id
+            user.profile.mira_id = mira_id
 
-        user.userprofile.save()
-        self.auth_login(user)
+        user.profile.save()
+        return self.auth_login(user)

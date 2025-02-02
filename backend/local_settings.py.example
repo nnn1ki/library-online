@@ -1,6 +1,6 @@
 from app.settings import *
 
-OPAC_HOSTNAME = "https://library.istu.edu/opac/api"
+OPAC_HOSTNAME = "https://library.istu.edu/opac"
 SERVICE_HOSTNAME = "http://localhost:5173"
 
 OAUTH_CLIENT_ID = 

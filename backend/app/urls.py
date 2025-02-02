@@ -42,8 +42,8 @@ router.register("borrowed", BorrowedViewset, basename="borrowed")
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/login/', TokenObtainPairView.as_view()),
+    path('api/auth/bitrix-login/', BitrixAuthView.as_view()),
     path('api/auth/refresh/', TokenRefreshView.as_view()),
     path('api/auth/logout/', TokenBlacklistView.as_view()),
-    path('/api/auth/bitrix-login', BitrixAuthView.as_view()),
     path("api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
