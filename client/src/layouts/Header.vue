@@ -19,6 +19,10 @@
               <router-link to="/basket" class="nav-link" active-class="active">Корзина</router-link>
             </li>
             <li class="nav-item">
+              <router-link to="/orders" class="nav-link" active-class="active">Заказы</router-link>
+            </li>
+
+            <li class="nav-item">
               <router-link to="/note" class="nav-link" active-class="active">О проекте</router-link>
             </li>
             <!-- <li class="nav-item">
