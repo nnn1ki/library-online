@@ -110,6 +110,7 @@ import { storeToRefs } from "pinia";
 import { computed, ref, onMounted, watch } from "vue";
 // импорты для работы с docx
 import { Document, Packer, Paragraph, TextRun } from "docx";
+import { todo } from "node:test";
 
 const basketStore = useBasketStore();
 
@@ -151,92 +152,86 @@ watch(books, () => {
 
 // Расчитываемое свойство для книг в модальном окне
 const bookList = computed(() => {
-  return selectedBooks.value
-    .map((bookId) => books.value.find((item) => item.id == bookId))
-    .map((book, index) => {
-      const mainTitle = book?.title[0];
-      const otherTitles = book?.title.slice(1).join(", ");
-      const formattedOtherTitles = otherTitles ? `(${otherTitles})` : '';
-      
-      // Форматирование авторов
-      const authors = book?.author || [];
-      const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
+  // Разъединяем книги на русском от книг на английском и фильтруем по алфавиту
+  const sortBooks = (language) => {
+    const filteredBooks = selectedBooks.value
+      .map((bookId) => books.value.find((item) => item.id == bookId))
+      .filter((book) => book?.language[0] === language);
 
-      return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book?.year})<br>${authorText}`;
-    })
-    .join("<hr>"); // Используем <hr> для разделителей
+    return filteredBooks.sort((a, b) => {
+      const authorA = a.author[0].split(" ")[0];
+      const authorB = b.author[0].split(" ")[0];
+      const titleA = a.title[0];
+      const titleB = b.title[0];
+
+      return authorA.localeCompare(authorB) || titleA.localeCompare(titleB);
+    });
+  };
+
+  // Получаем отсортированные списки книг на русском и английском языках
+  const russianBooks = sortBooks('rus');
+  const englishBooks = sortBooks('eng');
+
+  // Объединяем оба списка
+  const combinedBooks = [...russianBooks, ...englishBooks];
+
+  // Формируем список литературы
+  return combinedBooks.map((book, index) => {
+    // const mainTitle = book?.title[0];
+    // const authors = book?.author;
+    // const year = book?.year;
+    // const city = book?.city;
+    // const publisher = book?.publisher;
+    // const subject = book?.subject;
+    // return `${index + 1}. ${authors[0]} ${mainTitle} : ${subject} / ${authors.join(', ')} - ${city} : ${publisher}, ${year}.`;
+
+    // Используем brief, т.к. он содержит нужную информацию
+    const brief = book?.brief;
+    // Извлекаем часть до разделителя ": ил. –" или "– ISBN"
+    const endIndex1 = brief.indexOf(": ил. –");
+    const endIndex2 = brief.indexOf("– ISBN");
+    
+    let briefWithoutPages = brief;
+
+    if (endIndex1 !== -1) {
+      briefWithoutPages = brief.substring(0, endIndex1).trim();
+    } else if (endIndex2 !== -1) {
+      briefWithoutPages = brief.substring(0, endIndex2).trim();
+    }
+    return `${index + 1}. ${briefWithoutPages}`;
+  }).join("<hr>");
 });
 
 // Функция для сохранения книг
 function saveBooks() {
-  // Сохранение в текстовый файл
   if (fileFormat.value === 'text') {
-    // Формируем текстовое содержимое
-    const content = selectedBooks.value
-      .map((bookId) => books.value.find((item) => item.id == bookId))
-      .map((book, index) => {
-        const mainTitle = book?.title[0];
-        const otherTitles = book?.title.slice(1).join(", ");
-        const formattedOtherTitles = otherTitles ? `(${otherTitles})` : '';
-        
-        // Форматирование авторов
-        const authors = book?.author;
-        const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
-
-        return `${index + 1}. ${mainTitle} ${formattedOtherTitles} (${book?.year})\n${authorText}`;
-      })
-      .join("\n"); // Используем \n для переноса строк
-
+    // Сохранение в текстовый файл
+    // Получаем текстовое содержимое из уже сформированного bookList
+    const content = bookList.value.split("<hr>").join("\n"); // Разбиваем текст по "<hr>" и объединяем строки с новой строки
     // Создаём имя файла по умолчанию
     const today = new Date();
     const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.txt`;
-
     // Запрашиваем имя файла у пользователя
     const fileName = prompt("Введите имя файла:", defaultFileName);
-
     // Если пользователь нажал "Отмена" или оставил поле пустым, выходим из функции
     if (fileName === null || fileName.trim() === "") {
-      return; // Прерываем выполнение функции
+      return;
     }
 
     const blob = new Blob([content], { type: 'text/plain' }); // Создаём Blob с типом текст
     const url = URL.createObjectURL(blob); // Создаём URL для Blob
-
-    const a = document.createElement('a'); // Создаём элемент <a>
-    a.href = url; // Устанавливаем href как URL Blob
-    a.download = fileName; // Устанавливаем имя файла для скачивания
-    document.body.appendChild(a); // Добавляем элемент в DOM
-    a.click(); // Эмулируем клик для скачивания
-    document.body.removeChild(a); // Удаляем элемент из DOM
-    URL.revokeObjectURL(url); // Освобождаем память
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
   } else if (fileFormat.value === 'word') {
-    // Код для сохранения в .docx файл
-    const content = []
-    // Заполнение массива content данными о книгах
-    selectedBooks.value.forEach((bookId, index) => {
-      const book = books.value.find((item) => item.id == bookId);
-      const mainTitle = book?.title[0];
-      let otherTitles = []
-      if (book.title.length > 1) {
-        otherTitles = book?.title.slice(1).join(", ");
-      }
-      const authors = book?.author;
-      const authorText = authors.length === 1 ? `Автор: ${authors[0]}` : `Авторы: ${authors.join("; ")}`;
-      const year = book?.year;
-      // Форматирование строки для добавления в массив content
-      let bookInfo = ""
-      if (otherTitles.length === 0) {
-        bookInfo = `${index + 1}. ${mainTitle} (${year})`;
-      } else {
-        bookInfo = `${index + 1}. ${mainTitle} (${otherTitles}) (${year})`;
-      }
-      // Добавление названия книги и авторов в массив content
-      content.push({
-        title: bookInfo,
-        authors: authorText
-      });
-    });
+    // Сохранение в .docx файл
+    // Получаем текстовое содержимое из уже сформированного bookList
+    const content = bookList.value.split("<hr>"); // Разбиваем текст по "<hr>"
 
     const doc = new Document({
       sections: [{
@@ -247,24 +242,18 @@ function saveBooks() {
               new TextRun("Список литературы:"),
             ],
           }),
-          // Добавляем каждую книгу как отдельный параграф
-          ...content.map(item => [
+          // Добавляем каждую книгу на следующую строку
+          ...content.map(item => 
             new Paragraph({
               children: [
-                new TextRun(item.title),
+                new TextRun(item),
               ],
-            }),
-            // Добавляем к книге авторов как отдельный параграф
-            new Paragraph({
-              children: [
-                new TextRun(item.authors),
-              ],
-            }),
-          ]).flat(), // Используем flat() для объединения массивов
+            })
+          ),
         ],
       }],
     });
-
+    
     Packer.toBlob(doc).then((blob) => {
       const today = new Date();
       const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.docx`;
@@ -316,12 +305,6 @@ function saveBooks() {
   margin-bottom: 5px;
 }
 
-hr {
-  margin: 10px 0; /* Отступы сверху и снизу */
-  border-width: 3px; /* Установите нужную толщину */
-  border-color: #000000; /* Цвет границы (черный) */
-}
-
 .book-title .other-titles {
   font-style: italic;
 }
@@ -330,6 +313,12 @@ hr {
   color: #777;
   font-size: 0.9rem;
   margin-bottom: 10px;
+}
+
+hr {
+  margin: 10px 0;
+  border-width: 3px;
+  border-color: #000000;
 }
 
 /* Кнопки в карточке книги */
