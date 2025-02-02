@@ -6,21 +6,17 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 import requests
 
-from app.local_settings import OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET
+from django.conf import settings
 
 from django.contrib.auth.models import User
-from django.shortcuts import redirect
+
+from rest_framework.exceptions import APIException
 
 class BitrixAuthView(APIView):
     permission_classes = []
 
     class InnerSerializer(serializers.Serializer):
         code = serializers.CharField()
-        state = serializers.CharField(required=False)
-        domain = serializers.CharField(required=False)
-        member_id = serializers.CharField(required=False)
-        scope = serializers.CharField(required=False)
-        server_domain = serializers.CharField(required=False)
 
     def auth_login(user):
         tokens = TokenObtainPairSerializer.get_token(user)
@@ -32,9 +28,8 @@ class BitrixAuthView(APIView):
 
     def default_auth_processor(self, state, user):
         self.auth_login(user)
-        return redirect("/")
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.InnerSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
 
@@ -42,25 +37,25 @@ class BitrixAuthView(APIView):
 
         r = requests.get("https://int.istu.edu/oauth/token/?grant_type=authorization_code", {
             "code": serializer.validated_data['code'],
-            "client_id": OAUTH_CLIENT_ID,
-            "client_secret": OAUTH_CLIENT_SECRET,
+            "client_id": settings.OAUTH_CLIENT_ID,
+            "client_secret": settings.OAUTH_CLIENT_SECRET,
         }, verify=False)
 
         response_data = {}
 
         data = r.json()
-        if r.status_code != 200:
+        if (r.status_code != 200):
             # messages.add_message(request, messages.WARNING, data['error_description'])
-            return redirect(HTTP_REFERER)
+            raise APIException(data['error_desription'], code=401)
 
         data = r.json()
         r = requests.get(data['client_endpoint'] + 'user.info.json', {
             "auth": data['access_token'],
         })
-        if r.status_code != 200:
+        if (r.status_code != 200):
             response_data['result'] = 'Failed'
             response_data['message'] = data['error_description']
-            return redirect(HTTP_REFERER)
+            raise APIException(data['error_desription'], code=401)
 
         data = r.json()
         result = data['result']
@@ -91,5 +86,3 @@ class BitrixAuthView(APIView):
 
         user.userprofile.save()
         self.auth_login(user)
-
-        return redirect("/")
