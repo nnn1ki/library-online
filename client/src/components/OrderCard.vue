@@ -2,7 +2,7 @@
     <div class="card order-card">
         <div class="order-header">
             <span class="order-number">📦 Заказ #{{ num }}</span>
-            <span class="order-status" :class="statusClass">● {{ currentStatus }}</span>
+            <span class="order-status" :class="statusClass">● {{ orderStatuses[currentStatus] }}</span>
         </div>
         <div class="book-list">
             <div v-for="(orderBook, index) in props.order.books" :key="orderBook.book.id" class="book-item">
@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { OrderStatusEnum, Order } from "@/api/types";
+import { type OrderStatusEnum, type Order, orderStatuses } from "@/api/types";
 import ShortBook from "@/components/ShortBook.vue"
 import { useOrderStore } from "@/stores/orderStore";
 const allowedCancelStatuses: OrderStatusEnum[] = ['new', 'processing', 'ready'];
@@ -35,15 +35,15 @@ const props = defineProps<{
     num: number,
 }>();
 
-const canCancelOrder = computed(() => 
-  allowedCancelStatuses.includes(currentStatus.value)
+const canCancelOrder = computed(() =>
+    allowedCancelStatuses.includes(currentStatus.value)
 );
 
-const canEditOrder = computed(() => 
-  allowedEditStatuses.includes(currentStatus.value)
+const canEditOrder = computed(() =>
+    allowedEditStatuses.includes(currentStatus.value)
 );
 const showOrderActions = computed(() =>
-  canCancelOrder.value || canEditOrder.value
+    canCancelOrder.value || canEditOrder.value
 );
 
 const currentStatus = computed(() => {
@@ -58,13 +58,13 @@ const statusClass = computed(() => {
     };
 });
 
-async function onCancelOrderClick() {    
-  console.log('Cancel order:', props.order.id);
-  await orderStore.handleDeleteOrder(props.order.id);
+async function onCancelOrderClick() {
+    console.log('Cancel order:', props.order.id);
+    await orderStore.handleDeleteOrder(props.order.id);
 };
 
-async function onEditOrderClick() {    
-  console.log('Edit order:', props.order.id);
+async function onEditOrderClick() {
+    console.log('Edit order:', props.order.id);
 };
 
 </script>
@@ -165,11 +165,11 @@ async function onEditOrderClick() {
 }
 
 .order-actions-footer {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
 }
 </style>

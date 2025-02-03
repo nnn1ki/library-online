@@ -1,25 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onBeforeMount } from "vue";
 import borrowedBooks from "@/components/BorrowedBooks.vue"
 import ShortBook from "@/components/ShortBook.vue";
 import { useOrderStore } from "@/stores/orderStore";
 import { borrowedList } from '@/api/order'
-import { storeToRefs } from "pinia";
 
 const orderStore = useOrderStore();
 
 // Поле для ввода email (опционально)
 const email = ref("");
 
-const totalBooks = computed(() => {
-  return selectedBooks.value.reduce((total, book) => total + book.quantity, 0);
-});
-
-const { selectedBooks } = storeToRefs(orderStore);
 const loading = ref(false);
 const placeOrder = async () => {
   loading.value = true;
-  console.log(orderStore.selectedBooks);
   await orderStore.handleCreateOrder();
   loading.value = false;
 };
@@ -33,16 +26,14 @@ onBeforeMount(async () => {
 <template>
   <div class="container">
     <borrowedBooks v-if="orderStore.borrowedBooks.length > 0" />
-    
+
     <div class="order-summary">
       <h2 class="summary-title">📚 Оформление заказа</h2>
 
       <div class="book-list">
         <h5 class="section-subtitle">Выбранные книги</h5>
-        <div v-for="(book, i) in orderStore.selectedBooks" 
-             :key="book.id" 
-             class="book-item card">
-            <short-book :book="book" :num="i"/>
+        <div v-for="(book, i) in orderStore.selectedBooks" :key="book.id" class="book-item card">
+          <short-book :book="book" :num="i" />
         </div>
       </div>
 
@@ -61,22 +52,11 @@ onBeforeMount(async () => {
       <!-- Поле для email -->
       <div class="email-input card">
         <label for="email" class="input-label">📧 Email (для уведомлений)</label>
-        <input 
-          id="email" 
-          type="email" 
-          v-model="email" 
-          placeholder="example@mail.com" 
-          class="styled-input"
-        />
+        <input id="email" type="email" v-model="email" placeholder="example@mail.com" class="styled-input" />
       </div>
 
       <!-- Кнопка оформления -->
-      <button 
-        class="order-button" 
-        @click="placeOrder" 
-        :disabled="loading"
-        :class="{ 'processing': loading }"
-      >
+      <button class="order-button" @click="placeOrder" :disabled="loading" :class="{ 'processing': loading }">
         <span v-if="!loading">✅ Оформить заказ</span>
         <span v-else>
           <span class="button-spinner"></span>
@@ -208,11 +188,17 @@ onBeforeMount(async () => {
   animation: spin 0.8s linear infinite;
   display: inline-block;
   vertical-align: middle;
-  box-sizing: border-box; /* Важно для правильного размера */
+  box-sizing: border-box;
+  /* Важно для правильного размера */
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
