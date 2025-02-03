@@ -115,7 +115,6 @@ import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import { computed, ref, onMounted, watch } from "vue";
 import { Document, Packer, Paragraph, TextRun } from "docx";
-import { todo } from "node:test";
 
 const basketStore = useBasketStore();
 
@@ -158,10 +157,10 @@ watch(books, () => {
 // Расчитываемое свойство для книг в модальном окне
 const bookList = computed(() => {
   // Разъединяем книги на русском от книг на английском и фильтруем по названиям по алфавиту
-  const sortBooks = (language) => {
+  const sortBooks = (language: string) => {
     const filteredBooks = selectedBooks.value
-      .map((bookId) => books.value.find((item) => item.id == bookId!))
-      .filter((book) => book?.language[0] === language);
+      .map((bookId) => books.value.find((item) => item.id == bookId)!)
+      .filter((book) => book.language[0] === language);
 
     return filteredBooks.sort((a, b) => {
       const titleA = a.title[0];
@@ -172,8 +171,8 @@ const bookList = computed(() => {
   };
 
   // Получаем отсортированные списки книг на русском и английском языках
-  const russianBooks = sortBooks('rus');
-  const englishBooks = sortBooks('eng');
+  const russianBooks = sortBooks("rus");
+  const englishBooks = sortBooks("eng");
 
   // Объединяем оба списка
   const combinedBooks = [...russianBooks, ...englishBooks];
@@ -186,28 +185,33 @@ const bookList = computed(() => {
     // const city = book.city;
     // const publisher = book.publisher;
     // const subject = book.subject;
-    // return `${index + 1}. ${authors[0]} ${mainTitle} : ${subject} / ${authors.join(', ')} - ${city} : ${publisher}, ${year}.`;
+    // return `${index + 1}. ${authors[0]} ${mainTitle} : ${subject} / ${authors.join(", ")} - ${city} : ${publisher}, ${year}.`;
 
     // Используем brief, т.к. он содержит нужную информацию
     const brief = book.brief;
-    // Извлекаем часть до разделителя ": ил. –" или "– ISBN"
-    const endIndex1 = brief.indexOf(": ил. –");
-    const endIndex2 = brief.indexOf("– ISBN");
-    
-    let briefWithoutPages = brief;
 
-    if (endIndex1 !== -1) {
-      briefWithoutPages = brief.substring(0, endIndex1).trim();
-    } else if (endIndex2 !== -1) {
-      briefWithoutPages = brief.substring(0, endIndex2).trim();
+    if (brief !== null) {
+      // Извлекаем часть до разделителя ": ил. –" или "– ISBN"
+      const endIndex1 = brief.indexOf(": ил. –");
+      const endIndex2 = brief.indexOf("– ISBN");
+
+      let briefWithoutPages = brief;
+
+      if (endIndex1 !== -1) {
+        briefWithoutPages = brief.substring(0, endIndex1).trim();
+      } else if (endIndex2 !== -1) {
+        briefWithoutPages = brief.substring(0, endIndex2).trim();
+      }
+      return `${index + 1}. ${briefWithoutPages}`;
+    } else {
+      return `${index + 1}. ${book.description}`
     }
-    return `${index + 1}. ${briefWithoutPages}`;
   }).join("<hr>");
 });
 
 // Функция для сохранения книг
 function saveBooks() {
-  if (fileFormat.value === 'txt') {
+  if (fileFormat.value === "txt") {
     // Сохранение в текстовый файл
     // Получаем текстовое содержимое из уже сформированного bookList
     const content = bookList.value.split("<hr>").join("\n"); // Разбиваем текст по "<hr>" и объединяем строки с новой строки
@@ -221,7 +225,7 @@ function saveBooks() {
 
     downloadBlob(blob, defaultFileName);
 
-  } else if (fileFormat.value === 'docx') {
+  } else if (fileFormat.value === "docx") {
     // Сохранение в .docx файл
     // Получаем текстовое содержимое из уже сформированного bookList
     const content = bookList.value.split("<hr>"); // Разбиваем текст по "<hr>"
@@ -236,7 +240,7 @@ function saveBooks() {
             ],
           }),
           // Добавляем каждую книгу на следующую строку
-          ...content.map(item => 
+          ...content.map(item =>
             new Paragraph({
               children: [
                 new TextRun(item),
