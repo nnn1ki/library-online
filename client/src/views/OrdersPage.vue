@@ -4,13 +4,13 @@
       <strong>
         Продолжить оформление заказа
       </strong>
-      <CurrenOrderCard :order="orderStore.selectedBooks"/>
+      <CurrenOrderCard :order="orderStore.selectedBooks" />
     </div>
     <div v-for="(order, i) in orders" :key="order.id" class="row">
-      <order-card :order="order" :num="i + 1" />
+      <OrderCard :order="order" :num="i + 1" />
     </div>
     <div v-if="loading">
-      <loadingModal/>
+      <LoadingModal />
     </div>
   </div>
 </template>
@@ -22,7 +22,7 @@ import { ordersList } from "@/api/order";
 import { type Order } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
 import OrderCard from "@/components/OrderCard.vue";
-import loadingModal from "@/components/loadingModal.vue";
+import LoadingModal from "@/components/LoadingModal.vue";
 import CurrenOrderCard from "@/components/CurrenOrderCard.vue";
 const orders = ref<Order[]>([]);
 const loading = ref(false)
@@ -83,5 +83,4 @@ onMounted(async () => {
   font-size: 1.1rem;
   border-radius: 8px;
 }
-
 </style>
