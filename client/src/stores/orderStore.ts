@@ -10,11 +10,10 @@ import {
     editOrder,
     createOrder,
     deleteOrder,
-    borrowedList,
 } from "@/api/order";
 import { getBook } from "@/api/books";
-import { deleteBasketBook, basketBooksList } from "@/api/basket";
-import type { Book, Order, BorrowedBook, orderStatuses, OrderStatusEnum } from "@/api/types";
+import { deleteBasketBook } from "@/api/basket";
+import type { Book, Order, BorrowedBook, OrderStatusEnum } from "@/api/types";
 
 import { useAuthStore } from "./auth";
 import { useBasketStore } from "@/stores/basket"
@@ -64,7 +63,7 @@ export const useOrderStore = defineStore("orderStore", () => {
             selectedBooks.value = [];
             await basketStore.updateBooks();
             toast.success("Заказ принят");
-            await nextTick();            
+            await nextTick();
         } catch (error) {
             toast.error("Что то не так");
         }
@@ -75,6 +74,12 @@ export const useOrderStore = defineStore("orderStore", () => {
         try {
             await deleteOrder(orderId);
             toast.info("Ваш заказ отменен");
+
+            userOrders.value = userOrders.value.filter((order) => {
+                order.id !== orderId;
+            });
+            const cancledOrder = await getOrder(orderId);
+            userOrders.value.push(cancledOrder);
         } catch (error) {
             toast.error("Что то пошло не так...");
         }
@@ -96,6 +101,7 @@ export const useOrderStore = defineStore("orderStore", () => {
                 const validBooks = order.books.filter(book =>
                     book.status === "ordered"
                 );
+
                 return total + validBooks.length;
             }
             return total;
@@ -123,9 +129,12 @@ export const useOrderStore = defineStore("orderStore", () => {
     }
 
     function bookInOrders(targetBookId: string): boolean {
-        return userOrders.value.some(order =>
-            order.books.some(orderBook => orderBook.book.id === targetBookId)
-        );
+        return userOrders.value.some(order => {
+            const lastStatus = order.statuses[order.statuses.length - 1];
+            if (lastStatus && allowedStatusesToCountOrderedBooks.includes(lastStatus.status)) {
+                order.books.some(orderBook => orderBook.book.id === targetBookId)
+            }
+        });
     }
 
     async function clearBasket(selectedIds: string[]) {
@@ -134,6 +143,7 @@ export const useOrderStore = defineStore("orderStore", () => {
             await deleteBasketBook(id).catch(() =>
                 console.log("Ошибка при удалении элемента корзины"));
         }
+
     }
 
     return {
