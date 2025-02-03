@@ -1,9 +1,6 @@
 <template>
   <div class="container">
     <div v-if="orderStore.selectedBooks.length > 0">
-      <strong>
-        Продолжить оформление заказа
-      </strong>
       <CurrenOrderCard :order="orderStore.selectedBooks"/>
     </div>
     <div v-for="(order, i) in orders" :key="order.id" class="row">
