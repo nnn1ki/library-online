@@ -1,5 +1,11 @@
 <template>
   <div class="container">
+    <div v-if="orderStore.selectedBooks.length > 0">
+      <strong>
+        Продолжить оформление заказа
+      </strong>
+      <CurrenOrderCard :order="orderStore.selectedBooks"/>
+    </div>
     <div v-for="(order, i) in orders" :key="order.id" class="row">
       <order-card :order="order" :num="i + 1" />
     </div>
@@ -14,12 +20,13 @@ import { ref, onMounted } from "vue";
 
 import { ordersList } from "@/api/order";
 import { type Order } from "@/api/types";
-
+import { useOrderStore } from "@/stores/orderStore";
 import OrderCard from "@/components/OrderCard.vue";
 import loadingModal from "@/components/loadingModal.vue";
+import CurrenOrderCard from "@/components/CurrenOrderCard.vue";
 const orders = ref<Order[]>([]);
 const loading = ref(false)
-
+const orderStore = useOrderStore();
 onMounted(async () => {
   loading.value = true;
   orders.value = await ordersList();
