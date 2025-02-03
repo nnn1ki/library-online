@@ -35,6 +35,8 @@ const props = defineProps<{
     num: number,
 }>();
 
+const emit = defineEmits(['delete']);
+
 const canCancelOrder = computed(() =>
     allowedCancelStatuses.includes(currentStatus.value)
 );
@@ -59,7 +61,7 @@ const statusClass = computed(() => {
 });
 
 async function onCancelOrderClick() {
-    console.log('Cancel order:', props.order.id);
+    emit("delete");
     await orderStore.handleDeleteOrder(props.order.id);
 };
 

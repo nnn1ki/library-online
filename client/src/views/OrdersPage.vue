@@ -4,7 +4,7 @@
       <CurrenOrderCard :order="orderStore.selectedBooks"/>
     </div>
     <div v-for="(order, i) in orders" :key="order.id" class="row">
-      <OrderCard :order="order" :num="i + 1" />
+      <OrderCard :order="order" :num="i + 1" @delete="fetchOrderList"/>
     </div>
     <div v-if="loading">
       <LoadingModal />
@@ -26,9 +26,13 @@ const loading = ref(false)
 const orderStore = useOrderStore();
 onMounted(async () => {
   loading.value = true;
-  orders.value = await ordersList();
+  await fetchOrderList();
   loading.value = false;
 });
+
+async function fetchOrderList(){
+  orders.value = (await ordersList()).reverse();
+}
 
 </script>
 

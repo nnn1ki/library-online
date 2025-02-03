@@ -74,12 +74,7 @@ export const useOrderStore = defineStore("orderStore", () => {
         try {
             await deleteOrder(orderId);
             toast.info("Ваш заказ отменен");
-
-            userOrders.value = userOrders.value.filter((order) => {
-                order.id !== orderId;
-            });
-            const cancledOrder = await getOrder(orderId);
-            userOrders.value.push(cancledOrder);
+            
         } catch (error) {
             toast.error("Что то пошло не так...");
         }
