@@ -120,39 +120,6 @@ onBeforeMount(async () => {
   border-left: 4px solid #42b983;
 }
 
-.book-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.book-number {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-}
-
-
-.book-title {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #34495e;
-}
-
-.book-year {
-  color: #7f8c8d;
-  font-size: 0.9em;
-}
-
-.book-authors {
-  margin: 0.5rem 0 0;
-  color: #7f8c8d;
-  font-size: 0.9em;
-}
-
 .section-subtitle {
   color: #7f8c8d;
   margin-bottom: 1.5rem;

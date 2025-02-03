@@ -64,13 +64,11 @@ export const useOrderStore = defineStore("orderStore", () => {
             selectedBooks.value = [];
             await basketStore.updateBooks();
             toast.success("Заказ принят");
-            await nextTick();
-            router.push({ name: "Home" });
-            
+            await nextTick();            
         } catch (error) {
             toast.error("Что то не так");
-            router.push({ name: "Home" });
         }
+        router.push({ name: "Home" });
     }
 
     async function handleDeleteOrder(orderId: number) {
