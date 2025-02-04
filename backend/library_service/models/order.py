@@ -49,6 +49,9 @@ class OrderItem(models.Model):
     book_id = models.CharField(max_length=255)
     status = models.CharField(max_length=255, choices=Status.choices, default=Status.ORDERED)
     order_to_return = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    handed_date = models.DateTimeField(null=True, blank=True)
+    to_return_date = models.DateTimeField(null=True, blank=True)
+    returned_date = models.DateTimeField(null=True, blank=True)
     
     class Meta:
         verbose_name = "Элемент заказа"
