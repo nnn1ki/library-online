@@ -699,7 +699,19 @@ components:
             $ref: "#/components/schemas/OrderStatus"
         library:
           $ref: "#/components/schemas/Library"
-    
+        handed_date:
+          $ref: "#/components/schemas/HandedDate"
+        to_return_date:
+          $ref: "#/components/schemas/ToReturnDate"
+    HandedDate:
+      type: string
+      description: Дата получения книги
+      example: "2024-12-31"
+    ToReturnDate:
+      type: string
+      description: Срок сдачи книги
+      example: "2024-12-31"
+
     BorrowedBook:
       type: object
       properties:
@@ -709,3 +721,7 @@ components:
           $ref: "#/components/schemas/Book"
         order:
           $ref: "#/components/schemas/OrderId"
+        handed_date:
+          $ref: "#/components/schemas/HandedDate"
+        to_return_date:
+          $ref: "#/components/schemas/ToReturnDate"
