@@ -18,6 +18,7 @@ class BitrixAuthView(APIView):
         serializer = self.Serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
 
+        # TODO: заменить на aiohttp и полностью избавить проект от requests
         token_response = requests.get("https://int.istu.edu/oauth/token/?grant_type=authorization_code", {
             "code": serializer.validated_data["code"],
             "client_id": settings.OAUTH_CLIENT_ID,

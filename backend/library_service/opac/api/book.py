@@ -1,4 +1,4 @@
-import requests
+from aiohttp import ClientSession
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json, Undefined
 from django.conf import settings
@@ -46,7 +46,7 @@ class OpacBook:
     links: list[OpacBookLink] | None = None
     created: str | None = None
 
-def opac_search(database: str, expression: str) -> list[OpacBook]:
+async def opac_search(client: ClientSession, database: str, expression: str) -> list[OpacBook]:
     payload = {
         "database": database,
         "expression": expression,
@@ -54,21 +54,19 @@ def opac_search(database: str, expression: str) -> list[OpacBook]:
     }
 
     params = {
-        "extended": True
+        "extended": "true"
     }
 
-    r = requests.post(f"{settings.OPAC_HOSTNAME}/api/search", json=payload, params=params)
+    r = await client.post(f"{settings.OPAC_HOSTNAME}/api/search", json=payload, params=params)
     r.raise_for_status()
-    
-    return OpacBook.schema().load(r.json(), many=True)
+    return OpacBook.schema().load(await r.json(), many=True)
 
-def opac_book_retrieve(database: str, mfn: int) -> OpacBook:
+async def opac_book_retrieve(client: ClientSession, database: str, mfn: int) -> OpacBook:
     params = {
         "format": "@opac_plain",
-        "extended": True
+        "extended": "true"
     }
 
-    r = requests.get(f"{settings.OPAC_HOSTNAME}/api/books/by/mfn/{database}/{mfn}", params=params)
+    r = await client.get(f"{settings.OPAC_HOSTNAME}/api/books/by/mfn/{database}/{mfn}", params=params)
     r.raise_for_status()
-
-    return OpacBook.schema().load(r.json())
+    return OpacBook.schema().load(await r.json())

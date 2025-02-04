@@ -1,4 +1,4 @@
-import requests
+from aiohttp import ClientSession
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json, Undefined
 from django.conf import settings
@@ -8,8 +8,8 @@ from django.conf import settings
 class OpacAnnounce:
     link: str
 
-def opac_announces_list() -> list[OpacAnnounce]:
-    r = requests.get(f"{settings.OPAC_HOSTNAME}/api/announces")
+async def opac_announces_list(client: ClientSession) -> list[OpacAnnounce]:
+    r = await client.get(f"{settings.OPAC_HOSTNAME}/api/announces")
     r.raise_for_status()
 
-    return OpacAnnounce.schema().load(r.json(), many=True)
+    return OpacAnnounce.schema().load(await r.json(), many=True)

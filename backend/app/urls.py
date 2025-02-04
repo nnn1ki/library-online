@@ -20,8 +20,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
+
+from adrf.routers import DefaultRouter as AsyncDefaultRouter
 
 from library_service.views.catalog import *
 from library_service.views.basket import *
@@ -29,7 +30,7 @@ from library_service.views.profile import *
 from library_service.views.order import *
 from library_service.views.bitrix import BitrixAuthView
 
-router = DefaultRouter()
+router = AsyncDefaultRouter()
 router.register("book", BookViewset, basename="book")
 router.register("library", LibraryViewset, basename="library")
 router.register("scenario", ScenarioViewset, basename="scenario")

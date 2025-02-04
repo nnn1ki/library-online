@@ -1,30 +1,39 @@
+import asyncio
+from aiohttp import ClientSession
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
+
+from adrf import serializers as aserializers
 
 from library_service.models.user import Basket, BasketItem
 from library_service.opac.book import book_validate
 
-class AddBasketSerializer(serializers.Serializer):
+class AddBasketSerializer(aserializers.Serializer):
     books = serializers.ListField(child=serializers.CharField())
 
-    def create(self, validated_data):
+    async def acreate(self, validated_data):
         user = self.context["request"].user
-        basket = Basket.objects.filter(user=user).first()
+        basket = await Basket.objects.filter(user=user).afirst()
 
         if (basket is None):
-            basket = Basket.objects.create(user=user)
+            basket = await Basket.objects.acreate(user=user)
         
-        books_current = [book.book_id for book in BasketItem.objects.filter(basket=basket)]
-        books_add: list[str] = validated_data["books"]
-        for book in books_add:
-            if book not in books_current:
-                if book_validate(book) is None:
-                    raise APIException(f"Invalid book id {book}", code=400)
+        books_current = [book.book_id async for book in BasketItem.objects.filter(basket=basket)]
+        books_add: list[str] = list(set(validated_data["books"]))
 
-                BasketItem.objects.create(book_id=book, basket=basket)
-                books_current.append(book)
-            
-        return {
-            "books": books_current
-        }
+        async with ClientSession() as client:
+            tasks = []
+            for book in books_add:
+                if book not in books_current:
+                    async def task(book=book):
+                        if await book_validate(client, book) is None:
+                            raise APIException(f"Invalid book id {book}", code=400)
+
+                        await BasketItem.objects.acreate(book_id=book, basket=basket)
+                    tasks.append(task())
+        
+            await asyncio.gather(*tasks)            
+            return {
+                "books": books_current + books_add
+            }
         
