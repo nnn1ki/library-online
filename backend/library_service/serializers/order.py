@@ -19,7 +19,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ["id", "book", "status", "handed_date", "to_return_date"]
+        fields = ["id", "book", "status", "handed_date", "to_return_date", "returned_date"]
 
     def get_book(self, obj: OrderItem):
         return BookSerializer(book_retrieve(obj.book_id)).data

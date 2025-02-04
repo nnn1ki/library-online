@@ -682,11 +682,15 @@ components:
         handed_date:
           type: string
           description: Дата получения книги
-          example: "2024-12-31"
+          format: date
         to_return_date:
           type: string
           description: Срок сдачи книги
-          example: "2024-12-31"
+          format: date
+        returned_date:
+          type: string
+          description: Дата сдачи книги
+          format: date
     OrderId:
       type: number
       description: ID заказа
@@ -720,8 +724,8 @@ components:
         handed_date:
           type: string
           description: Дата получения книги
-          example: "2024-12-31"
+          format: date
         to_return_date:
           type: string
           description: Срок сдачи книги
-          example: "2024-12-31"
+          format: date
