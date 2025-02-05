@@ -171,9 +171,8 @@ import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import { useOrderStore } from "@/stores/orderStore";
-import { computed, ref, onMounted, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { Document, Packer, Paragraph, TextRun } from "docx";
-import { routeLocationKey } from "vue-router";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -219,10 +218,10 @@ watch(books, () => {
 // Расчитываемое свойство для книг в модальном окне
 const bookList = computed(() => {
   // Разъединяем книги на русском от книг на английском и фильтруем по названиям по алфавиту
-  const sortBooks = (language: string) => {
+  const sortBooks = (language?: string) => {
     const filteredBooks = selectedBooks.value
       .map((bookId) => books.value.find((item) => item.id == bookId)!)
-      .filter((book) => book.language[0] === language);
+      .filter((book) => (language !== undefined ? book.language[0] === language : true));
 
     return filteredBooks.sort((a, b) => {
       const titleA = a.title[0];
@@ -235,9 +234,12 @@ const bookList = computed(() => {
   // Получаем отсортированные списки книг на русском и английском языках
   const russianBooks = sortBooks("rus");
   const englishBooks = sortBooks("eng");
+  const otherBooks = sortBooks().filter(
+    (book) => book.language[0] !== "rus" && book.language[0] !== "eng"
+  );
 
   // Объединяем оба списка
-  const combinedBooks = [...russianBooks, ...englishBooks];
+  const combinedBooks = [...russianBooks, ...englishBooks, ...otherBooks];
 
   // Формируем список литературы
   return combinedBooks
