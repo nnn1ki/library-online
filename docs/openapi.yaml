@@ -113,6 +113,7 @@ paths:
     get:
       tags:
         - profile
+      summary: Получение информации о себе
       security:
         - bearer: []
       responses:
