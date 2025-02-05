@@ -7,9 +7,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
-import { onBeforeMount, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useAuthStore } from "@/stores/auth";
+import { onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -28,7 +28,7 @@ onBeforeMount(async () => {
     state.value = "auth";
     if (await authStore.bitrixLogin(code)) {
       state.value = "success";
-      router.push("/profile")
+      router.push("/profile");
     } else {
       state.value = "error";
     }

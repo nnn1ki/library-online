@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <div v-if="orderStore.selectedBooks.length > 0">
-      <CurrenOrderCard :order="orderStore.selectedBooks"/>
+      <CurrentOrderCard :order="orderStore.selectedBooks" />
     </div>
     <div v-for="(order, i) in orders" :key="order.id" class="row">
-      <OrderCard :order="order" :num="i + 1" @delete="fetchOrderList"/>
+      <OrderCard :order="order" :num="i + 1" @delete="fetchOrderList" />
     </div>
     <div v-if="loading">
       <LoadingModal />
@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 
 import { ordersList } from "@/api/order";
@@ -20,9 +20,9 @@ import { type Order } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
 import OrderCard from "@/components/OrderCard.vue";
 import LoadingModal from "@/components/LoadingModal.vue";
-import CurrenOrderCard from "@/components/CurrenOrderCard.vue";
+import CurrentOrderCard from "@/components/CurrentOrderCard.vue";
 const orders = ref<Order[]>([]);
-const loading = ref(false)
+const loading = ref(false);
 const orderStore = useOrderStore();
 onMounted(async () => {
   loading.value = true;
@@ -30,13 +30,12 @@ onMounted(async () => {
   loading.value = false;
 });
 
-async function fetchOrderList(){
+async function fetchOrderList() {
   orders.value = (await ordersList()).reverse();
 }
-
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .order-summary {
   padding: 20px;
   background-color: #f9f9f9;

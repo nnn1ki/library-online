@@ -1,31 +1,6 @@
-<script setup lang="ts">
-import { ref, computed, onBeforeMount } from "vue";
-import borrowedBooks from "@/components/BorrowedBooks.vue"
-import ShortBook from "@/components/ShortBook.vue";
-import { useOrderStore } from "@/stores/orderStore";
-import { borrowedList } from '@/api/order'
-
-const orderStore = useOrderStore();
-
-// Поле для ввода email (опционально)
-const email = ref("");
-
-const loading = ref(false);
-const placeOrder = async () => {
-  loading.value = true;
-  await orderStore.handleCreateOrder();
-  loading.value = false;
-};
-
-onBeforeMount(async () => {
-  orderStore.borrowedBooks = await borrowedList();
-});
-
-</script>
-
 <template>
   <div class="container">
-    <borrowedBooks v-if="orderStore.borrowedBooks.length > 0" />
+    <BorrowedBooks v-if="orderStore.borrowedBooks.length > 0" />
 
     <div class="order-summary">
       <h2 class="summary-title">📚 Оформление заказа</h2>
@@ -33,7 +8,7 @@ onBeforeMount(async () => {
       <div class="book-list">
         <h5 class="section-subtitle">Выбранные книги</h5>
         <div v-for="(book, i) in orderStore.selectedBooks" :key="book.id" class="book-item card">
-          <short-book :book="book" :num="i" />
+          <ShortBook :book="book" :num="i" />
         </div>
       </div>
 
@@ -52,11 +27,22 @@ onBeforeMount(async () => {
       <!-- Поле для email -->
       <div class="email-input card">
         <label for="email" class="input-label">📧 Email (для уведомлений)</label>
-        <input id="email" type="email" v-model="email" placeholder="example@mail.com" class="styled-input" />
+        <input
+          id="email"
+          type="email"
+          v-model="email"
+          placeholder="example@mail.com"
+          class="styled-input"
+        />
       </div>
 
       <!-- Кнопка оформления -->
-      <button class="order-button" @click="placeOrder" :disabled="loading" :class="{ 'processing': loading }">
+      <button
+        class="order-button"
+        @click="placeOrder"
+        :disabled="loading"
+        :class="{ processing: loading }"
+      >
         <span v-if="!loading">✅ Оформить заказ</span>
         <span v-else>
           <span class="button-spinner"></span>
@@ -67,7 +53,31 @@ onBeforeMount(async () => {
   </div>
 </template>
 
-<style scoped>
+<script setup lang="ts">
+import { ref, computed, onBeforeMount } from "vue";
+import BorrowedBooks from "@/components/BorrowedBooks.vue";
+import ShortBook from "@/components/ShortBook.vue";
+import { useOrderStore } from "@/stores/orderStore";
+import { borrowedList } from "@/api/order";
+
+const orderStore = useOrderStore();
+
+// Поле для ввода email (опционально)
+const email = ref("");
+
+const loading = ref(false);
+const placeOrder = async () => {
+  loading.value = true;
+  await orderStore.handleCreateOrder();
+  loading.value = false;
+};
+
+onBeforeMount(async () => {
+  orderStore.borrowedBooks = await borrowedList();
+});
+</script>
+
+<style scoped lang="scss">
 .container {
   max-width: 800px;
   margin: 2rem auto;

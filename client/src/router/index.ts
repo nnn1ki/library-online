@@ -41,11 +41,10 @@ const router = createRouter({
       component: NotePage,
     },
     {
-      path:"/orders",
+      path: "/orders",
       name: "OrdersPage",
       component: OrdersPage,
-    }
-
+    },
   ],
 });
 
