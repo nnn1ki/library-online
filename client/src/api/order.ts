@@ -14,7 +14,7 @@ export async function ordersList(): Promise<Order[]> {
 
 export async function getOrder(orderId: number): Promise<Order> {
   try {
-    const { data } = await axios.get(`/api/order/${orderId}`);
+    const { data } = await axios.get(`/api/order/${orderId}/`);
     console.log(`/api/order/${orderId}`, data);
     return data;
   } catch (error) {
@@ -23,11 +23,7 @@ export async function getOrder(orderId: number): Promise<Order> {
   }
 }
 
-export async function createOrder(
-  libraryId: number,
-  bookIds: number[],
-  borrowedBookIds: number[]
-) {
+export async function createOrder(libraryId: number, bookIds: string[], borrowedBookIds: number[]) {
   try {
     await axios.post("/api/order/", {
       library: libraryId,
@@ -47,7 +43,7 @@ export async function editOrder(
   borrowedBookIds: number[]
 ) {
   try {
-    await axios.put(`/api/order/${orderId}`, {
+    await axios.put(`/api/order/${orderId}/`, {
       library: libraryId,
       books: bookIds,
       borrowed: borrowedBookIds,
@@ -60,7 +56,7 @@ export async function editOrder(
 
 export async function deleteOrder(orderId: number) {
   try {
-    await axios.delete(`/api/order/${orderId}`);
+    await axios.delete(`/api/order/${orderId}/`);
   } catch (error) {
     console.error("Ошибка при удалении заказа", error);
     throw error;

@@ -2,7 +2,7 @@ import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { computed, ref } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 import type { ProfileInfo } from "@/api/types";
 import { profileInfo } from "@/api/profile";
 
@@ -71,7 +71,22 @@ export const useAuthStore = defineStore("auth", () => {
       });
       refresh.value = data.refresh;
       access.value = data.access;
-      await updateProfileInfo();
+      updateProfileInfo();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  async function bitrixLogin(code: string): Promise<boolean> {
+    try {
+      const simpleAxios = axios.create();
+      const { data } = await simpleAxios.post<Tokens>("/api/auth/bitrix-login/", {
+        code: code,
+      });
+      refresh.value = data.refresh;
+      access.value = data.access;
+      updateProfileInfo();
       return true;
     } catch (_) {
       return false;
@@ -89,6 +104,10 @@ export const useAuthStore = defineStore("auth", () => {
     });
   }
 
+  onBeforeMount(async () => {
+    await updateProfileInfo();
+  });
+
   return {
     isAuthenticated,
     currentUser,
@@ -97,6 +116,7 @@ export const useAuthStore = defineStore("auth", () => {
     updateTokens,
     updateProfileInfo,
     login,
+    bitrixLogin,
     logout,
   };
 });

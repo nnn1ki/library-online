@@ -4,8 +4,8 @@
     <span>Библиотека</span>
     <select v-model="library" class="form-select form-select-sm" @change="updateSearchParams">
       <option :value="undefined"></option>
-      <option v-for="lib in libraries" :key="lib.id" :value="lib.id">{{
-        lib.description }} ({{ lib.address }})
+      <option v-for="lib in libraries" :key="lib.id" :value="lib.id">
+        {{ lib.description }} ({{ lib.address }})
       </option>
     </select>
 
@@ -14,26 +14,51 @@
       <div v-for="(condition, index) in conditions" :key="index" class="filter-condition mb-3 mt-3">
         <div class="d-flex align-items-center gap-2">
           <!-- Операторы И/ИЛИ -->
-          <select v-if="index !== 0" v-model="condition.operator" class="form-select form-select-sm"
-            @change="updateSearchParams">
-            <option v-for="[description, operator] in [['И', '*'], ['ИЛИ', '+']]" :key="operator" :value="operator">{{
-              description }}
+          <select
+            v-if="index !== 0"
+            v-model="condition.operator"
+            class="form-select form-select-sm"
+            @change="updateSearchParams"
+          >
+            <option
+              v-for="[description, operator] in [
+                ['И', '*'],
+                ['ИЛИ', '+'],
+              ]"
+              :key="operator"
+              :value="operator"
+            >
+              {{ description }}
             </option>
           </select>
 
           <!-- Тип фильтра -->
-          <select v-model="condition.scenarioPrefix" class="form-select form-select-sm" @change="updateSearchParams">
-            <option v-for="scenario in scenarios" :key="scenario.prefix" :value="scenario.prefix">{{
-              scenario.description
-              }}</option>
+          <select
+            v-model="condition.scenarioPrefix"
+            class="form-select form-select-sm"
+            @change="updateSearchParams"
+          >
+            <option v-for="scenario in scenarios" :key="scenario.prefix" :value="scenario.prefix">
+              {{ scenario.description }}
+            </option>
           </select>
 
           <!-- Значение фильтра -->
-          <input v-model="condition.value" type="text" class="form-control form-control-sm"
-            placeholder="Введите значение" @input="updateSearchParams" />
+          <input
+            v-model="condition.value"
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Введите значение"
+            @input="updateSearchParams"
+          />
 
           <!-- Удалить условие -->
-          <button v-if="index !== 0" type="button" class="btn btn-danger btn-sm" @click="removeCondition(index)">
+          <button
+            v-if="index !== 0"
+            type="button"
+            class="btn btn-danger btn-sm"
+            @click="removeCondition(index)"
+          >
             <i class="bi bi-x-square"></i>
           </button>
         </div>
@@ -82,16 +107,18 @@ const libraries = ref<Library[]>([]);
 const defaultScenario = "T=";
 
 const library = ref<number>();
-const conditions = ref<{
-  scenarioPrefix: string,
-  operator: "+" | "*",
-  value: string
-}[]>([
+const conditions = ref<
+  {
+    scenarioPrefix: string;
+    operator: "+" | "*";
+    value: string;
+  }[]
+>([
   {
     scenarioPrefix: defaultScenario,
     operator: "*",
-    value: ""
-  }
+    value: "",
+  },
 ]);
 
 const results = ref<Book[]>([]);
@@ -102,7 +129,7 @@ function addCondition() {
   conditions.value.push({
     scenarioPrefix: defaultScenario,
     operator: "*",
-    value: ""
+    value: "",
   });
 }
 
@@ -114,16 +141,18 @@ function removeCondition(index: number) {
 function buildQuery(): string {
   const query = conditions.value
     .filter((condition) => condition.value !== "")
-    .map((condition) => `${condition.operator}(${condition.scenarioPrefix}${condition.value}$)`).reduce((a, b) => a + b, "");
+    .map((condition) => `${condition.operator}(${condition.scenarioPrefix}${condition.value}$)`)
+    .reduce((a, b) => a + b, "");
   return query.substring(1);
 }
 
 function updateSearchParams() {
   router.push({
-    path: "/", query: {
+    path: "",
+    query: {
       query: buildQuery(),
-      library: library.value
-    }
+      library: library.value,
+    },
   });
 }
 
@@ -153,22 +182,26 @@ onBeforeMount(async () => {
   }
 
   if (typeof queryParam === "string") {
-    conditions.value = queryParam.split(")").map((item) => item.replace("(", "").replace("$", "")).filter((item) => item !== "").map((item) => {
-      let operator = item.charAt(0);
-      if (operator == "*" || operator == "+") {
-        item = item.substring(1);
-      } else {
-        operator = "*";
-      }
+    conditions.value = queryParam
+      .split(")")
+      .map((item) => item.replace("(", "").replace("$", ""))
+      .filter((item) => item !== "")
+      .map((item) => {
+        let operator = item.charAt(0);
+        if (operator == "*" || operator == "+") {
+          item = item.substring(1);
+        } else {
+          operator = "*";
+        }
 
-      const [prefix, value] = item.split("=");
+        const [prefix, value] = item.split("=");
 
-      return {
-        operator: operator as "*" | "+",
-        scenarioPrefix: `${prefix}=`,
-        value: value
-      }
-    });
+        return {
+          operator: operator as "*" | "+",
+          scenarioPrefix: `${prefix}=`,
+          value: value,
+        };
+      });
 
     search();
   }

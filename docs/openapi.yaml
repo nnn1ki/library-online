@@ -42,6 +42,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tokens'
+  /api/auth/bitrix-login/:
+    post:
+      tags: 
+        - auth
+      summary: Получение пары токенов по oauth на https://int.istu.edu/
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  description: Код авторизации от системы OAuth.
+                  type: string
+      responses:
+        '401':
+          description: Unauthorized
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
   /api/auth/refresh/:
     post:
       tags: 
@@ -89,6 +113,7 @@ paths:
     get:
       tags:
         - profile
+      summary: Получение информации о себе
       security:
         - bearer: []
       responses:
@@ -477,6 +502,12 @@ components:
         username:
           description: username пользователя
           type: string
+        first_name:
+          description: Имя 
+          type: string
+        last_name:
+          description: Фамилия
+          type: string
         groups:
           description: Группы пользователя
           type: array
@@ -641,12 +672,26 @@ components:
           $ref: "#/components/schemas/OrderBookId"
         book:
           $ref: "#/components/schemas/Book"
-        handed:
-          type: boolean
-          description: Была ли выдана книга
-        returned:
-          type: boolean
-          description: Возвращена ли книга
+        status:
+          type: string
+          description: Статус книги
+          enum:
+            - ordered
+            - handed
+            - returned
+            - cancelled
+        handed_date:
+          type: string
+          description: Дата получения книги
+          format: date
+        to_return_date:
+          type: string
+          description: Срок сдачи книги
+          format: date
+        returned_date:
+          type: string
+          description: Дата сдачи книги
+          format: date
     OrderId:
       type: number
       description: ID заказа
@@ -667,7 +712,7 @@ components:
             $ref: "#/components/schemas/OrderStatus"
         library:
           $ref: "#/components/schemas/Library"
-    
+
     BorrowedBook:
       type: object
       properties:
@@ -677,3 +722,11 @@ components:
           $ref: "#/components/schemas/Book"
         order:
           $ref: "#/components/schemas/OrderId"
+        handed_date:
+          type: string
+          description: Дата получения книги
+          format: date
+        to_return_date:
+          type: string
+          description: Срок сдачи книги
+          format: date
