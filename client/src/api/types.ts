@@ -50,7 +50,7 @@ export type Book = {
   created: string | null;
 };
 
-export const statuses = {
+export const orderStatuses = {
   new: "Новый",
   processing: "Собирается",
   ready: "Готов к выдаче",
@@ -59,19 +59,26 @@ export const statuses = {
   error: "Ошибка",
   archived: "Заархивирован",
 } as const;
-export type Status = keyof typeof statuses;
+export type OrderStatusEnum = keyof typeof orderStatuses;
 
 export type OrderStatus = {
-  status: Status;
+  status: OrderStatusEnum;
   date: string;
   description: string;
 };
 
+export const orderBookStatuses = {
+  ordered: "Заказана",
+  handed: "Выдана",
+  returned: "Возвращена",
+  cancelled: "Заказ отменен",
+} as const;
+export type OrderBookStatus = keyof typeof orderBookStatuses;
+
 export type OrderBook = {
   id: number;
   book: Book;
-  handed: boolean;
-  returned: boolean;
+  status: OrderBookStatus;
 };
 
 export type Order = {

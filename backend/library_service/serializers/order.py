@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
+from django.db.models import Q
+
 from library_service.opac.book import book_retrieve, book_validate
 from library_service.models.order import *
 from library_service.models.catalog import Library
@@ -17,7 +19,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ["id", "book", "handed", "returned"]
+        fields = ["id", "book", "status"]
 
     def get_book(self, obj: OrderItem):
         return BookSerializer(book_retrieve(obj.book_id)).data
@@ -51,14 +53,16 @@ class CreateUpdateOrderSerializer(serializers.Serializer):
             if not book.can_be_ordered:
                 raise APIException(f"Can't order book {book_id}", code=400)
 
-            # TODO: проверять, что у клиента нет такой книги
+            if OrderItem.objects.all().filter(order__user=self.context["request"].user, book_id=book_id).filter(Q(status=OrderItem.Status.ORDERED) | Q(status=OrderItem.Status.HANDED)).exists():
+                raise APIException(f"Can't order the same book {book_id} twice", code=400)
+
             # TODO: exemplar_id
             OrderItem.objects.create(order=order, book_id=book_id)
 
         borrowed_books: list[str] = validated_data["borrowed"]
         for book in borrowed_books:
             order_item = OrderItem.objects.get(pk=book)
-            if order_item is not None and order_item.order == order and order_item.handed and not order_item.returned:
+            if order_item is not None and order_item.order == order and order_item.status == OrderItem.Status.HANDED:
                 order_item.order_to_return = order
                 order_item.save()
 

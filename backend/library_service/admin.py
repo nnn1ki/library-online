@@ -33,8 +33,8 @@ class HistoryAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ["id", "order", "book_id", "exemplar_id", "returned", "handed"]
-    list_filter = ["order", "returned", "handed"]
+    list_display = ["id", "order", "book_id", "exemplar_id", "status"]
+    list_filter = ["order", "status"]
 
 @admin.register(Library)
 class LibraryAdmin(admin.ModelAdmin):

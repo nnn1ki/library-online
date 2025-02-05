@@ -4,6 +4,7 @@ import BasketPage from "@/views/BasketPage.vue";
 import ProfilePage from "@/views/ProfilePage.vue";
 import OrderPage from "@/views/OrderPage.vue";
 import NotePage from "@/views/NotePage.vue";
+import OrdersPage from "@/views/OrdersPage.vue";
 import OauthRedirectPage from "@/views/OauthRedirectPage.vue";
 
 const router = createRouter({
@@ -30,7 +31,7 @@ const router = createRouter({
       component: BasketPage,
     },
     {
-      path: "/orders",
+      path: "/order",
       name: "OrderPage",
       component: OrderPage,
     },
@@ -39,6 +40,12 @@ const router = createRouter({
       name: "NotePage",
       component: NotePage,
     },
+    {
+      path:"/orders",
+      name: "OrdersPage",
+      component: OrdersPage,
+    }
+
   ],
 });
 

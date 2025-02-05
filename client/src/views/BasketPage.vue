@@ -47,7 +47,7 @@
         <div class="summary-box">
           <h5 class="summary-title">Итого: {{ selectedBooks.length }} книг</h5>
           <div class="btn-group-vertical w-100">
-            <button class="btn btn-success" :disabled="books.length === 0 || selectedBooks.length === 0">
+            <button class="btn btn-success" :disabled="books.length === 0 || selectedBooks.length === 0" @click="onCreateOrderClick">
               Оформить заказ
             </button>
             <button class="btn btn-warning" :disabled="books.length === 0 || selectedBooks.length === 0"
@@ -99,9 +99,14 @@ import type { Book } from "@/api/types";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
+import { useOrderStore } from "@/stores/orderStore"
 import { computed, ref, onMounted, watch } from "vue";
+import { routeLocationKey } from "vue-router";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const basketStore = useBasketStore();
+const orderStore = useOrderStore();
 
 const { books } = storeToRefs(basketStore);
 const selectedBooks = ref<string[]>([]);
@@ -173,6 +178,14 @@ function saveBooks() {
   document.body.removeChild(a); // Удаляем элемент из DOM
   URL.revokeObjectURL(url); // Освобождаем память
 };
+
+async function onCreateOrderClick() {
+  orderStore.selectedBooks = basketStore.books.filter((b) => { 
+    return selectedBooks.value.some((selectedBook) => selectedBook === b.id)
+  });
+  
+  router.push("/order");
+}
 
 </script>
 
