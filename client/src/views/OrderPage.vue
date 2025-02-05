@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from "vue";
-import borrowedBooks from "@/components/BorrowedBooks.vue"
+import borrowedBooks from "@/components/BorrowedBooks.vue";
 import ShortBook from "@/components/ShortBook.vue";
 import { useOrderStore } from "@/stores/orderStore";
-import { borrowedList } from '@/api/order'
+import { borrowedList } from "@/api/order";
 
 const orderStore = useOrderStore();
 
@@ -20,7 +20,6 @@ const placeOrder = async () => {
 onBeforeMount(async () => {
   orderStore.borrowedBooks = await borrowedList();
 });
-
 </script>
 
 <template>
@@ -52,11 +51,22 @@ onBeforeMount(async () => {
       <!-- Поле для email -->
       <div class="email-input card">
         <label for="email" class="input-label">📧 Email (для уведомлений)</label>
-        <input id="email" type="email" v-model="email" placeholder="example@mail.com" class="styled-input" />
+        <input
+          id="email"
+          type="email"
+          v-model="email"
+          placeholder="example@mail.com"
+          class="styled-input"
+        />
       </div>
 
       <!-- Кнопка оформления -->
-      <button class="order-button" @click="placeOrder" :disabled="loading" :class="{ 'processing': loading }">
+      <button
+        class="order-button"
+        @click="placeOrder"
+        :disabled="loading"
+        :class="{ processing: loading }"
+      >
         <span v-if="!loading">✅ Оформить заказ</span>
         <span v-else>
           <span class="button-spinner"></span>

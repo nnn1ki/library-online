@@ -2,13 +2,18 @@
   <div class="borrow-summary">
     <div class="summary-header">
       <span class="alert-icon">⚠️</span>
-      <h3 class="summary-title">Необходимо вернуть книги <br>Отметьте те, которые принесете</h3>
+      <h3 class="summary-title">Необходимо вернуть книги <br />Отметьте те, которые принесете</h3>
     </div>
 
     <div class="book-list">
       <div v-for="item in orderStore.borrowedBooks" :key="item.book.id" class="book-item card">
         <label class="book-content">
-          <input type="checkbox" :value="item.id" v-model="orderStore.selectedBorrowedBooks" class="book-checkbox" />
+          <input
+            type="checkbox"
+            :value="item.id"
+            v-model="orderStore.selectedBorrowedBooks"
+            class="book-checkbox"
+          />
           <div class="book-details">
             <div class="book-header">
               <h4 class="book-title">

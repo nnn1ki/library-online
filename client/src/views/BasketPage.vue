@@ -5,8 +5,13 @@
       <div class="col-9">
         <div v-if="books.length !== 0" class="row align-items-center select-all">
           <div class="col-auto">
-            <input class="form-check-input" type="checkbox" :checked="allSelected" @change="toggleSelectAll"
-              aria-label="Выбрать все книги" />
+            <input
+              class="form-check-input"
+              type="checkbox"
+              :checked="allSelected"
+              @change="toggleSelectAll"
+              aria-label="Выбрать все книги"
+            />
           </div>
           <div class="col">
             <button class="btn btn-primary" @click="toggleSelectAll">
@@ -17,8 +22,14 @@
         <div v-for="book in books" :key="book.description" class="book-card">
           <div class="row align-items-center">
             <div class="col-auto">
-              <input class="form-check-input" type="checkbox" :value="book" :checked="selectedBooks.includes(book.id)"
-                @change="toggleBookSelection(book.id)" aria-label="Выбрать книгу" />
+              <input
+                class="form-check-input"
+                type="checkbox"
+                :value="book"
+                :checked="selectedBooks.includes(book.id)"
+                @change="toggleBookSelection(book.id)"
+                aria-label="Выбрать книгу"
+              />
             </div>
             <div class="col-auto">
               <img v-if="book.cover !== null" :src="book.cover" class="book-image img-fluid" />
@@ -32,7 +43,15 @@
                   <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
                     Удалить
                   </button>
-                  <button class="btn btn-info" @click="modalBook = book; isModalVisible = true">Подробнее</button>
+                  <button
+                    class="btn btn-info"
+                    @click="
+                      modalBook = book;
+                      isModalVisible = true;
+                    "
+                  >
+                    Подробнее
+                  </button>
                   <button class="btn btn-primary">Читать онлайн</button>
                 </div>
               </div>
@@ -47,14 +66,26 @@
         <div class="summary-box">
           <h5 class="summary-title">Итого: {{ selectedBooks.length }} книг</h5>
           <div class="btn-group-vertical w-100">
-            <button class="btn btn-success" :disabled="books.length === 0 || selectedBooks.length === 0" @click="onCreateOrderClick">
+            <button
+              class="btn btn-success"
+              :disabled="books.length === 0 || selectedBooks.length === 0"
+              @click="onCreateOrderClick"
+            >
               Оформить заказ
             </button>
-            <button class="btn btn-warning" :disabled="books.length === 0 || selectedBooks.length === 0"
-              data-bs-toggle="modal" data-bs-target="#confirmationModal">
+            <button
+              class="btn btn-warning"
+              :disabled="books.length === 0 || selectedBooks.length === 0"
+              data-bs-toggle="modal"
+              data-bs-target="#confirmationModal"
+            >
               Сохранить в файл
             </button>
-            <button class="btn btn-danger" :disabled="books.length === 0" @click="basketStore.clearBooks()">
+            <button
+              class="btn btn-danger"
+              :disabled="books.length === 0"
+              @click="basketStore.clearBooks()"
+            >
               Очистить корзину
             </button>
           </div>
@@ -63,15 +94,25 @@
 
       <!-- Модальное окно для подтверждения сохранения -->
       <div>
-        <div class="modal fade" id="confirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-          aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div
+          class="modal fade"
+          id="confirmationModal"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false"
+          tabindex="-1"
+          aria-labelledby="confirmationModalLabel"
+          aria-hidden="true"
+        >
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">
-                  Подтверждение сохранения
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                <h5 class="modal-title" id="confirmationModalLabel">Подтверждение сохранения</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Закрыть"
+                ></button>
               </div>
               <div class="modal-body">
                 <p>Вы хотите распечатать книги:</p>
@@ -82,7 +123,12 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                   Отмена
                 </button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveBooks">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  data-bs-dismiss="modal"
+                  @click="saveBooks"
+                >
                   Сохранить
                 </button>
               </div>
@@ -99,7 +145,7 @@ import type { Book } from "@/api/types";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
-import { useOrderStore } from "@/stores/orderStore"
+import { useOrderStore } from "@/stores/orderStore";
 import { computed, ref, onMounted, watch } from "vue";
 import { routeLocationKey } from "vue-router";
 import { useRouter } from "vue-router";
@@ -114,8 +160,6 @@ const selectedBooks = ref<string[]>([]);
 const isModalVisible = ref(false);
 const modalBook = ref<Book>();
 
-
-
 function toggleBookSelection(bookId: string) {
   const index = selectedBooks.value.indexOf(bookId);
   if (index === -1) {
@@ -123,7 +167,7 @@ function toggleBookSelection(bookId: string) {
   } else {
     selectedBooks.value.splice(index, 1);
   }
-};
+}
 
 function toggleSelectAll() {
   if (allSelected.value) {
@@ -131,17 +175,17 @@ function toggleSelectAll() {
   } else {
     selectedBooks.value = books.value.map((b) => b.id);
   }
-};
+}
 
 // Вычисляемое свойство для проверки, выбраны ли все книги
 const allSelected = computed(() => {
-  return (
-    books.value.length > 0 && selectedBooks.value.length === books.value.length
-  );
+  return books.value.length > 0 && selectedBooks.value.length === books.value.length;
 });
 
 watch(books, () => {
-  selectedBooks.value = selectedBooks.value.filter((item) => books.value.filter((b) => b.id === item).length !== 0);
+  selectedBooks.value = selectedBooks.value.filter(
+    (item) => books.value.filter((b) => b.id === item).length !== 0
+  );
 });
 
 // Расчитываемое свойство для книг в модальном окне
@@ -162,31 +206,30 @@ function saveBooks() {
 
   // Создаём имя файла по умолчанию
   const today = new Date();
-  const defaultFileName = `Заказ Литературы_${today.toISOString().split('T')[0]}.txt`;
+  const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}.txt`;
 
   // Запрашиваем имя файла у пользователя
   const fileName = prompt("Введите имя файла:", defaultFileName) || defaultFileName;
 
-  const blob = new Blob([content], { type: 'text/plain' }); // Создаём Blob с типом текст
+  const blob = new Blob([content], { type: "text/plain" }); // Создаём Blob с типом текст
   const url = URL.createObjectURL(blob); // Создаём URL для Blob
 
-  const a = document.createElement('a'); // Создаём элемент <a>
+  const a = document.createElement("a"); // Создаём элемент <a>
   a.href = url; // Устанавливаем href как URL Blob
   a.download = fileName; // Устанавливаем имя файла для скачивания
   document.body.appendChild(a); // Добавляем элемент в DOM
   a.click(); // Эмулируем клик для скачивания
   document.body.removeChild(a); // Удаляем элемент из DOM
   URL.revokeObjectURL(url); // Освобождаем память
-};
-
-async function onCreateOrderClick() {
-  orderStore.selectedBooks = basketStore.books.filter((b) => { 
-    return selectedBooks.value.some((selectedBook) => selectedBook === b.id)
-  });
-  
-  router.push("/order");
 }
 
+async function onCreateOrderClick() {
+  orderStore.selectedBooks = basketStore.books.filter((b) => {
+    return selectedBooks.value.some((selectedBook) => selectedBook === b.id);
+  });
+
+  router.push("/order");
+}
 </script>
 
 <style scoped>

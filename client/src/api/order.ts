@@ -23,11 +23,7 @@ export async function getOrder(orderId: number): Promise<Order> {
   }
 }
 
-export async function createOrder(
-  libraryId: number,
-  bookIds: string[],
-  borrowedBookIds: number[]
-) {
+export async function createOrder(libraryId: number, bookIds: string[], borrowedBookIds: number[]) {
   try {
     await axios.post("/api/order/", {
       library: libraryId,

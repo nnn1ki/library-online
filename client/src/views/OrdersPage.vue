@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <div v-if="orderStore.selectedBooks.length > 0">
-      <CurrenOrderCard :order="orderStore.selectedBooks"/>
+      <CurrenOrderCard :order="orderStore.selectedBooks" />
     </div>
     <div v-for="(order, i) in orders" :key="order.id" class="row">
-      <OrderCard :order="order" :num="i + 1" @delete="fetchOrderList"/>
+      <OrderCard :order="order" :num="i + 1" @delete="fetchOrderList" />
     </div>
     <div v-if="loading">
       <LoadingModal />
@@ -22,7 +22,7 @@ import OrderCard from "@/components/OrderCard.vue";
 import LoadingModal from "@/components/LoadingModal.vue";
 import CurrenOrderCard from "@/components/CurrenOrderCard.vue";
 const orders = ref<Order[]>([]);
-const loading = ref(false)
+const loading = ref(false);
 const orderStore = useOrderStore();
 onMounted(async () => {
   loading.value = true;
@@ -30,10 +30,9 @@ onMounted(async () => {
   loading.value = false;
 });
 
-async function fetchOrderList(){
+async function fetchOrderList() {
   orders.value = (await ordersList()).reverse();
 }
-
 </script>
 
 <style scoped>

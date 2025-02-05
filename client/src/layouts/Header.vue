@@ -9,11 +9,14 @@
         <nav>
           <ul class="nav mb-0">
             <li class="nav-item">
-              <router-link to="/" class="nav-link" active-class="active">Главная страница</router-link>
+              <router-link to="/" class="nav-link" active-class="active"
+                >Главная страница</router-link
+              >
             </li>
             <li class="nav-item">
-              <router-link to="/profile" class="nav-link" active-class="active">{{ isAuthenticated ? "Профиль" : "Вход"
-                }}</router-link>
+              <router-link to="/profile" class="nav-link" active-class="active">{{
+                isAuthenticated ? "Профиль" : "Вход"
+              }}</router-link>
             </li>
             <li class="nav-item">
               <router-link to="/basket" class="nav-link" active-class="active">Корзина</router-link>
@@ -34,7 +37,8 @@
 
       <!-- Дополнительные компоненты (слот) -->
       <div class="header-right d-flex align-items-center">
-        <slot></slot> <!-- Слот для добавления пользовательских компонентов -->
+        <slot></slot>
+        <!-- Слот для добавления пользовательских компонентов -->
       </div>
     </div>
   </header>

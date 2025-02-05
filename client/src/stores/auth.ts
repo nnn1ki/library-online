@@ -81,12 +81,9 @@ export const useAuthStore = defineStore("auth", () => {
   async function bitrixLogin(code: string): Promise<boolean> {
     try {
       const simpleAxios = axios.create();
-      const { data } = await simpleAxios.post<Tokens>(
-        "/api/auth/bitrix-login/",
-        {
-          code: code,
-        }
-      );
+      const { data } = await simpleAxios.post<Tokens>("/api/auth/bitrix-login/", {
+        code: code,
+      });
       refresh.value = data.refresh;
       access.value = data.access;
       updateProfileInfo();

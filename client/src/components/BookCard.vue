@@ -9,17 +9,28 @@
     <div class="card-body">
       <!-- Заголовок книги и автор -->
       <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
-      <h6 v-if="book.author.length > 0" class="card-subtitle text-muted">{{ book.author.join(", ") }}</h6>
-      <h6 v-else-if="book.collective.length > 0" class="card-subtitle text-muted">{{ book.collective.join(", ") }}</h6>
+      <h6 v-if="book.author.length > 0" class="card-subtitle text-muted">
+        {{ book.author.join(", ") }}
+      </h6>
+      <h6 v-else-if="book.collective.length > 0" class="card-subtitle text-muted">
+        {{ book.collective.join(", ") }}
+      </h6>
 
       <div class="d-flex justify-content-between align-items-center">
         <!-- Кнопка добавления в корзину -->
-        <button class="btn btn-info btn-sm" type="button" @click="addBook(book)" :disabled="isAdding || isInBasket">
+        <button
+          class="btn btn-info btn-sm"
+          type="button"
+          @click="addBook(book)"
+          :disabled="isAdding || isInBasket"
+        >
           <i class="bi bi-cart3"></i> В Корзину
         </button>
 
         <!-- Кнопка для подробного описания -->
-        <button class="btn btn-primary btn-sm mt-2" type="button" @click="isModalVisible = true">Подробнее</button>
+        <button class="btn btn-primary btn-sm mt-2" type="button" @click="isModalVisible = true">
+          Подробнее
+        </button>
       </div>
     </div>
   </div>
@@ -35,7 +46,7 @@ import { storeToRefs } from "pinia";
 import AboutBookDialog from "./AboutBookDialog.vue";
 
 const props = defineProps<{
-  book: Book
+  book: Book;
 }>();
 const { book } = toRefs(props);
 
@@ -52,14 +63,15 @@ async function addBook(book: Book) {
   if (isInBasket.value || isAdding.value) return;
   isAdding.value = true;
 
-  await basketStore.addBook(book).catch((error) => {
-    console.error("Ошибка при добавлении книги:", error);
-  }).finally(() => {
-    if (!isInBasket.value) isAdding.value = false;
-  });
-
+  await basketStore
+    .addBook(book)
+    .catch((error) => {
+      console.error("Ошибка при добавлении книги:", error);
+    })
+    .finally(() => {
+      if (!isInBasket.value) isAdding.value = false;
+    });
 }
-
 </script>
 
 <style scoped>
