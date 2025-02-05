@@ -74,7 +74,7 @@ async function addBook(book: Book) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .card {
   width: 100%;
   border-radius: 8px;

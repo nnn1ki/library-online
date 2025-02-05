@@ -29,7 +29,7 @@ const props = defineProps<{
 }>();
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .book-content {
   display: flex;
   gap: 1rem;

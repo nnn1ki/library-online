@@ -22,4 +22,4 @@ const authStore = useAuthStore();
 const { isAuthenticated, currentUser } = storeToRefs(authStore);
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped lang="scss"></style>

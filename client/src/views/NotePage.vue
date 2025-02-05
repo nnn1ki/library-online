@@ -55,7 +55,7 @@ const steps = [
 ];
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .instructions-page {
   padding: 20px;
 }

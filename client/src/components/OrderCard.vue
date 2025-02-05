@@ -68,7 +68,7 @@ async function onEditOrderClick() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .order-card {
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);

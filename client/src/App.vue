@@ -17,7 +17,7 @@ import Footer from "@/layouts/Footer.vue";
 import { RouterView } from "vue-router";
 </script>
 
-<style>
+<style scoped lang="scss">
 /* Корневой контейнер для всей страницы */
 .app {
   display: flex;

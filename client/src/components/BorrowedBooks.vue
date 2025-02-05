@@ -44,7 +44,7 @@ import { useOrderStore } from "@/stores/orderStore";
 const orderStore = useOrderStore();
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .borrow-summary {
   background: #fff8f8;
   border-radius: 12px;

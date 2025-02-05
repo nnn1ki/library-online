@@ -7,7 +7,7 @@
 
 <script setup></script>
 
-<style scoped>
+<style scoped lang="scss">
 .modal {
   position: fixed;
   top: 0;

@@ -61,7 +61,7 @@ const isInBasket = computed(() => basketBooks.value.some((item) => item.id == bo
 const visible = defineModel<boolean>();
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .modal {
   display: block;
   position: fixed;

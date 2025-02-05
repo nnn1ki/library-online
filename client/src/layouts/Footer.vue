@@ -40,7 +40,7 @@
 
 <script setup lang="ts"></script>
 
-<style scoped>
+<style scoped lang="scss">
 .footer {
   background-color: #333;
   color: #fff;

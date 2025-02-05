@@ -53,7 +53,7 @@ const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Основные стили для header */
 .header {
   background-color: #fff;

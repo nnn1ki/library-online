@@ -232,7 +232,7 @@ async function onCreateOrderClick() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Основной контейнер для карточек */
 .book-card {
   padding: 15px;
