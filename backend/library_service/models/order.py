@@ -38,12 +38,20 @@ class OrderHistory(models.Model):
         return f"History for Order {self.order.id}"
     
 class OrderItem(models.Model):
+    class Status(models.TextChoices):
+        ORDERED = "ordered", "Заказана"
+        HANDED = "handed", "Выдана"
+        RETURNED = "returned", "Возвращена"
+        CANCELLED = "cancelled", "Заказ отменен"
+        
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="books")
     exemplar_id = models.CharField(max_length=25, blank=True) # TODO: убрать потом blank=True
     book_id = models.CharField(max_length=255)
-    handed = models.BooleanField(default=False)
-    returned = models.BooleanField(default=False)
+    status = models.CharField(max_length=255, choices=Status.choices, default=Status.ORDERED)
     order_to_return = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    handed_date = models.DateField(null=True, blank=True)
+    to_return_date = models.DateField(null=True, blank=True)
+    returned_date = models.DateField(null=True, blank=True)
     
     class Meta:
         verbose_name = "Элемент заказа"

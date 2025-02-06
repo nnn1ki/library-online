@@ -113,6 +113,7 @@ paths:
     get:
       tags:
         - profile
+      summary: Получение информации о себе
       security:
         - bearer: []
       responses:
@@ -671,12 +672,26 @@ components:
           $ref: "#/components/schemas/OrderBookId"
         book:
           $ref: "#/components/schemas/Book"
-        handed:
-          type: boolean
-          description: Была ли выдана книга
-        returned:
-          type: boolean
-          description: Возвращена ли книга
+        status:
+          type: string
+          description: Статус книги
+          enum:
+            - ordered
+            - handed
+            - returned
+            - cancelled
+        handed_date:
+          type: string
+          description: Дата получения книги
+          format: date
+        to_return_date:
+          type: string
+          description: Срок сдачи книги
+          format: date
+        returned_date:
+          type: string
+          description: Дата сдачи книги
+          format: date
     OrderId:
       type: number
       description: ID заказа
@@ -697,7 +712,7 @@ components:
             $ref: "#/components/schemas/OrderStatus"
         library:
           $ref: "#/components/schemas/Library"
-    
+
     BorrowedBook:
       type: object
       properties:
@@ -707,3 +722,11 @@ components:
           $ref: "#/components/schemas/Book"
         order:
           $ref: "#/components/schemas/OrderId"
+        handed_date:
+          type: string
+          description: Дата получения книги
+          format: date
+        to_return_date:
+          type: string
+          description: Срок сдачи книги
+          format: date

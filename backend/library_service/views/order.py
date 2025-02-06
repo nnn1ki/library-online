@@ -65,6 +65,11 @@ class OrderViewset(
             raise APIException(f"Can't cancel an order with status {order_last_status.status}", code=400)
         
         await OrderHistory.objects.acreate(order=order, status=OrderHistory.Status.CANCELLED)
+
+        async for book in order.books.all():
+            book.status = OrderItem.Status.CANCELLED
+            await book.asave()
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class BorrowedViewset (
@@ -76,4 +81,4 @@ class BorrowedViewset (
     queryset = OrderItem.objects.all()
 
     def get_queryset(self):
-        return super().get_queryset().filter(order__user=self.request.user, handed=True, returned=False)
+        return super().get_queryset().filter(order__user=self.request.user, status=OrderItem.Status.HANDED)

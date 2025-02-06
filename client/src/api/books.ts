@@ -1,10 +1,7 @@
 import axios from "axios";
 import type { Book } from "@/api/types";
 
-export async function searchBooks(
-  expression: string,
-  library?: number
-): Promise<Book[]> {
+export async function searchBooks(expression: string, library?: number): Promise<Book[]> {
   try {
     const { data } = await axios.get("/api/book/", {
       params: {

@@ -89,8 +89,7 @@ erDiagram
         int order_id FK
         varchar exemplar_id
         varchar book_id
-        bool handed
-        bool returned
+        varchar status
         int order_id_to_return FK
     }
 
@@ -116,6 +115,13 @@ erDiagram
 В директории `docs` находится OpenAPI документация проекта.  
 В директории `backend` находится код для бэкенда на Django.  
 В директории `client` находится код для веб-клиента на Vue.
+
+### Разработка проекта
+
+На фронте используется форматирование с использованием Prettier. Рекомендуется установить данное расширение. Для автоматического форматирования всего проекта используется:  
+```bash
+npm run format
+```
 
 ### Запуск приложения
 

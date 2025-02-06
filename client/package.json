@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "library",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,15 +8,17 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "type-check": "vue-tsc --build --force"
+    "type-check": "vue-tsc --build --force",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
   },
   "dependencies": {
-    "@vue/compiler-sfc": "^3.5.13",
     "@vueuse/core": "^12.4.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "cookies": "^0.9.1",
+    "docx": "^9.1.1",
     "jquery-csrf-token": "^2.2.1",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
@@ -29,14 +31,18 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^20.16.11",
+    "@types/lodash": "^4.17.13",
     "@vitejs/plugin-vue": "^5.1.4",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/eslint-config-typescript": "^14.3.0",
     "@vue/tsconfig": "^0.5.1",
+    "eslint": "^9.19.0",
+    "eslint-plugin-vue": "^9.32.0",
     "npm-run-all2": "^6.2.3",
     "prettier": "^3.4.2",
     "sass-embedded": "^1.81.0",
     "typescript": "~5.5.4",
     "vite": "^5.4.8",
-    "vue-language-server": "^0.0.67",
     "vue-tsc": "^2.1.6"
   }
 }

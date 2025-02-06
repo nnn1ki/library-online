@@ -4,6 +4,8 @@ from rest_framework.exceptions import APIException
 from adrf import serializers as aserializers
 from adrf import fields as afields
 
+from django.db.models import Q
+
 from library_service.opac.book import book_retrieve, book_validate
 from library_service.models.order import *
 from library_service.models.catalog import Library
@@ -20,7 +22,7 @@ class OrderItemSerializer(aserializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ["id", "book", "handed", "returned"]
+        fields = ["id", "book", "status", "handed_date", "to_return_date", "returned_date"]
 
     async def get_book(self, obj: OrderItem):
         return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
@@ -55,14 +57,16 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
             if not book.can_be_ordered:
                 raise APIException(f"Can't order book {book_id}", code=400)
 
-            # TODO: проверять, что у клиента нет такой книги
+            if await OrderItem.objects.all().filter(order__user=self.context["request"].user, book_id=book_id).filter(Q(status=OrderItem.Status.ORDERED) | Q(status=OrderItem.Status.HANDED)).aexists():
+                raise APIException(f"Can't order the same book {book_id} twice", code=400)
+
             # TODO: exemplar_id
             await OrderItem.objects.acreate(order=order, book_id=book_id)
 
         borrowed_books: list[str] = validated_data["borrowed"]
         for book in borrowed_books:
             order_item = await OrderItem.objects.aget(pk=book)
-            if order_item is not None and order_item.order == order and order_item.handed and not order_item.returned:
+            if order_item is not None and order_item.order == order and order_item.status == OrderItem.Status.HANDED:
                 order_item.order_to_return = order
                 await order_item.asave()
 
@@ -102,7 +106,7 @@ class BorrowedBookSerializer(aserializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ["id", "book", "order"]
+        fields = ["id", "book", "order", "handed_date", "to_return_date"]
     
     async def get_book(self, obj: OrderItem):
         return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
