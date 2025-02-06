@@ -5,7 +5,7 @@ from django.contrib.auth.models import User, Group
 
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import AuthenticationFailed
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from adrf.views import APIView as AsyncAPIView
@@ -26,16 +26,16 @@ class BitrixAuthView(AsyncAPIView):
             })
 
             token_response_data = await token_response.json()
-            if (token_response.status != 200):
-                raise APIException(token_response_data["error_description"], code=401)
+            if token_response.status != 200:
+                raise AuthenticationFailed(token_response_data["error_description"], code="token_response")
 
             userinfo_response = await client.get(token_response_data["client_endpoint"] + "user.info.json", params={
                 "auth": token_response_data["access_token"],
             })
 
             userinfo_response_data = await userinfo_response.json()
-            if (userinfo_response.status != 200):
-                raise APIException(userinfo_response_data["error_description"], code=401)
+            if userinfo_response.status != 200:
+                raise AuthenticationFailed(userinfo_response_data["error_description"], code="userinfo_response")
 
             result = userinfo_response_data["result"]
 

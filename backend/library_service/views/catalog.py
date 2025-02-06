@@ -2,7 +2,7 @@ from aiohttp import ClientSession
 from rest_framework.decorators import action
 
 from rest_framework.response import Response
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ValidationError
 
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 from adrf import mixins as amixins
@@ -21,7 +21,7 @@ class BookViewset(amixins.RetrieveModelMixin, AsyncGenericViewSet):
         expression: str | None = self.request.query_params.get("expression")
 
         if expression is None:
-            raise APIException("No expression provided", code=400)
+            raise ValidationError("No expression provided", code="no_expression")
 
         libraries = Library.objects.all()
         if library is not None:

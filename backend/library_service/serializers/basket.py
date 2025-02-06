@@ -1,7 +1,6 @@
 import asyncio
-from aiohttp import ClientSession
 from rest_framework import serializers
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ValidationError
 
 from adrf import serializers as aserializers
 
@@ -15,7 +14,7 @@ class AddBasketSerializer(aserializers.Serializer):
         user = self.context["request"].user
         basket = await Basket.objects.filter(user=user).afirst()
 
-        if (basket is None):
+        if basket is None:
             basket = await Basket.objects.acreate(user=user)
         
         books_current = [book.book_id async for book in BasketItem.objects.filter(basket=basket)]
@@ -26,12 +25,12 @@ class AddBasketSerializer(aserializers.Serializer):
             if book not in books_current:
                 async def task(book=book):
                     if await book_validate(self.context["client_session"], book) is None:
-                        raise APIException(f"Invalid book id {book}", code=400)
+                        raise ValidationError(f"Invalid book id {book}", code="invalid_book_id")
                     books_current.append(book)
                     await BasketItem.objects.acreate(book_id=book, basket=basket)
                 tasks.append(task())
     
-        await asyncio.gather(*tasks)            
+        await asyncio.gather(*tasks)
         return {
             "books": books_current
         }

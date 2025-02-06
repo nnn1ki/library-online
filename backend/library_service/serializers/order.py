@@ -2,7 +2,7 @@ import asyncio
 from django.db.models import Q
 
 from rest_framework import serializers
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ValidationError
 
 from adrf import serializers as aserializers
 from adrf import fields as afields
@@ -49,22 +49,22 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
     async def configure_order(self, order: Order, validated_data):
         books: list[str] = validated_data["books"]
         if len(books) == 0:
-            raise APIException(f"Can't make an empty order", code=400)
+            raise ValidationError(f"Can't make an empty order", code="empty_order")
 
         current_books = [order_book.book_id async for order_book in OrderItem.objects.all().filter(order__user=self.context["request"].user).filter(Q(status=OrderItem.Status.ORDERED) | Q(status=OrderItem.Status.HANDED))]
         tasks = []
         for book_id in set(books):
             async def task(book_id=book_id):
                 if book_id in current_books:
-                    raise APIException(f"Can't order the same book {book_id} twice", code=400)
+                    raise ValidationError(f"Can't order the same book {book_id} twice", code="same_book_twice")
 
                 book = await book_validate(self.context["client_session"], book_id, order.library)
 
                 if book is None:
-                    raise APIException(f"Invalid book id {book_id}", code=400)
+                    raise ValidationError(f"Invalid book id {book_id}", code="invalid_book_id")
                 
                 if not book.can_be_ordered:
-                    raise APIException(f"Can't order book {book_id}", code=400)
+                    raise ValidationError(f"Can't order book {book_id}", code="cant_order_book")
 
                 # TODO: exemplar_id
                 await OrderItem.objects.acreate(order=order, book_id=book_id)
@@ -92,8 +92,8 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
         order_statuses = OrderHistory.objects.filter(order=instance).all()
         
         # Когда статус new, то в истории статусов заказа будет только одна запись
-        if (await order_statuses.acount() > 1):
-            raise APIException("Order status is not new", code=400)
+        if await order_statuses.acount() > 1:
+            raise ValidationError("Order status is not new", code="cant_update_order")
         
         await OrderItem.objects.filter(order=instance).all().adelete()
 

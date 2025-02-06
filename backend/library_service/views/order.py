@@ -1,5 +1,5 @@
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -33,8 +33,8 @@ class OrderViewset(
         ACCEPTABLE_STATUSES = [OrderHistory.Status.NEW, OrderHistory.Status.PROCESSING, OrderHistory.Status.READY]
         order_last_status = await OrderHistory.objects.filter(order=order).order_by("date").alast() # Нам интересен только последний статус заказа
 
-        if (order_last_status.status not in ACCEPTABLE_STATUSES):
-            raise APIException(f"Can't cancel an order with status {order_last_status.status}", code=400)
+        if order_last_status.status not in ACCEPTABLE_STATUSES:
+            raise ValidationError(f"Can't cancel an order with status {order_last_status.status}", code="cant_cancel_order")
         
         await OrderHistory.objects.acreate(order=order, status=OrderHistory.Status.CANCELLED)
 
