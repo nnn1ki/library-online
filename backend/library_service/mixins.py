@@ -1,5 +1,25 @@
 from aiohttp import ClientSession
+from threading import Lock
 from adrf import mixins as amixins
+from rest_framework.exceptions import PermissionDenied
+
+class LockUserMixin:
+    mutex = Lock()
+    current_users: set[str] = set()
+
+    def lock_user(self):
+        cls = self.__class__
+        username = self.request.user.username
+        with cls.mutex:
+            if username in cls.current_users:
+                raise PermissionDenied("A request is already being processed", code="no_transactions??")
+            else:
+                cls.current_users.add(username)
+    
+    def unlock_user(self):
+        cls = self.__class__
+        cls.current_users.discard(self.request.user.username)
+
 
 class ClientSessionMixin:
     client_session: ClientSession | None = None
