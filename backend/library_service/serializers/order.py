@@ -1,28 +1,31 @@
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
+from adrf import serializers as aserializers
+from adrf import fields as afields
+
 from library_service.opac.book import book_retrieve, book_validate
 from library_service.models.order import *
 from library_service.models.catalog import Library
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
 
-class OrderStatusSerializer(serializers.ModelSerializer):
+class OrderStatusSerializer(aserializers.ModelSerializer):
     class Meta:
         model = OrderHistory
         fields = ["description", "status", "date"]
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    book = serializers.SerializerMethodField()
+class OrderItemSerializer(aserializers.ModelSerializer):
+    book = afields.SerializerMethodField()
     
     class Meta:
         model = OrderItem
         fields = ["id", "book", "handed", "returned"]
 
-    def get_book(self, obj: OrderItem):
-        return BookSerializer(book_retrieve(obj.book_id)).data
+    async def get_book(self, obj: OrderItem):
+        return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(aserializers.ModelSerializer):
     library = LibrarySerializer()
     statuses = OrderStatusSerializer(many=True)
     books = OrderItemSerializer(many=True)
@@ -32,18 +35,19 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ["id", "library", "statuses", "books"]
 
 
-class CreateUpdateOrderSerializer(serializers.Serializer):
+class CreateUpdateOrderSerializer(aserializers.Serializer):
     library = serializers.IntegerField()
     books = serializers.ListField(child=serializers.CharField())
     borrowed = serializers.ListField(child=serializers.IntegerField())
 
-    def configure_order(self, order: Order, validated_data):
+    async def configure_order(self, order: Order, validated_data):
         books: list[str] = validated_data["books"]
         if len(books) == 0:
             raise APIException(f"Can't make an empty order", code=400)
 
         for book_id in set(books):
-            book = book_validate(book_id, order.library)
+            # TODO: parallel tasks
+            book = await book_validate(self.context["client_session"], book_id, order.library)
 
             if book is None:
                 raise APIException(f"Invalid book id {book_id}", code=400)
@@ -53,52 +57,52 @@ class CreateUpdateOrderSerializer(serializers.Serializer):
 
             # TODO: проверять, что у клиента нет такой книги
             # TODO: exemplar_id
-            OrderItem.objects.create(order=order, book_id=book_id)
+            await OrderItem.objects.acreate(order=order, book_id=book_id)
 
         borrowed_books: list[str] = validated_data["borrowed"]
         for book in borrowed_books:
-            order_item = OrderItem.objects.get(pk=book)
+            order_item = await OrderItem.objects.aget(pk=book)
             if order_item is not None and order_item.order == order and order_item.handed and not order_item.returned:
                 order_item.order_to_return = order
-                order_item.save()
+                await order_item.asave()
 
-    def create(self, validated_data):
+    async def acreate(self, validated_data):
         user = self.context["request"].user
 
-        order = Order.objects.create(user=user, library=Library.objects.get(pk=validated_data["library"]))
-        self.configure_order(order, validated_data)
+        order = await Order.objects.acreate(user=user, library=await Library.objects.aget(pk=validated_data["library"]))
+        await self.configure_order(order, validated_data)
 
-        OrderHistory.objects.create(order=order, status=OrderHistory.Status.NEW)
+        await OrderHistory.objects.acreate(order=order, status=OrderHistory.Status.NEW)
         return validated_data
 
-    def update(self, instance: Order, validated_data):
+    async def aupdate(self, instance: Order, validated_data):
         order_statuses = OrderHistory.objects.filter(order=instance).all()
         
         # Когда статус new, то в истории статусов заказа будет только одна запись
-        if (order_statuses.count() > 1):
+        if (await order_statuses.acount() > 1):
             raise APIException("Order status is not new", code=400)
         
-        OrderItem.objects.filter(order=instance).all().delete()
+        await OrderItem.objects.filter(order=instance).all().adelete()
 
         old_borrowed_books = OrderItem.objects.filter(order_to_return=instance).all()
-        for order_item in old_borrowed_books:
+        async for order_item in old_borrowed_books:
             order_item.order_to_return = None
-            order_item.save()
+            await order_item.asave()
         
-        instance.library = Library.objects.get(pk=validated_data["library"])
-        instance.save()
+        instance.library = await Library.objects.aget(pk=validated_data["library"])
+        await instance.asave()
 
-        self.configure_order(instance, validated_data)
+        await self.configure_order(instance, validated_data)
         # TODO: как-то помечать, что заказ был изменен?
         return validated_data
 
 
-class BorrowedBookSerializer(serializers.ModelSerializer):
-    book = serializers.SerializerMethodField()
+class BorrowedBookSerializer(aserializers.ModelSerializer):
+    book = afields.SerializerMethodField()
 
     class Meta:
         model = OrderItem
         fields = ["id", "book", "order"]
     
-    def get_book(self, obj: OrderItem):
-        return BookSerializer(book_retrieve(obj.book_id)).data
+    async def get_book(self, obj: OrderItem):
+        return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data

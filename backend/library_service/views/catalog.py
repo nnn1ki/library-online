@@ -1,10 +1,8 @@
 from aiohttp import ClientSession
 from rest_framework.decorators import action
 
-from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
-from rest_framework import mixins
 
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 from adrf import mixins as amixins
@@ -47,7 +45,7 @@ class BookViewset(amixins.RetrieveModelMixin, AsyncGenericViewSet):
             serializer = self.get_serializer(books, many=True)
             return Response(serializer.data)
     
-class LibraryViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+class LibraryViewset(amixins.ListModelMixin, amixins.RetrieveModelMixin, AsyncGenericViewSet):
     queryset = Library.objects.all()
     serializer_class = LibrarySerializer
 

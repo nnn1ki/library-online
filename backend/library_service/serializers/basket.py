@@ -34,6 +34,6 @@ class AddBasketSerializer(aserializers.Serializer):
         
             await asyncio.gather(*tasks)            
             return {
-                "books": books_current + books_add
+                "books": list(set(books_current + books_add))
             }
         

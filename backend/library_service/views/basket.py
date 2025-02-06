@@ -48,4 +48,4 @@ class BasketViewset(
     @action(detail=False, url_path="replace", methods=["put"])
     async def replace(self, request, *args, **kwargs):
         await self.get_queryset().adelete()
-        return await self.create(request, *args, **kwargs)
+        return await self.acreate(request, *args, **kwargs)
