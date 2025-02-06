@@ -12,6 +12,7 @@ from library_service.models.order import *
 from library_service.models.catalog import Library
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
+from library_service.serializers.parallel_list import ParallelListSerializer
 
 class OrderStatusSerializer(aserializers.ModelSerializer):
     class Meta:
@@ -24,6 +25,7 @@ class OrderItemSerializer(aserializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ["id", "book", "status", "handed_date", "to_return_date", "returned_date"]
+        list_serializer_class = ParallelListSerializer
 
     async def get_book(self, obj: OrderItem):
         return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
@@ -36,6 +38,7 @@ class OrderSerializer(aserializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ["id", "library", "statuses", "books"]
+        list_serializer_class = ParallelListSerializer
 
 
 class CreateUpdateOrderSerializer(aserializers.Serializer):
@@ -113,6 +116,7 @@ class BorrowedBookSerializer(aserializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ["id", "book", "order", "handed_date", "to_return_date"]
+        list_serializer_class = ParallelListSerializer
     
     async def get_book(self, obj: OrderItem):
         return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
