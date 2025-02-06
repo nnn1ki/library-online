@@ -1,10 +1,11 @@
+import asyncio
+from django.db.models import Q
+
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
 from adrf import serializers as aserializers
 from adrf import fields as afields
-
-from django.db.models import Q
 
 from library_service.opac.book import book_retrieve, book_validate
 from library_service.models.order import *
@@ -47,21 +48,26 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
         if len(books) == 0:
             raise APIException(f"Can't make an empty order", code=400)
 
+        current_books = [order_book.book_id async for order_book in OrderItem.objects.all().filter(order__user=self.context["request"].user).filter(Q(status=OrderItem.Status.ORDERED) | Q(status=OrderItem.Status.HANDED))]
+        tasks = []
         for book_id in set(books):
-            # TODO: parallel tasks
-            book = await book_validate(self.context["client_session"], book_id, order.library)
+            async def task(book_id=book_id):
+                if book_id in current_books:
+                    raise APIException(f"Can't order the same book {book_id} twice", code=400)
 
-            if book is None:
-                raise APIException(f"Invalid book id {book_id}", code=400)
-            
-            if not book.can_be_ordered:
-                raise APIException(f"Can't order book {book_id}", code=400)
+                book = await book_validate(self.context["client_session"], book_id, order.library)
 
-            if await OrderItem.objects.all().filter(order__user=self.context["request"].user, book_id=book_id).filter(Q(status=OrderItem.Status.ORDERED) | Q(status=OrderItem.Status.HANDED)).aexists():
-                raise APIException(f"Can't order the same book {book_id} twice", code=400)
+                if book is None:
+                    raise APIException(f"Invalid book id {book_id}", code=400)
+                
+                if not book.can_be_ordered:
+                    raise APIException(f"Can't order book {book_id}", code=400)
 
-            # TODO: exemplar_id
-            await OrderItem.objects.acreate(order=order, book_id=book_id)
+                # TODO: exemplar_id
+                await OrderItem.objects.acreate(order=order, book_id=book_id)
+            tasks.append(task())
+        
+        await asyncio.gather(*tasks)
 
         borrowed_books: list[str] = validated_data["borrowed"]
         for book in borrowed_books:

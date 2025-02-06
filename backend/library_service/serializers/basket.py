@@ -19,21 +19,20 @@ class AddBasketSerializer(aserializers.Serializer):
             basket = await Basket.objects.acreate(user=user)
         
         books_current = [book.book_id async for book in BasketItem.objects.filter(basket=basket)]
-        books_add: list[str] = list(set(validated_data["books"]))
+        books_add: list[str] = validated_data["books"]
 
-        async with ClientSession() as client:
-            tasks = []
-            for book in books_add:
-                if book not in books_current:
-                    async def task(book=book):
-                        if await book_validate(client, book) is None:
-                            raise APIException(f"Invalid book id {book}", code=400)
-
-                        await BasketItem.objects.acreate(book_id=book, basket=basket)
-                    tasks.append(task())
-        
-            await asyncio.gather(*tasks)            
-            return {
-                "books": list(set(books_current + books_add))
-            }
+        tasks = []
+        for book in set(books_add):
+            if book not in books_current:
+                async def task(book=book):
+                    if await book_validate(self.context["client_session"], book) is None:
+                        raise APIException(f"Invalid book id {book}", code=400)
+                    books_current.append(book)
+                    await BasketItem.objects.acreate(book_id=book, basket=basket)
+                tasks.append(task())
+    
+        await asyncio.gather(*tasks)            
+        return {
+            "books": books_current
+        }
         

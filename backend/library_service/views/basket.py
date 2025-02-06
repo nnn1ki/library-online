@@ -1,7 +1,7 @@
 import asyncio
-
 from aiohttp import ClientSession
 from django.http import Http404
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -9,12 +9,13 @@ from rest_framework.permissions import IsAuthenticated
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 from adrf import mixins as amixins
 
+from library_service.mixins import SessionCreateModelMixin
 from library_service.serializers.basket import *
 from library_service.serializers.catalog import BookSerializer
 from library_service.opac.book import book_retrieve
 
 class BasketViewset(
-    amixins.CreateModelMixin,
+    SessionCreateModelMixin,
     amixins.DestroyModelMixin,
     AsyncGenericViewSet
 ):
