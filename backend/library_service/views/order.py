@@ -28,40 +28,31 @@ class OrderViewset(
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user).prefetch_related("library")
     
+    @LockUserMixin.lock_request
     async def acreate(self, *args, **kwargs):
-        try:
-            self.lock_user()
-            return await super().acreate(*args, **kwargs)
-        finally:
-            self.unlock_user()
+        return await super().acreate(*args, **kwargs)
     
+    @LockUserMixin.lock_request
     async def aupdate(self, *args, **kwargs):
-        try:
-            self.lock_user()
-            return await super().aupdate(*args, **kwargs)
-        finally:
-            self.unlock_user()
+        return await super().aupdate(*args, **kwargs)
 
+    @LockUserMixin.lock_request
     async def adestroy(self, request, *args, **kwargs):
-        try:
-            self.lock_user()
-            order = await self.aget_object()
+        order = await self.aget_object()
 
-            ACCEPTABLE_STATUSES = [OrderHistory.Status.NEW, OrderHistory.Status.PROCESSING, OrderHistory.Status.READY]
-            order_last_status = await OrderHistory.objects.filter(order=order).order_by("date").alast() # Нам интересен только последний статус заказа
+        ACCEPTABLE_STATUSES = [OrderHistory.Status.NEW, OrderHistory.Status.PROCESSING, OrderHistory.Status.READY]
+        order_last_status = await OrderHistory.objects.filter(order=order).order_by("date").alast() # Нам интересен только последний статус заказа
 
-            if order_last_status.status not in ACCEPTABLE_STATUSES:
-                raise ValidationError(f"Can't cancel an order with status {order_last_status.status}", code="cant_cancel_order")
-            
-            await OrderHistory.objects.acreate(order=order, status=OrderHistory.Status.CANCELLED)
+        if order_last_status.status not in ACCEPTABLE_STATUSES:
+            raise ValidationError(f"Can't cancel an order with status {order_last_status.status}", code="cant_cancel_order")
+        
+        await OrderHistory.objects.acreate(order=order, status=OrderHistory.Status.CANCELLED)
 
-            async for book in order.books.all():
-                book.status = OrderItem.Status.CANCELLED
-                await book.asave()
+        async for book in order.books.all():
+            book.status = OrderItem.Status.CANCELLED
+            await book.asave()
 
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        finally:
-            self.unlock_user()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class BorrowedViewset (
     SessionListModelMixin,

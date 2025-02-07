@@ -3,9 +3,22 @@ from threading import Lock
 from adrf import mixins as amixins
 from rest_framework.exceptions import PermissionDenied
 
+# Довольно костыльное решение, чтобы избежать случаев, когда два запроса одновременно обращаются к БД (data races)
+# Лучше вместо этого использовать транзакции - @transaction.atomic
+# Но транзакции еще не поддерживаются в асинк коде 😢, так что пока используем такое решение
 class LockUserMixin:
     mutex = Lock()
     current_users: set[str] = set()
+
+    @staticmethod
+    def lock_request(request_handler):
+        async def handler(self, *args, **kwargs):
+            try:
+                self.lock_user()
+                return await request_handler(self, *args, **kwargs)
+            finally:
+                self.unlock_user()
+        return handler
 
     def lock_user(self):
         cls = self.__class__
