@@ -1,29 +1,36 @@
+import asyncio
 from rest_framework import serializers
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ValidationError
+
+from adrf import serializers as aserializers
 
 from library_service.models.user import Basket, BasketItem
 from library_service.opac.book import book_validate
 
-class AddBasketSerializer(serializers.Serializer):
+class AddBasketSerializer(aserializers.Serializer):
     books = serializers.ListField(child=serializers.CharField())
 
-    def create(self, validated_data):
+    async def acreate(self, validated_data):
         user = self.context["request"].user
-        basket = Basket.objects.filter(user=user).first()
+        basket = await Basket.objects.filter(user=user).afirst()
 
-        if (basket is None):
-            basket = Basket.objects.create(user=user)
+        if basket is None:
+            basket = await Basket.objects.acreate(user=user)
         
-        books_current = [book.book_id for book in BasketItem.objects.filter(basket=basket)]
+        books_current = [book.book_id async for book in BasketItem.objects.filter(basket=basket)]
         books_add: list[str] = validated_data["books"]
-        for book in books_add:
-            if book not in books_current:
-                if book_validate(book) is None:
-                    raise APIException(f"Invalid book id {book}", code=400)
 
-                BasketItem.objects.create(book_id=book, basket=basket)
-                books_current.append(book)
-            
+        tasks = []
+        for book in set(books_add):
+            if book not in books_current:
+                async def task(book=book):
+                    if await book_validate(self.context["client_session"], book) is None:
+                        raise ValidationError(f"Invalid book id {book}", code="invalid_book_id")
+                    books_current.append(book)
+                    await BasketItem.objects.acreate(book_id=book, basket=basket)
+                tasks.append(task())
+    
+        await asyncio.gather(*tasks)
         return {
             "books": books_current
         }
