@@ -14,7 +14,7 @@ BOOKS: list[OpacBook] = [
     OpacBook("ISTU_2", "", OpacBookInfo(["BBBB"], [], ["YYYY"], [], ["eng"], [], [], [], [], []), True, 2025, [OpacBookExemplar("1235", 1, "ok")]),
     OpacBook("ISTU_3", "", OpacBookInfo(["CCCC"], [], ["ZZZZ"], [], ["eng"], [], [], [], [], []), True, 2025, [OpacBookExemplar("1236", 1, "ok")]),
     OpacBook("NTD_1", "", OpacBookInfo(["AAAA"], [], ["XXXX"], [], ["eng"], [], [], [], [], []), True, 2025, [OpacBookExemplar("1234", 1, "ok")]),
-    OpacBook("NTD_2", "", OpacBookInfo(["BBBB"], [], ["YYYY"], [], ["eng"], [], [], [], [], []), True, 2025, [OpacBookExemplar("1235", 1, "ok")]),
+    OpacBook("NTD_2", "", OpacBookInfo(["BBBB", "AAA"], [], ["YYYY"], [], ["eng"], [], [], [], [], []), True, 2025, [OpacBookExemplar("1235", 1, "ok")]),
 ]
 ANNOUNCES: list[OpacAnnounce] = [OpacAnnounce("/opac/index.html?expression=IN=1235"), OpacAnnounce("/opac/index.html?expression=IN=1236")]
 
