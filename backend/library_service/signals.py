@@ -4,6 +4,8 @@ from django.dispatch import receiver
 
 from library_service.models.user import UserProfile
 
+# TODO: async??
+
 @receiver(post_migrate)
 def create_default_groups(sender, **kwargs):
     Group.objects.get_or_create(name="Librarian")

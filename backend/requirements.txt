@@ -9,3 +9,4 @@ adrf==0.1.9
 aiohttp==3.11.11
 uvicorn==0.34.0
 asyncio==3.4.3
+pytest-asyncio==0.25.3
