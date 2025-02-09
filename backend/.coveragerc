@@ -1,0 +1,8 @@
+[run]
+omit =
+    local_settings.py
+    manage.py
+    app/asgi.py
+    app/wsgi.py
+    library_service/migrations/* 
+    library_service/tests/* 
