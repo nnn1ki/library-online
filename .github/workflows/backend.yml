@@ -3,6 +3,9 @@ name: Python backend CI
 on:
   push:
 
+permissions:
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
