@@ -6,4 +6,4 @@ class LibraryServiceConfig(AppConfig):
     name = 'library_service'
     
     def ready(self):
-        import library_service.signals
+        import library_service.signals # pylint: disable=import-outside-toplevel

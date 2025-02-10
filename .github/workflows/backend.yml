@@ -49,3 +49,8 @@ jobs:
       with:
         recreate: true
         path: code-coverage-results.md
+
+    - name: Run linter
+      run: |
+        cd backend
+        pylint ./
