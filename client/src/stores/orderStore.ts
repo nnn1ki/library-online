@@ -4,7 +4,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { ref, nextTick } from "vue";
 import { useToast } from "vue-toastification";
 
-import { ordersList, getOrder, editOrder, createOrder, deleteOrder } from "@/api/order";
+import { ordersList, createOrder, deleteOrder } from "@/api/order";
 import { getBook } from "@/api/books";
 import { deleteBasketBook } from "@/api/basket";
 import type { Book, Order, BorrowedBook, OrderStatusEnum } from "@/api/types";
@@ -61,7 +61,7 @@ export const useOrderStore = defineStore("orderStore", () => {
       await basketStore.updateBooks();
       toast.success("Заказ принят");
       await nextTick();
-    } catch (error) {
+    } catch {
       toast.error("Что то не так");
     }
     router.push({ name: "Home" });
@@ -71,7 +71,7 @@ export const useOrderStore = defineStore("orderStore", () => {
     try {
       await deleteOrder(orderId);
       toast.info("Ваш заказ отменен");
-    } catch (error) {
+    } catch {
       toast.error("Что то пошло не так...");
     }
   }
@@ -111,7 +111,7 @@ export const useOrderStore = defineStore("orderStore", () => {
           toast.error(`Нельзя заказать книгу "${book.title}",\nона будет удалена из заказа`);
           selectedBooks.value = selectedBooks.value.filter((b) => b.id !== book.id);
         }
-      } catch (error) {
+      } catch {
         toast.error(`Ошибка при проверке книги "${book.title}"`);
         allCanBeOrdered = false;
       }

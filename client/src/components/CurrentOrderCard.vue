@@ -18,9 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import type { OrderStatusEnum, Book } from "@/api/types";
+import type { Book } from "@/api/types";
 import ShortBook from "@/components/ShortBook.vue";
-import { useOrderStore } from "@/stores/orderStore";
 
 const props = defineProps<{
   order: Book[];

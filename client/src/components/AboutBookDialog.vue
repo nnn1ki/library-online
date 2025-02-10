@@ -14,7 +14,7 @@
           <i v-else class="book-image bi bi-image"></i>
           <!-- Правая часть: информация -->
           <div class="book-details ms-3">
-            <h5 v-for="title in book.title">{{ title }}</h5>
+            <h5 v-for="[index, title] in book.title.entries()" v-bind:key="index">{{ title }}</h5>
             <h6 class="text-muted">Год: {{ book.year }}</h6>
             <h6 v-if="book.author.length > 0" class="text-muted">
               Авторы: {{ book.author.join(", ") }}
@@ -46,7 +46,7 @@
 import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
-import { computed, ref, toRefs, useModel } from "vue";
+import { computed, toRefs } from "vue";
 
 const props = defineProps<{
   book: Book;

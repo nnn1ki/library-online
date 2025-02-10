@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import SearchFilter from "@/layouts/BooksSearch.vue";
 import BookCard from "@/components/BookCard.vue";
 import type { Book } from "@/api/types";

@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeMount } from "vue";
+import { ref, onBeforeMount } from "vue";
 import BorrowedBooks from "@/components/BorrowedBooks.vue";
 import ShortBook from "@/components/ShortBook.vue";
 import { useOrderStore } from "@/stores/orderStore";
