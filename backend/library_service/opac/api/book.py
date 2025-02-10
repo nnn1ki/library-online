@@ -1,17 +1,19 @@
 from dataclasses import dataclass
-from dataclasses_json import DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, config, Undefined
 from aiohttp import ClientSession
 from django.conf import settings
 
 
 @dataclass
 class OpacBookLink(DataClassJsonMixin):
+    dataclass_json_config = config(undefined=Undefined.EXCLUDE)["dataclasses_json"]
     url: str
     description: str | None = None
 
 
 @dataclass
 class OpacBookExemplar(DataClassJsonMixin):
+    dataclass_json_config = config(undefined=Undefined.EXCLUDE)["dataclasses_json"]
     number: str
     amount: int
     status: str
@@ -21,6 +23,7 @@ class OpacBookExemplar(DataClassJsonMixin):
 
 @dataclass
 class OpacBookInfo(DataClassJsonMixin):
+    dataclass_json_config = config(undefined=Undefined.EXCLUDE)["dataclasses_json"]
     author: list[str]
     collective: list[str]
     title: list[str]
@@ -35,6 +38,7 @@ class OpacBookInfo(DataClassJsonMixin):
 
 @dataclass
 class OpacBook(DataClassJsonMixin):
+    dataclass_json_config = config(undefined=Undefined.EXCLUDE)["dataclasses_json"]
     id: str
     description: str
     info: OpacBookInfo
@@ -54,7 +58,7 @@ async def opac_search(client: ClientSession, database: str, expression: str) -> 
 
     r = await client.post(f"{settings.OPAC_HOSTNAME}/api/search", json=payload, params=params)
     r.raise_for_status()
-    return OpacBook.schema().load(await r.json(), many=True, unknown="exclude")
+    return OpacBook.schema().load(await r.json(), many=True)
 
 
 async def opac_book_retrieve(client: ClientSession, database: str, mfn: int) -> OpacBook:
@@ -62,4 +66,4 @@ async def opac_book_retrieve(client: ClientSession, database: str, mfn: int) -> 
 
     r = await client.get(f"{settings.OPAC_HOSTNAME}/api/books/by/mfn/{database}/{mfn}", params=params)
     r.raise_for_status()
-    return OpacBook.schema().load(await r.json(), unknown="exclude")
+    return OpacBook.schema().load(await r.json())
