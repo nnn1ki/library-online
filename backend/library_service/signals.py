@@ -1,10 +1,13 @@
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 
 from library_service.models.user import UserProfile
 
 # TODO: async??
+
+User = get_user_model()
 
 
 @receiver(post_migrate)

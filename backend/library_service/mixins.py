@@ -1,5 +1,5 @@
-from aiohttp import ClientSession
 from threading import Lock
+from aiohttp import ClientSession
 from adrf import mixins as amixins
 from rest_framework.exceptions import PermissionDenied
 
@@ -36,6 +36,7 @@ class LockUserMixin:
         cls.current_users.discard(self.request.user.username)
 
 
+# pylint: disable-next=too-few-public-methods
 class ClientSessionMixin:
     client_session: ClientSession | None = None
 

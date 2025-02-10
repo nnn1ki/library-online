@@ -1,12 +1,13 @@
-import asyncio
-from aiohttp import ClientSession
 from dataclasses import dataclass
 from typing import Iterable
+
+import asyncio
+from aiohttp import ClientSession
+from django.conf import settings
+
 from library_service.opac.api.announces import opac_announces_list
 from library_service.models.catalog import Library, LibraryDatabase
 from library_service.opac.api.book import OpacBook, opac_book_retrieve, opac_search
-
-from django.conf import settings
 
 
 @dataclass
@@ -24,6 +25,7 @@ class Book:
     copies: int
     can_be_ordered: bool
     links: list[BookLink]
+    # pylint: disable=duplicate-code
     author: list[str]
     collective: list[str]
     title: list[str]
@@ -34,6 +36,7 @@ class Book:
     publisher: list[str]
     subject: list[str]
     keyword: list[str]
+    # pylint: enable=duplicate-code
     cover: str | None
     brief: str | None
     created: str | None
@@ -74,7 +77,7 @@ async def books_list(client: ClientSession, libraries: Iterable[Library], expres
         databases: Iterable[LibraryDatabase] = library.databases.all()
         async for db in databases:
 
-            async def task(db=db) -> list[Book]:
+            async def task(library=library, db=db) -> list[Book]:
                 search_result = await opac_search(client, db.database, expression)
                 return [Book(book, library.id) for book in search_result]
 
@@ -119,5 +122,5 @@ async def book_validate(client: ClientSession, book_id: str, library: Library | 
             return None
 
         return await book_retrieve(client, book_id)
-    except:
+    except Exception: # pylint: disable=broad-exception-caught
         return None

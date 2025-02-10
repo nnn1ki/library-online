@@ -5,8 +5,22 @@ from rest_framework import status
 
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 
-from library_service.mixins import *
-from library_service.serializers.order import *
+from library_service.mixins import (
+    LockUserMixin,
+    SessionCreateModelMixin,
+    SessionListModelMixin,
+    SessionRetrieveModelMixin,
+    SessionUpdateModelMixin,
+)
+from library_service.models.order import Order, OrderHistory, OrderItem
+from library_service.serializers.order import BorrowedBookSerializer, CreateUpdateOrderSerializer, OrderSerializer
+
+
+ACCEPTABLE_STATUSES = [
+    OrderHistory.Status.NEW,
+    OrderHistory.Status.PROCESSING,
+    OrderHistory.Status.READY,
+]
 
 
 class OrderViewset(
@@ -41,11 +55,6 @@ class OrderViewset(
     async def adestroy(self, request, *args, **kwargs):
         order = await self.aget_object()
 
-        ACCEPTABLE_STATUSES = [
-            OrderHistory.Status.NEW,
-            OrderHistory.Status.PROCESSING,
-            OrderHistory.Status.READY,
-        ]
         order_last_status = (
             await OrderHistory.objects.filter(order=order).order_by("date").alast()
         )  # Нам интересен только последний статус заказа

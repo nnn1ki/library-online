@@ -16,7 +16,10 @@ disable=
     missing-class-docstring,
     missing-function-docstring,
     too-many-ancestors,
-    too-many-instance-attributes
+    too-many-instance-attributes,
+    abstract-method,
+    no-else-return,
+    no-else-raise,
 
 [FORMAT]
 max-line-length=120

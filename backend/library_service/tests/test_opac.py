@@ -31,7 +31,7 @@ async def test_search_exemplar(client_session: ClientSession):
         book
         for book in opac_mock.BOOKS
         if book.id.split("_")[0] == "ISTU"
-        if any([exemplar.number == "1236" for exemplar in book.exemplars])
+        if any(exemplar.number == "1236" for exemplar in book.exemplars)
     ]
 
     assert len(books) == 1
@@ -52,7 +52,7 @@ async def test_search_part(client_session: ClientSession):
         book
         for book in opac_mock.BOOKS
         if book.id.split("_")[0] == "NTD"
-        if any([author.startswith("AAA") for author in book.info.author])
+        if any(author.startswith("AAA") for author in book.info.author)
     ]
 
     assert len(books) == 2

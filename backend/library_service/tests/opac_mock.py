@@ -87,8 +87,13 @@ async def search(request: web.Request):
 
     expression = expression.replace("(", "").replace(")", "")
 
-    possible_books = [[book, False, True] for book in BOOKS if book.id.split("_")[0] == database]
+    # NOTE: this is technically an incorrect type hint
+    # (it's a list of lists, not a list of tuples)
+    possible_books: list[tuple[OpacBook, bool, bool]] = [
+        [book, False, True] for book in BOOKS if book.id.split("_")[0] == database
+    ]
 
+    # pylint: disable-next=too-many-nested-blocks
     for or_statement in expression.split("+"):
         for and_statement in or_statement.split("*"):
             if and_statement != "":
@@ -96,16 +101,16 @@ async def search(request: web.Request):
                 for book in possible_books:
                     if scenario == "A":
                         if expression.endswith("$"):
-                            book[2] &= any([author.startswith(expression[:-1]) for author in book[0].info.author])
+                            book[2] &= any(author.startswith(expression[:-1]) for author in book[0].info.author)
                         else:
                             book[2] &= expression in book[0].info.author
                     elif scenario == "T":
                         if expression.endswith("$"):
-                            book[2] &= any([title.startswith(expression[:-1]) for title in book[0].info.title])
+                            book[2] &= any(title.startswith(expression[:-1]) for title in book[0].info.title)
                         else:
                             book[2] &= expression in book[0].info.title
                     elif scenario == "IN":
-                        book[2] &= any([exemplar.number == expression for exemplar in book[0].exemplars])
+                        book[2] &= any(exemplar.number == expression for exemplar in book[0].exemplars)
 
         for book in possible_books:
             book[1] |= book[2]

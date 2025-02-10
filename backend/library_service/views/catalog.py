@@ -7,10 +7,10 @@ from rest_framework.exceptions import ValidationError
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 from adrf import mixins as amixins
 
+from library_service.models.catalog import Library
 from library_service.opac.api.scenarios import opac_scenarios
 from library_service.opac.book import book_retrieve, books_announces_list, books_list
-from library_service.serializers.catalog import *
-from library_service.models.catalog import *
+from library_service.serializers.catalog import BookSerializer, LibrarySerializer, ScenarioSerializer
 
 
 class BookViewset(amixins.RetrieveModelMixin, AsyncGenericViewSet):
@@ -34,9 +34,9 @@ class BookViewset(amixins.RetrieveModelMixin, AsyncGenericViewSet):
             return Response(serializer.data)
 
     async def aget_object(self):
-        id = self.kwargs["pk"]
+        pk = self.kwargs["pk"]
         async with ClientSession() as client:
-            book = await book_retrieve(client, id)
+            book = await book_retrieve(client, pk)
             return book
 
     @action(url_path="announcement", methods=["GET"], detail=False)
@@ -57,8 +57,7 @@ class ScenarioViewset(AsyncGenericViewSet):
 
     async def alist(self, request, *args, **kwargs):
         async with ClientSession() as client:
-            scenarios = await opac_scenarios(
-                client, "ISTU"
-            )  # TODO: по идее, сценарии сильно не отличаются между БД, но лучше все же убрать хардкод
+            # TODO: по идее, сценарии сильно не отличаются между БД, но лучше все же убрать хардкод
+            scenarios = await opac_scenarios(client, "ISTU")
             serializer = self.get_serializer(scenarios, many=True)
             return Response(serializer.data)

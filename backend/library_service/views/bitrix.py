@@ -1,7 +1,8 @@
 from aiohttp import ClientSession
 from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -11,10 +12,15 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from adrf.views import APIView as AsyncAPIView
 
 
+User = get_user_model()
+
+
 class BitrixAuthView(AsyncAPIView):
     class Serializer(serializers.Serializer):
         code = serializers.CharField()
 
+    # TODO: отрефакторить, чтобы pylint не ругался
+    # pylint: disable-next=too-many-locals
     async def post(self, request, *args, **kwargs):
         serializer = self.Serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
@@ -68,9 +74,11 @@ class BitrixAuthView(AsyncAPIView):
 
             # user.profile.is_teacher = bool(result["is_teacher"])
             # user.profile.is_student = bool(result["is_student"])
-            # user.profile.full_name = " ".join(i for i in [result["last_name"], result["name"], result["second_name"]] if i)
+            # user.profile.full_name = " ".join(
+            #     i for i in [result["last_name"], result["name"], result["second_name"]] if i
+            # )
 
-            mira_id = int(result["mira_id"][0] if result["mira_id"] or 0 else 0)
+            mira_id = int(result["mira_id"][0] if result["mira_id"] else 0)
             if mira_id > 2:
                 user.profile.mira_id = mira_id
 

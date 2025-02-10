@@ -1,6 +1,6 @@
+import multiprocessing
 from aiohttp import ClientSession
 import pytest
-import multiprocessing
 
 from library_service.tests.opac_mock import run_server
 

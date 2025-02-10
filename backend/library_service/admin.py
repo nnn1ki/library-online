@@ -1,7 +1,8 @@
 from django.contrib import admin
-from library_service.models.user import *
-from library_service.models.catalog import *
-from library_service.models.order import *
+
+from library_service.models.catalog import Library, LibraryDatabase
+from library_service.models.order import Order, OrderHistory, OrderItem
+from library_service.models.user import Basket, BasketItem, UserProfile
 
 
 @admin.register(UserProfile)

@@ -7,8 +7,8 @@ from rest_framework.exceptions import ValidationError
 from adrf import serializers as aserializers
 from adrf import fields as afields
 
+from library_service.models.order import Order, OrderHistory, OrderItem
 from library_service.opac.book import book_retrieve, book_validate
-from library_service.models.order import *
 from library_service.models.catalog import Library
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
@@ -62,7 +62,7 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
         borrowed_books: list[str] = validated_data["borrowed"]
 
         if len(books) == 0:
-            raise ValidationError(f"Can't make an empty order", code="empty_order")
+            raise ValidationError("Can't make an empty order", code="empty_order")
 
         queryset = (
             OrderItem.objects.all()
