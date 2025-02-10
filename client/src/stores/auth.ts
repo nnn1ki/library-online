@@ -53,7 +53,7 @@ export const useAuthStore = defineStore("auth", () => {
     if (await updateTokens()) {
       try {
         currentUser.value = await profileInfo();
-      } catch (_) {
+      } catch {
         // TODO: check if the error is actually related to the tokens
         refresh.value = undefined;
         access.value = undefined;
@@ -73,7 +73,7 @@ export const useAuthStore = defineStore("auth", () => {
       access.value = data.access;
       updateProfileInfo();
       return true;
-    } catch (_) {
+    } catch {
       return false;
     }
   }
@@ -88,7 +88,7 @@ export const useAuthStore = defineStore("auth", () => {
       access.value = data.access;
       updateProfileInfo();
       return true;
-    } catch (_) {
+    } catch {
       return false;
     }
   }

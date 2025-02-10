@@ -3,25 +3,25 @@ from app.settings import *
 OPAC_HOSTNAME = "https://library.istu.edu/opac"
 SERVICE_HOSTNAME = "http://localhost:5173"
 
-OAUTH_CLIENT_ID = 
-OAUTH_CLIENT_SECRET = 
+OAUTH_CLIENT_ID = ""
+OAUTH_CLIENT_SECRET = ""
 
 # for SQLite
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
 # for PostgreSQL
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'dbname',
-#         'USER': 'postgres_superuser',
-#         'PASSWORD': 'password',
-#         'HOST': 'localhost',
-#         'PORT': '',
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "dbname",
+#         "USER": "postgres_superuser",
+#         "PASSWORD": "password",
+#         "HOST": "localhost",
+#         "PORT": "",
 #     }
 # }

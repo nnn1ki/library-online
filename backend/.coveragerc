@@ -1,0 +1,15 @@
+[run]
+omit =
+    local_settings.py
+    manage.py
+    app/asgi.py
+    app/wsgi.py
+    library_service/migrations/*
+    library_service/tests/*
+
+    backend/local_settings.py
+    backend/manage.py
+    backend/app/asgi.py
+    backend/app/wsgi.py
+    backend/library_service/migrations/*
+    backend/library_service/tests/*

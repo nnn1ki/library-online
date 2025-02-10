@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, toRefs } from "vue";
+import { computed, ref, toRefs } from "vue";
 import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
