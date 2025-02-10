@@ -122,5 +122,5 @@ async def book_validate(client: ClientSession, book_id: str, library: Library | 
             return None
 
         return await book_retrieve(client, book_id)
-    except Exception: # pylint: disable=broad-exception-caught
+    except Exception:  # pylint: disable=broad-exception-caught
         return None
