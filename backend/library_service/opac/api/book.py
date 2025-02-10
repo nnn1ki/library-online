@@ -3,11 +3,13 @@ from dataclasses import dataclass
 from dataclasses_json import dataclass_json, Undefined
 from django.conf import settings
 
+
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class OpacBookLink:
     url: str
     description: str | None = None
+
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
@@ -17,6 +19,7 @@ class OpacBookExemplar:
     status: str
     onhand: str | None = None
     sigla: str | None = None
+
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
@@ -32,6 +35,7 @@ class OpacBookInfo:
     subject: list[str]
     keyword: list[str]
 
+
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class OpacBook:
@@ -46,26 +50,19 @@ class OpacBook:
     links: list[OpacBookLink] | None = None
     created: str | None = None
 
-async def opac_search(client: ClientSession, database: str, expression: str) -> list[OpacBook]:
-    payload = {
-        "database": database,
-        "expression": expression,
-        "format": "@opac_plain"
-    }
 
-    params = {
-        "extended": "true"
-    }
+async def opac_search(client: ClientSession, database: str, expression: str) -> list[OpacBook]:
+    payload = {"database": database, "expression": expression, "format": "@opac_plain"}
+
+    params = {"extended": "true"}
 
     r = await client.post(f"{settings.OPAC_HOSTNAME}/api/search", json=payload, params=params)
     r.raise_for_status()
     return OpacBook.schema().load(await r.json(), many=True)
 
+
 async def opac_book_retrieve(client: ClientSession, database: str, mfn: int) -> OpacBook:
-    params = {
-        "format": "@opac_plain",
-        "extended": "true"
-    }
+    params = {"format": "@opac_plain", "extended": "true"}
 
     r = await client.get(f"{settings.OPAC_HOSTNAME}/api/books/by/mfn/{database}/{mfn}", params=params)
     r.raise_for_status()

@@ -14,11 +14,8 @@ from library_service.serializers.basket import *
 from library_service.serializers.catalog import BookSerializer
 from library_service.opac.book import book_retrieve
 
-class BasketViewset(
-    SessionCreateModelMixin,
-    amixins.DestroyModelMixin,
-    AsyncGenericViewSet
-):
+
+class BasketViewset(SessionCreateModelMixin, amixins.DestroyModelMixin, AsyncGenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = BasketItem.objects.all()
 
@@ -27,7 +24,7 @@ class BasketViewset(
             return BookSerializer
         elif self.action in ["acreate", "replace"]:
             return AddBasketSerializer
-    
+
     def get_queryset(self):
         return super().get_queryset().filter(basket__user=self.request.user)
 
@@ -37,9 +34,9 @@ class BasketViewset(
 
         if await object.acount() == 0:
             raise Http404("Book not found")
-        
+
         return object
-    
+
     async def alist(self, request, *args, **kwargs):
         async with ClientSession() as client:
             books = await asyncio.gather(*[book_retrieve(client, book.book_id) async for book in self.get_queryset()])

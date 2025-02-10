@@ -54,3 +54,8 @@ jobs:
       run: |
         cd backend
         pylint ./
+    
+    - name: Check formatting
+      run: |
+        cd backend
+        black --check ./

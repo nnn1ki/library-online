@@ -34,7 +34,7 @@ jobs:
         cd client
         npx eslint src/ --ignore-pattern .gitignore
 
-    - name: Run formatter
+    - name: Check formatting
       run: |
         cd client
         npx prettier -c src/
