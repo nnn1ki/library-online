@@ -1,0 +1,39 @@
+name: Frontend job
+
+on:
+  pull_request:
+    types:
+      - synchronize
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+    
+    - name: Install Dependencies
+      run: |
+        cd client
+        npm ci
+      
+    # - name: Run Tests
+    #   run: |
+    #     cd client
+    #     npm run test
+
+    - name: Run linter
+      run: |
+        cd client
+        npx eslint src/ --ignore-pattern .gitignore
+
+    - name: Run formatter
+      run: |
+        cd client
+        npx prettier -c src/

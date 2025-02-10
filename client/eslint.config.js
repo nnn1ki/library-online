@@ -1,4 +1,4 @@
-import pluginVue from 'eslint-plugin-vue'
+import pluginVue from "eslint-plugin-vue"
 import {
   defineConfigWithVueTs,
   vueTsConfigs,
@@ -11,7 +11,7 @@ export default defineConfigWithVueTs(
         sourceType: "script",
     },
   },
-  pluginVue.configs['flat/essential'],
+  pluginVue.configs["flat/essential"],
   vueTsConfigs.recommended,
   skipFormattingConfig
 );
