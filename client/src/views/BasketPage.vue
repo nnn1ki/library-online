@@ -133,29 +133,14 @@
                 <p>Всего книг: {{ selectedBooks.length }}</p>
               </div>
               <div class="modal-footer">
-                <label>
-                  <input type="radio" value="txt" v-model="fileFormat" checked />
-                  Текстовый файл (.txt)
-                </label>
-                <label>
-                  <input type="radio" value="docx" v-model="fileFormat" />
-                  Word файл (.docx)
-                </label>
-                <label>
-                  <input disabled="true" type="radio" value="pdf" v-model="fileFormat" />
-                  PDF файл (.pdf)
-                </label>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                  Отмена
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-primary"
-                  data-bs-dismiss="modal"
-                  @click="saveBooks"
-                >
-                  Сохранить
-                </button>
+                <label for="fileFormat">Выберите формат файла:</label>
+                <select id="fileFormat" v-model="fileFormat">
+                  <option value="txt">Текстовый файл (.txt)</option>
+                  <option value="docx">Word файл (.docx)</option>
+                  <option value="pdf">PDF файл (.pdf)</option>
+                </select>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveBooks">Сохранить</button>
               </div>
             </div>
           </div>
