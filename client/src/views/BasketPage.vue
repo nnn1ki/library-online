@@ -110,7 +110,6 @@
           data-bs-keyboard="false"
           tabindex="-1"
           aria-labelledby="confirmationModalLabel"
-          aria-hidden="true"
         >
           <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -159,6 +158,7 @@ import { useOrderStore } from "@/stores/orderStore";
 import { computed, ref, watch } from "vue";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { useRouter } from "vue-router";
+import { jsPDF } from "jspdf";
 
 const router = useRouter();
 const basketStore = useBasketStore();
@@ -260,64 +260,113 @@ const bookList = computed(() => {
     .join("<hr>");
 });
 
-// Функция для сохранения книг
-function saveBooks() {
-  if (fileFormat.value === "txt") {
-    // Сохранение в текстовый файл
-    // Получаем текстовое содержимое из уже сформированного bookList
-    const content = bookList.value.split("<hr>").join("\n"); // Разбиваем текст по "<hr>" и объединяем строки с новой строки
+async function saveBooks() {
+  // Получаем текущую дату для формирования имени файла
+  const today = new Date();
+  const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}`;
 
-    // Создаём имя файла по умолчанию
-    const blob = new Blob([content], { type: "text/plain" }); // Создаём Blob с типом текст
-
-    // Создаём имя файла по умолчанию
-    const today = new Date();
-    const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}.txt`;
-
-    downloadBlob(blob, defaultFileName);
-  } else if (fileFormat.value === "docx") {
-    // Сохранение в .docx файл
-    // Получаем текстовое содержимое из уже сформированного bookList
-    const content = bookList.value.split("<hr>"); // Разбиваем текст по "<hr>"
-
-    const doc = new Document({
-      sections: [
-        {
-          properties: {},
-          children: [
-            new Paragraph({
-              children: [new TextRun("Список литературы:")],
-            }),
-            // Добавляем каждую книгу на следующую строку
-            ...content.map(
-              (item) =>
-                new Paragraph({
-                  children: [new TextRun(item)],
-                })
-            ),
-          ],
-        },
-      ],
-    });
-
-    Packer.toBlob(doc).then((blob) => {
-      const today = new Date();
-      const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}.docx`;
-
-      downloadBlob(blob, defaultFileName);
-    });
-  } else if (fileFormat.value === "pdf") {
-    throw Error("TODO");
+  try {
+    // Проверяем выбранный формат файла и вызываем соответствующую функцию
+    if (fileFormat.value === "txt") {
+      await saveAsText(defaultFileName);
+    } else if (fileFormat.value === "docx") {
+      await saveAsDocx(defaultFileName);
+    } else if (fileFormat.value === "pdf") {
+      await saveAsPdf(defaultFileName);
+    } else {
+      throw new Error("Неподдерживаемый формат файла.");
+    }
+  } catch (error) {
+    alert(`Ошибка: ${error.message}`);
   }
 }
 
-function downloadBlob(blob: Blob, defaultFilename: string) {
+async function saveAsText(defaultFileName) {
+  // Формируем содержимое для текстового файла
+  const content = bookList.value.split("<hr>").join("\n");
+  const blob = new Blob([content], { type: "text/plain" });
+  downloadBlob(blob, defaultFileName);
+}
+
+async function saveAsDocx(defaultFileName) {
+  // Формируем содержимое для Word документа
+  const content = bookList.value.split("<hr>");
+  const doc = new Document({
+    sections: [
+      {
+        properties: {},
+        children: [
+          new Paragraph({
+            children: [new TextRun("Список литературы:")],
+          }),
+          ...content.map(item => new Paragraph({
+            children: [new TextRun(item)],
+          })),
+        ],
+      },
+    ],
+  });
+
+  const blob = await Packer.toBlob(doc);
+  downloadBlob(blob, defaultFileName);
+}
+
+async function saveAsPdf(defaultFileName) {
+  const pdf = new jsPDF();
+  await loadFont(pdf);
+
+  const filename = prompt("Введите имя файла для PDF:", defaultFileName);
+  if (filename === null || filename.trim() === "") {
+    return;
+  }
+  // Формируем содержимое для PDF документа
+  const content = bookList.value.split("<hr>").map(item => item.trim()).filter(item => item !== "");
+
+  pdf.text("Список литературы:", 10, 10);
+  
+  // Устанавливаем начальную позицию для текста
+  let yOffset = 20;
+
+  content.forEach((item) => {
+    // Разбиваем текст на строки, чтобы они не выходили за пределы страницы
+    const lines = pdf.splitTextToSize(item, 190); // 190 - ширина текста
+    pdf.text(lines, 10, yOffset);
+    yOffset += lines.length * 10; // Увеличиваем смещение по Y на количество строк
+  });
+
+  pdf.save(filename);
+}
+
+// Функция для загрузки шрифта
+async function loadFont(pdf) {
+  try {
+    const fontName = "Tinos-Regular";
+    const response = await fetch(`src/views/${fontName}.ttf`);
+    const fontData = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(fontData);
+    
+    // Преобразование Uint8Array в строку
+    let binaryString = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+      binaryString += String.fromCharCode(uint8Array[i]);
+    }
+
+    pdf.addFileToVFS(`${fontName}.ttf`, btoa(binaryString));
+    pdf.addFont(`${fontName}.ttf`, fontName, "normal");
+    pdf.setFont(fontName);
+    pdf.setFontSize(14);
+  } catch (error) {
+    console.error('Ошибка загрузки шрифта:', error);
+  }
+}
+
+function downloadBlob(blob, defaultFilename) {
   // Запрашиваем имя файла у пользователя
   const filename = prompt("Введите имя файла:", defaultFilename);
 
   // Если пользователь нажал "Отмена" или оставил поле пустым, выходим из функции
   if (filename === null || filename.trim() === "") {
-    return; // Прерываем выполнение функции
+    return;
   }
 
   const url = URL.createObjectURL(blob); // Создаём URL для Blob
