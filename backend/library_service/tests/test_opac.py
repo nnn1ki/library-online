@@ -5,6 +5,7 @@ from library_service.opac.api.databases import opac_databases
 from library_service.opac.api.scenarios import opac_scenarios
 from library_service.opac.api.announces import opac_announces_list
 from library_service.tests import opac_mock
+from library_service.tests.opac_mock import BookId, books_by_id
 
 
 async def test_databases(client_session: ClientSession):
@@ -26,89 +27,39 @@ async def test_book_retrieve(client_session: ClientSession):
 
 
 async def test_search_exemplar(client_session: ClientSession):
-    expression = "IN=1236"
-    books = [
-        book
-        for book in opac_mock.BOOKS
-        if book.id.split("_")[0] == "ISTU"
-        if any(exemplar.number == "1236" for exemplar in book.exemplars)
-    ]
-
-    assert len(books) == 1
-    assert await opac_search(client_session, "ISTU", expression) == books
+    for book in [book for book in opac_mock.BOOKS if book.id.startswith("ISTU")]:
+        exemplar_id = book.exemplars[0].number
+        expression = f"IN={exemplar_id}"
+        assert await opac_search(client_session, "ISTU", expression) == [book]
 
 
 async def test_search_all(client_session: ClientSession):
-    expression = "T=$"
-    books = [book for book in opac_mock.BOOKS if book.id.split("_")[0] == "ISTU"]
-
-    assert len(books) == 3
-    assert await opac_search(client_session, "ISTU", expression) == books
+    assert await opac_search(client_session, "ISTU", "T=$") == books_by_id(
+        BookId.ISTU_AAAA_XXXX, BookId.ISTU_BBBB_YYYY, BookId.ISTU_CCCC_ZZZZ
+    )
 
 
 async def test_search_part(client_session: ClientSession):
-    expression = "A=AAA$"
-    books = [
-        book
-        for book in opac_mock.BOOKS
-        if book.id.split("_")[0] == "NTD"
-        if any(author.startswith("AAA") for author in book.info.author)
-    ]
-
-    assert len(books) == 2
-    assert await opac_search(client_session, "NTD", expression) == books
+    assert await opac_search(client_session, "NTD", "A=AAA$") == books_by_id(
+        BookId.NTD_AAAA_XXXX, BookId.NTD_BBBB_AAA_YYYY
+    )
 
 
 async def test_search_and(client_session: ClientSession):
-    expression = "A=AAAA*T=XXXX"
-    books = [
-        book
-        for book in opac_mock.BOOKS
-        if book.id.split("_")[0] == "ISTU"
-        if "AAAA" in book.info.author and "XXXX" in book.info.title
-    ]
-
-    assert len(books) == 1
-    assert await opac_search(client_session, "ISTU", expression) == books
+    assert await opac_search(client_session, "ISTU", "A=AAAA*T=XXXX") == books_by_id(BookId.ISTU_AAAA_XXXX)
 
 
 async def test_search_and_none(client_session: ClientSession):
-    expression = "A=AAAA*T=YYYY"
-    books = [
-        book
-        for book in opac_mock.BOOKS
-        if book.id.split("_")[0] == "ISTU"
-        if "AAAA" in book.info.author and "YYYY" in book.info.title
-    ]
-
-    assert len(books) == 0
-    assert await opac_search(client_session, "ISTU", expression) == books
+    assert await opac_search(client_session, "ISTU", "A=AAAA*T=YYYY") == []
 
 
 async def test_search_or(client_session: ClientSession):
-    expression = "A=AAAA+T=YYYY"
-    books = [
-        book
-        for book in opac_mock.BOOKS
-        if book.id.split("_")[0] == "ISTU"
-        if "AAAA" in book.info.author or "YYYY" in book.info.title
-    ]
-
-    assert len(books) == 2
-    assert await opac_search(client_session, "ISTU", expression) == books
+    assert await opac_search(client_session, "ISTU", "A=AAAA+T=YYYY") == books_by_id(
+        BookId.ISTU_AAAA_XXXX, BookId.ISTU_BBBB_YYYY
+    )
 
 
 async def test_search_and_or(client_session: ClientSession):
-    expression = "A=AAAA*T=XXXX+A=BBBB*T=YYYY"
-    books = [
-        book
-        for book in opac_mock.BOOKS
-        if book.id.split("_")[0] == "NTD"
-        if "AAAA" in book.info.author
-        and "XXXX" in book.info.title
-        or "BBBB" in book.info.author
-        and "YYYY" in book.info.title
-    ]
-
-    assert len(books) == 2
-    assert await opac_search(client_session, "NTD", expression) == books
+    assert await opac_search(client_session, "NTD", "A=AAAA*T=XXXX+A=BBBB*T=YYYY") == books_by_id(
+        BookId.NTD_AAAA_XXXX, BookId.NTD_BBBB_AAA_YYYY
+    )
