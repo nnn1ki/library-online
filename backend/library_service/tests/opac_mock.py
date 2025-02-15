@@ -67,8 +67,7 @@ BOOKS: list[OpacBook] = [
     ),
 ]
 
-ANNOUNCES_BOOKS = [book for book in BOOKS if book.id in ["ISTU_BBBB-YYYY", "ISTU_CCCC-ZZZZ"]]
-ANNOUNCES = [OpacAnnounce(f"/opac/index.html?expression=IN={book.exemplars[0].number}") for book in ANNOUNCES_BOOKS]
+ANNOUNCES = [OpacAnnounce("/opac/index.html?expression=IN=1235"), OpacAnnounce("/opac/index.html?expression=IN=1236")]
 
 
 def books_by_id(*ids: BookId) -> list[OpacBook]:
@@ -90,8 +89,8 @@ def announces(request: web.Request):
 def book_retrieve(request: web.Request):
     database = request.match_info["database"]
     mfn = request.match_info["mfn"]
-    id = f"{database}_{mfn}"
-    book = [book for book in BOOKS if book.id == id][0]
+    book_id = f"{database}_{mfn}"
+    book = [book for book in BOOKS if book.id == book_id][0]
     return web.json_response(book.to_dict())
 
 
