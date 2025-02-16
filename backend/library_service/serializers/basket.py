@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from adrf import serializers as aserializers
 
 from library_service.models.user import Basket, BasketItem
-from library_service.opac.book import book_validate
+from library_service.opac.book import book_retrieve_safe
 
 
 class AddBasketSerializer(aserializers.Serializer):
@@ -26,7 +26,7 @@ class AddBasketSerializer(aserializers.Serializer):
             if book not in books_current:
 
                 async def task(book=book):
-                    if await book_validate(self.context["client_session"], book) is None:
+                    if await book_retrieve_safe(self.context["client_session"], book) is None:
                         raise ValidationError(f"Invalid book id {book}", code="invalid_book_id")
                     books_current.append(book)
                     await BasketItem.objects.acreate(book_id=book, basket=basket)

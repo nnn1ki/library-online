@@ -55,6 +55,18 @@ def test_book_retrieve(client: Client):
 
 
 @pytest.mark.django_db
+def test_book_retrieve_non_existant_library(client: Client):
+    response = client.get("/api/book/ISU_1/")
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_book_retrieve_non_existant_book(client: Client):
+    response = client.get("/api/book/ISTU_404/")
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
 def test_search_all(client: Client):
     response = client.get("/api/book/", {"expression": "T=$"})
     json = response.json()
@@ -92,6 +104,7 @@ def test_search_and_or(client: Client):
     ]
 
 
+@pytest.mark.django_db
 def test_search_no_expression(client: Client):
     response = client.get("/api/book/")
     assert response.status_code == 400

@@ -90,6 +90,7 @@ async def books_list(client: ClientSession, libraries: Iterable[Library], expres
 async def books_announces_list(client: ClientSession) -> list[Book]:
     announces = await opac_announces_list(client)
 
+    # NOTE: тут вылетит исключение, если не зарегистрирована БД ISTU
     istu_library = (
         await LibraryDatabase.objects.filter(database="ISTU").prefetch_related("library").afirst()
     ).library  # По идее, все анонсы отсылают на ISTU
@@ -115,7 +116,7 @@ async def book_retrieve(client: ClientSession, book_id: str) -> Book:
     return Book(book, library.id)
 
 
-async def book_validate(client: ClientSession, book_id: str, library: Library | None = None) -> Book | None:
+async def book_retrieve_safe(client: ClientSession, book_id: str, library: Library | None = None) -> Book | None:
     try:
         database, _ = split_book_id(book_id)
         if library is not None and not await library.databases.filter(database=database).aexists():

@@ -8,7 +8,7 @@ from adrf import serializers as aserializers
 from adrf import fields as afields
 
 from library_service.models.order import Order, OrderHistory, OrderItem
-from library_service.opac.book import book_retrieve, book_validate
+from library_service.opac.book import book_retrieve, book_retrieve_safe
 from library_service.models.catalog import Library
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
@@ -83,7 +83,7 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
                         code="same_book_twice",
                     )
 
-                book = await book_validate(self.context["client_session"], book_id, library)
+                book = await book_retrieve_safe(self.context["client_session"], book_id, library)
 
                 if book is None:
                     raise ValidationError(f"Invalid book id {book_id}", code="invalid_book_id")
