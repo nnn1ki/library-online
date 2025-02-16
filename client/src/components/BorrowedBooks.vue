@@ -2,49 +2,77 @@
   <div class="borrow-summary">
     <div class="summary-header">
       <span class="alert-icon">⚠️</span>
-      <h3 class="summary-title">Необходимо вернуть книги <br />Отметьте те, которые принесете</h3>
+      <h3 class="summary-title">Книги, которые у вас на руках. <br />Отметьте те, которые принесете. <br/> Обязательно нужно принести те, что помеченны как "задолжность"</h3>
     </div>
 
     <div class="book-list">
       <div v-for="item in orderStore.borrowedBooks" :key="item.book.id" class="book-item card">
-        <label class="book-content">
-          <input
-            type="checkbox"
-            :value="item.id"
-            v-model="orderStore.selectedBorrowedBooks"
-            class="book-checkbox"
-          />
-          <div class="book-details">
-            <div class="book-header">
-              <h4 class="book-title">
-                📖 {{ item.book.title[0] }}
-                <span class="book-year">({{ item.book.year }})</span>
-              </h4>
+        <div class="book-activities">
+          <label class="book-content">
+            <input type="checkbox" :value="item.id" v-model="orderStore.selectedBorrowedBooks" class="book-checkbox" />
+            <div class="book-details">
+              <div class="book-header">
+                <h4 class="book-title">
+                  📖 {{ item.book.title[0] }}
+                  <span class="book-year">({{ item.book.year }})</span>
+                </h4>
+              </div>
+              <div class="book-authors">
+                <template v-if="item.book.author.length > 0">
+                  <span class="author-icon">✍️</span>
+                  {{ item.book.author.join(", ") }}
+                </template>
+                <template v-else-if="item.book.collective.length > 0">
+                  <span class="collective-icon">👥</span>
+                  {{ item.book.collective.join(", ") }}
+                </template>
+              </div>
             </div>
-            <div class="book-authors">
-              <template v-if="item.book.author.length > 0">
-                <span class="author-icon">✍️</span>
-                {{ item.book.author.join(", ") }}
-              </template>
-              <template v-else-if="item.book.collective.length > 0">
-                <span class="collective-icon">👥</span>
-                {{ item.book.collective.join(", ") }}
-              </template>
-            </div>
-          </div>
-        </label>
+          </label>
+          <div class="in-depth" v-if="inDebt(item.to_return_date)"><div class="in-depth-info">Задолжность</div></div>
+        </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { useOrderStore } from "@/stores/orderStore";
+import { computed } from "vue";
 
 const orderStore = useOrderStore();
+
+const inDebt = (bookOnReturnDate: string): boolean => {
+  const today = new Date().toLocaleDateString();
+  const bookOnReturn = new Date(bookOnReturnDate).toLocaleDateString();
+  return bookOnReturn >= today;
+};
 </script>
 
 <style scoped lang="scss">
+.in-depth-info {
+  color: #ae3636;
+  padding: 0.5rem;
+  border-radius: 1rem;
+}
+.in-depth-info:hover{
+  cursor: help;
+
+}
+.in-depth {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.book-activities {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .borrow-summary {
   background: #fff8f8;
   border-radius: 12px;
@@ -151,5 +179,21 @@ const orderStore = useOrderStore();
 .collective-icon {
   font-size: 0.9em;
   opacity: 0.8;
+}
+
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-leave-active {
+  position: absolute;
 }
 </style>

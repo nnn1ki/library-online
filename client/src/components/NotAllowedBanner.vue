@@ -59,8 +59,9 @@ defineExpose({ openModal });
 
 .info img:hover { 
   cursor:help;
-  
+
 }
+
 .modal-content {
   background: white;
   padding: 50px;

@@ -92,4 +92,5 @@ export type BorrowedBook = {
   id: number;
   book: Book;
   order: number;
+  to_return_date: string,
 };

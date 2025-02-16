@@ -7,10 +7,26 @@
 
       <div class="book-list">
         <h5 class="section-subtitle">Выбранные книги</h5>
-        <div v-for="(book, i) in orderStore.selectedBooks" :key="book.id" class="book-item card">
-          <ShortBook :book="book" :num="i" />
-        </div>
+        <transition-group name="list" tag="div">
+          <div v-for="(book, i) in orderStore.selectedBooks" :key="book.id" class="book-item card">
+            <div class="book-activities">
+              <ShortBook :book="book" :num="i" /> <i class="remove-icon" @click="removeBook(book.id)"> ❌ </i>
+            </div>
+          </div>
+        </transition-group>
       </div>
+
+      <div class="book-list" v-if="booksToreturn.length !== 0">
+        <h5 class="section-subtitle">Книги которые вы принесете</h5>
+        <transition-group name="list" tag="div">
+          <div v-for="(book, i) in booksToreturn" :key="book.id" class="book-item card">
+            <div class="book-activities">
+              <ShortBook :book="book.book" :num="i" />
+            </div>
+          </div>
+        </transition-group>
+      </div>
+
 
       <!-- Информация о заказе -->
       <div class="order-info card">
@@ -26,23 +42,17 @@
 
       <!-- Поле для email -->
       <div class="email-input card">
+
         <label for="email" class="input-label">📧 Email (для уведомлений)</label>
-        <input
-          id="email"
-          type="email"
-          v-model="email"
-          placeholder="example@mail.com"
-          class="styled-input"
-        />
+        <input id="email" type="email" v-model="email" placeholder="example@mail.com" class="styled-input" />
+        <div class="notifcation">
+          <label for="email" class="input-label">📨 Уведомления в кампусе</label>
+          <input type="checkbox" class="notifcation-checkbox">
+        </div>
       </div>
 
       <!-- Кнопка оформления -->
-      <button
-        class="order-button"
-        @click="placeOrder"
-        :disabled="loading"
-        :class="{ processing: loading }"
-      >
+      <button class="order-button" @click="placeOrder" :disabled="loading" :class="{ processing: loading }">
         <span v-if="!loading">✅ Оформить заказ</span>
         <span v-else>
           <span class="button-spinner"></span>
@@ -54,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, computed } from "vue";
 import BorrowedBooks from "@/components/BorrowedBooks.vue";
 import ShortBook from "@/components/ShortBook.vue";
 import { useOrderStore } from "@/stores/orderStore";
@@ -64,6 +74,10 @@ const orderStore = useOrderStore();
 
 // Поле для ввода email (опционально)
 const email = ref("");
+
+const booksToreturn = computed(() => {
+  return orderStore.borrowedBooks.filter(book => orderStore.selectedBorrowedBooks.includes(book.id));
+});
 
 const loading = ref(false);
 const placeOrder = async () => {
@@ -75,9 +89,42 @@ const placeOrder = async () => {
 onBeforeMount(async () => {
   orderStore.borrowedBooks = await borrowedList();
 });
+
+const removeBook = (id: string) => {
+  orderStore.selectedBooks = orderStore.selectedBooks.filter((book) => book.id !== id)
+}
+
 </script>
 
 <style scoped lang="scss">
+.notifcation {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.notifcation-checkbox {
+  width: 20px;
+  height: 20px;
+  margin-top: 0.3rem;
+  accent-color: #42b983;
+}
+
+.book-activities {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.remove-icon {
+  padding-top: 1rem;
+}
+
+.remove-icon:hover {
+  cursor: pointer;
+}
+
 .container {
   max-width: 800px;
   margin: 2rem auto;
@@ -210,5 +257,36 @@ onBeforeMount(async () => {
   to {
     transform: rotate(360deg);
   }
+}
+
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.7s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-leave-active {
+  position: absolute;
+  transition: opacity 0.3s ease, transform 0.5s ease;
+}
+
+.list-enter-active {
+  transition-delay: 0.5s;
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
 }
 </style>
