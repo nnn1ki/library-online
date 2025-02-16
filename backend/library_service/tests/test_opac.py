@@ -29,8 +29,7 @@ async def test_book_retrieve(client_session: ClientSession):
 async def test_search_exemplar(client_session: ClientSession):
     for book in [book for book in opac_mock.BOOKS if book.id.startswith("ISTU")]:
         exemplar_id = book.exemplars[0].number
-        expression = f"IN={exemplar_id}"
-        assert await opac_search(client_session, "ISTU", expression) == [book]
+        assert await opac_search(client_session, "ISTU", f"IN={exemplar_id}") == [book]
 
 
 async def test_search_all(client_session: ClientSession):
@@ -60,6 +59,6 @@ async def test_search_or(client_session: ClientSession):
 
 
 async def test_search_and_or(client_session: ClientSession):
-    assert await opac_search(client_session, "NTD", "A=AAAA*T=XXXX+A=BBBB*T=YYYY") == books_by_id(
-        BookId.NTD_AAAA_XXXX, BookId.NTD_BBBB_AAA_YYYY
+    assert await opac_search(client_session, "ZIMA", "A=AAAA*T=XXXX+A=BBBB*T=XXXX") == books_by_id(
+        BookId.ZIMA_AAAA_XXXX, BookId.ZIMA_BBBB_XXXX
     )

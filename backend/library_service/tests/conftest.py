@@ -20,9 +20,12 @@ def run_mock_opac():
 @pytest.fixture(scope="session", autouse=True)
 def setup_database(django_db_setup, django_db_blocker):  # pylint: disable=unused-argument
     with django_db_blocker.unblock():
-        library = Library.objects.create(description="INRTU")
-        LibraryDatabase.objects.create(library=library, database="ISTU")
-        LibraryDatabase.objects.create(library=library, database="NTD")
+        library_inrtu = Library.objects.create(description="ISTU_LIB")
+        LibraryDatabase.objects.create(library=library_inrtu, database="ISTU")
+        LibraryDatabase.objects.create(library=library_inrtu, database="NTD")
+
+        library_zima = Library.objects.create(description="ZIMA_LIB")
+        LibraryDatabase.objects.create(library=library_zima, database="ZIMA")
 
 
 @pytest.fixture

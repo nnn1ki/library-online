@@ -8,7 +8,7 @@ from library_service.opac.api.scenarios import OpacScenario
 
 PORT = 3740
 
-DATABASES: list[OpacDatabase] = [OpacDatabase("ISTU", True), OpacDatabase("NTD", True)]
+DATABASES: list[OpacDatabase] = [OpacDatabase("ISTU", True), OpacDatabase("NTD", True), OpacDatabase("ZIMA", True)]
 SCENARIOS: list[OpacScenario] = [
     OpacScenario("A=", "author"),
     OpacScenario("T=", "title"),
@@ -22,6 +22,8 @@ class BookId(Enum):
     ISTU_CCCC_ZZZZ = "ISTU_3"
     NTD_AAAA_XXXX = "NTD_1"
     NTD_BBBB_AAA_YYYY = "NTD_2"
+    ZIMA_AAAA_XXXX = "ZIMA_1"
+    ZIMA_BBBB_XXXX = "ZIMA_2"
 
 
 BOOKS: list[OpacBook] = [
@@ -61,6 +63,22 @@ BOOKS: list[OpacBook] = [
         BookId.NTD_BBBB_AAA_YYYY.value,
         "",
         OpacBookInfo(["BBBB", "AAA"], [], ["YYYY"], [], ["eng"], [], [], [], [], []),
+        True,
+        2025,
+        [OpacBookExemplar("1235", 1, "ok")],
+    ),
+    OpacBook(
+        BookId.ZIMA_AAAA_XXXX.value,
+        "",
+        OpacBookInfo(["AAAA"], [], ["XXXX"], [], ["eng"], [], [], [], [], []),
+        True,
+        2025,
+        [OpacBookExemplar("1234", 1, "ok")],
+    ),
+    OpacBook(
+        BookId.ZIMA_BBBB_XXXX.value,
+        "",
+        OpacBookInfo(["BBBB"], [], ["XXXX"], [], ["eng"], [], [], [], [], []),
         True,
         2025,
         [OpacBookExemplar("1235", 1, "ok")],
