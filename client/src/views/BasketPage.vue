@@ -161,6 +161,9 @@
           </div>
         </div>
       </div>
+      <!-- Модальное окно авторзиации -->
+      <NotAllowedBanner ref="modalNotAllowedRef"/>
+
     </div>
   </div>
 </template>
@@ -168,22 +171,28 @@
 <script setup lang="ts">
 import type { Book } from "@/api/types";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
+import NotAllowedBanner from "@/components/NotAllowedBanner.vue";
 import { useBasketStore } from "@/stores/basket";
+import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { useOrderStore } from "@/stores/orderStore";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, shallowRef } from "vue";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const basketStore = useBasketStore();
 const orderStore = useOrderStore();
+const auth = useAuthStore();
 
 const { books } = storeToRefs(basketStore);
 const selectedBooks = ref<string[]>([]);
 
 const isModalVisible = ref(false);
 const modalBook = ref<Book>();
+
+const modalNotAllowedRef = shallowRef<{ openModal: () => void } | null>(null);
+
 
 const fileFormat = ref<"txt" | "docx" | "pdf">("txt");
 
@@ -346,6 +355,11 @@ function downloadBlob(blob: Blob, defaultFilename: string) {
 }
 
 async function onCreateOrderClick() {
+  if(!auth.isAuthenticated && modalNotAllowedRef.value){
+    modalNotAllowedRef.value?.openModal();
+    return;
+  }
+
   orderStore.selectedBooks = basketStore.books.filter((b) => {
     return selectedBooks.value.some((selectedBook) => selectedBook === b.id);
   });
