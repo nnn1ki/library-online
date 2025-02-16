@@ -11,19 +11,19 @@ User = get_user_model()
 
 
 @receiver(post_migrate)
-def create_default_groups(_sender, **kwargs):
+def create_default_groups(sender, **kwargs):
     Group.objects.get_or_create(name="Librarian")
     Group.objects.get_or_create(name="Reader")
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(_sender, instance, created, **kwargs):
+def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
 
 
 @receiver(post_save, sender=User)
-def save_user_profile(_sender, instance, **kwargs):
+def save_user_profile(sender, instance, **kwargs):
     try:
         instance.profile.save()
     except User.profile.RelatedObjectDoesNotExist:

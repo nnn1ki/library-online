@@ -6,6 +6,7 @@ import OrderPage from "@/views/OrderPage.vue";
 import NotePage from "@/views/NotePage.vue";
 import OrdersPage from "@/views/OrdersPage.vue";
 import OauthRedirectPage from "@/views/OauthRedirectPage.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +35,7 @@ const router = createRouter({
       path: "/order",
       name: "OrderPage",
       component: OrderPage,
+      meta: { requiresAuth: true },
     },
     {
       path: "/note",
@@ -47,5 +49,15 @@ const router = createRouter({
     },
   ],
 });
+
+
+router.beforeEach((to, from) => {
+  const auth = useAuthStore();
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    return {
+      path: from.path,
+    }
+  }
+})
 
 export default router;
