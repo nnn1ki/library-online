@@ -1,6 +1,8 @@
 import multiprocessing
 from aiohttp import ClientSession
 import pytest
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
 from library_service.models.catalog import Library, LibraryDatabase
 from library_service.tests.opac_mock import run_server
@@ -26,6 +28,11 @@ def setup_database(django_db_setup, django_db_blocker):  # pylint: disable=unuse
 
         library_zima = Library.objects.create(description="ZIMA_LIB")
         LibraryDatabase.objects.create(library=library_zima, database="ZIMA")
+
+        user = get_user_model().objects.create_user(
+            username="user", password="1234", first_name="Alan", last_name="Turing"
+        )
+        user.groups.add(Group.objects.get(name="Reader"))
 
 
 @pytest.fixture

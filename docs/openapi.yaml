@@ -81,8 +81,8 @@ paths:
                 refresh:
                   type: string
       responses:
-        '400':
-          description: Bad request
+        '401':
+          description: Unauthorized
         '200':
           description: OK
           content:
@@ -104,8 +104,8 @@ paths:
                 refresh:
                   type: string
       responses:
-        '400':
-          description: Bad request
+        '401':
+          description: Unauthorized
         '200':
           description: OK
 
