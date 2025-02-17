@@ -1,5 +1,5 @@
 <template>
-  <div class="card shadow-sm border-0">
+  <div class="card shadow-sm border-0" v-b-tooltip.hover.focus.bottom :title="getBookHintInfo(book)">
     <!-- Картинка -->
     <div v-if="book.cover !== null" class="book-image">
       <img :src="book.cover" />
@@ -44,6 +44,8 @@ import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import AboutBookDialog from "./AboutBookDialog.vue";
+import BootstrapVue from "bootstrap-vue";
+import { TooltipPlugin } from "bootstrap-vue";
 
 const props = defineProps<{
   book: Book;
@@ -71,6 +73,24 @@ async function addBook(book: Book) {
     .finally(() => {
       if (!isInBasket.value) isAdding.value = false;
     });
+}
+
+function getBookHintInfo(book: Book): string{
+  let hint: string;
+
+  hint = "";
+
+  if (book.can_be_ordered && book.copies > 0){
+    hint = `Книга доступна для заказа \nКниг, доступных для заказа: ${book.copies}`;
+  } else if (book.can_be_ordered && book.copies == 0) {
+    hint = 'Доступных книг для заказа пока нет, закажите позже или возьмите в читальном зале';
+  } else if (!book.can_be_ordered && book.links.length > 0) {
+    hint = 'Можете только прочитать книгу онлайн';
+  } else if (!book.can_be_ordered && book.links.length == 0) {
+    hint = 'Книга доступна только в зале';
+  }
+
+  return hint;
 }
 </script>
 
