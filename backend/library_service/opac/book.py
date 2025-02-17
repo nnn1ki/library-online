@@ -123,5 +123,5 @@ async def book_retrieve_safe(client: ClientSession, book_id: str, library: Libra
             return None
 
         return await book_retrieve(client, book_id)
-    except Exception:  # pylint: disable=broad-exception-caught
+    except Exception:  # pylint: disable=broad-exception-caught # TODO: на самом деле, pylint здесь прав
         return None

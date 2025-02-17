@@ -7,7 +7,7 @@ from library_service.tests import opac_mock
 from library_service.tests.opac_mock import BookId
 
 
-def get_library_id(client: Client, library: Literal["ISTU_LIB"] | Literal["ZIMA_LIB"]):
+def get_library_id(client: Client, library: Literal["ISTU_LIB"] | Literal["ZIMA_LIB"]) -> int:
     response = client.get("/api/library/")
     json = response.json()
     return [i["id"] for i in json if i["description"] == library][0]
