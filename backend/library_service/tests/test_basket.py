@@ -1,7 +1,6 @@
 from django.test import Client
 import pytest
 
-from library_service.tests import opac_mock
 from library_service.tests.opac_mock import BookId
 from library_service.tests.test_auth import authorize
 
