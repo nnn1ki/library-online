@@ -113,6 +113,7 @@ export const useOrderStore = defineStore("orderStore", () => {
         }
       } catch {
         toast.error(`Ошибка при проверке книги "${book.title}"`);
+
         allCanBeOrdered = false;
       }
     }

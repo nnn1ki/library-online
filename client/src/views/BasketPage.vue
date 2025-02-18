@@ -161,6 +161,8 @@
           </div>
         </div>
       </div>
+      <!-- Модальное окно авторзиации -->
+      <NotAllowedBanner v-model="modalOpen" />
     </div>
   </div>
 </template>
@@ -168,7 +170,9 @@
 <script setup lang="ts">
 import type { Book } from "@/api/types";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
+import NotAllowedBanner from "@/components/NotAllowedBanner.vue";
 import { useBasketStore } from "@/stores/basket";
+import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { useOrderStore } from "@/stores/orderStore";
 import { computed, ref, watch } from "vue";
@@ -178,12 +182,15 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const basketStore = useBasketStore();
 const orderStore = useOrderStore();
+const auth = useAuthStore();
 
 const { books } = storeToRefs(basketStore);
 const selectedBooks = ref<string[]>([]);
 
 const isModalVisible = ref(false);
 const modalBook = ref<Book>();
+
+const modalOpen = ref(false);
 
 const fileFormat = ref<"txt" | "docx" | "pdf">("txt");
 
@@ -346,6 +353,11 @@ function downloadBlob(blob: Blob, defaultFilename: string) {
 }
 
 async function onCreateOrderClick() {
+  if (!auth.isAuthenticated) {
+    modalOpen.value = true;
+    return;
+  }
+
   orderStore.selectedBooks = basketStore.books.filter((b) => {
     return selectedBooks.value.some((selectedBook) => selectedBook === b.id);
   });
