@@ -2,14 +2,22 @@
   <div class="borrow-summary">
     <div class="summary-header">
       <span class="alert-icon">⚠️</span>
-      <h3 class="summary-title">Книги, которые у вас на руках. <br />Отметьте те, которые принесете. <br/> Обязательно нужно принести те, что помеченны как "задолжность"</h3>
+      <h3 class="summary-title">
+        Книги, которые у вас на руках. <br />Отметьте те, которые принесете. <br />
+        Обязательно нужно принести те, что помеченны как "задолжность"
+      </h3>
     </div>
 
     <div class="book-list">
       <div v-for="item in orderStore.borrowedBooks" :key="item.book.id" class="book-item card">
         <div class="book-activities">
           <label class="book-content">
-            <input type="checkbox" :value="item.id" v-model="orderStore.selectedBorrowedBooks" class="book-checkbox" />
+            <input
+              type="checkbox"
+              :value="item.id"
+              v-model="orderStore.selectedBorrowedBooks"
+              class="book-checkbox"
+            />
             <div class="book-details">
               <div class="book-header">
                 <h4 class="book-title">
@@ -29,17 +37,17 @@
               </div>
             </div>
           </label>
-          <div class="in-depth" v-if="inDebt(item.to_return_date)"><div class="in-depth-info">Задолжность</div></div>
+          <div class="in-depth" v-if="inDebt(item.to_return_date)">
+            <div class="in-depth-info">Задолжность</div>
+          </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
 import { useOrderStore } from "@/stores/orderStore";
-import { computed } from "vue";
 
 const orderStore = useOrderStore();
 
@@ -56,10 +64,11 @@ const inDebt = (bookOnReturnDate: string): boolean => {
   padding: 0.5rem;
   border-radius: 1rem;
 }
-.in-depth-info:hover{
-  cursor: help;
 
+.in-depth-info:hover {
+  cursor: help;
 }
+
 .in-depth {
   display: flex;
   flex-direction: row;

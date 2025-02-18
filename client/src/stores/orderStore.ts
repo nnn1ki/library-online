@@ -88,7 +88,7 @@ export const useOrderStore = defineStore("orderStore", () => {
   }
 
   // проверка сколько книг в заказах
-  function  booksOrdered(): number {
+  function booksOrdered(): number {
     const countOfBooksPreviousOrders = userOrders.value.reduce((total, order) => {
       const lastStatus = order.statuses[order.statuses.length - 1];
       if (lastStatus && allowedStatusesToCountOrderedBooks.includes(lastStatus.status)) {
@@ -113,7 +113,7 @@ export const useOrderStore = defineStore("orderStore", () => {
         }
       } catch {
         toast.error(`Ошибка при проверке книги "${book.title}"`);
-        
+
         allCanBeOrdered = false;
       }
     }

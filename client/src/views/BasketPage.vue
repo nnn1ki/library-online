@@ -162,8 +162,7 @@
         </div>
       </div>
       <!-- Модальное окно авторзиации -->
-      <NotAllowedBanner ref="modalNotAllowedRef"/>
-
+      <NotAllowedBanner ref="modalNotAllowedRef" />
     </div>
   </div>
 </template>
@@ -192,7 +191,6 @@ const isModalVisible = ref(false);
 const modalBook = ref<Book>();
 
 const modalNotAllowedRef = shallowRef<{ openModal: () => void } | null>(null);
-
 
 const fileFormat = ref<"txt" | "docx" | "pdf">("txt");
 
@@ -355,7 +353,7 @@ function downloadBlob(blob: Blob, defaultFilename: string) {
 }
 
 async function onCreateOrderClick() {
-  if(!auth.isAuthenticated && modalNotAllowedRef.value){
+  if (!auth.isAuthenticated && modalNotAllowedRef.value) {
     modalNotAllowedRef.value?.openModal();
     return;
   }

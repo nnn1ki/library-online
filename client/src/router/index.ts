@@ -50,14 +50,13 @@ const router = createRouter({
   ],
 });
 
-
 router.beforeEach((to, from) => {
   const auth = useAuthStore();
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return {
       path: from.path,
-    }
+    };
   }
-})
+});
 
 export default router;

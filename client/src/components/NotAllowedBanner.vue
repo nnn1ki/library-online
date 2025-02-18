@@ -1,5 +1,20 @@
-<script setup>
-import { ref, watch } from "vue";
+<template>
+  <div v-if="isOpen" class="modal-overlay" @click="closeModal">
+    <div class="modal-content" @click.stop>
+      <div class="info">
+        <img src="@/assets/circle-info.svg" style="width: 100px" alt="" />
+      </div>
+      <h5><strong>Авторизуйтесь, чтобы сделать заказ</strong></h5>
+      <div class="buttons">
+        <button @click="goToProfile">Перейти в авторзиации 🔑</button>
+        <button class="close" @click="closeModal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -24,21 +39,6 @@ const goToProfile = () => {
 defineExpose({ openModal });
 </script>
 
-<template>
-  <div v-if="isOpen" class="modal-overlay" @click="closeModal">
-    <div class="modal-content" @click.stop>
-      <div class="info">
-        <img src="@/assets/circle-info.svg" style="width: 100px;" alt="">
-      </div>
-      <h5><strong>Авторизуйтесь, чтобы сделать заказ</strong></h5>
-      <div class="buttons">
-        <button @click="goToProfile">Перейти в авторзиации 🔑</button>
-        <button class="close" @click="closeModal">Закрыть</button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
 .modal-overlay {
   position: fixed;
@@ -53,13 +53,13 @@ defineExpose({ openModal });
   justify-content: center;
   z-index: 1000;
 }
+
 .info {
   margin-bottom: 2rem;
 }
 
-.info img:hover { 
-  cursor:help;
-
+.info img:hover {
+  cursor: help;
 }
 
 .modal-content {

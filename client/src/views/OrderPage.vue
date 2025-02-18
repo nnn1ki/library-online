@@ -10,7 +10,8 @@
         <transition-group name="list" tag="div">
           <div v-for="(book, i) in orderStore.selectedBooks" :key="book.id" class="book-item card">
             <div class="book-activities">
-              <ShortBook :book="book" :num="i" /> <i class="remove-icon" @click="removeBook(book.id)"> ❌ </i>
+              <ShortBook :book="book" :num="i" />
+              <i class="remove-icon" @click="removeBook(book.id)"> ❌ </i>
             </div>
           </div>
         </transition-group>
@@ -27,7 +28,6 @@
         </transition-group>
       </div>
 
-
       <!-- Информация о заказе -->
       <div class="order-info card">
         <div class="info-item">
@@ -42,17 +42,27 @@
 
       <!-- Поле для email -->
       <div class="email-input card">
-
         <label for="email" class="input-label">📧 Email (для уведомлений)</label>
-        <input id="email" type="email" v-model="email" placeholder="example@mail.com" class="styled-input" />
+        <input
+          id="email"
+          type="email"
+          v-model="email"
+          placeholder="example@mail.com"
+          class="styled-input"
+        />
         <div class="notifcation">
           <label for="email" class="input-label">📨 Уведомления в кампусе</label>
-          <input type="checkbox" class="notifcation-checkbox">
+          <input type="checkbox" class="notifcation-checkbox" />
         </div>
       </div>
 
       <!-- Кнопка оформления -->
-      <button class="order-button" @click="placeOrder" :disabled="loading" :class="{ processing: loading }">
+      <button
+        class="order-button"
+        @click="placeOrder"
+        :disabled="loading"
+        :class="{ processing: loading }"
+      >
         <span v-if="!loading">✅ Оформить заказ</span>
         <span v-else>
           <span class="button-spinner"></span>
@@ -76,7 +86,9 @@ const orderStore = useOrderStore();
 const email = ref("");
 
 const booksToreturn = computed(() => {
-  return orderStore.borrowedBooks.filter(book => orderStore.selectedBorrowedBooks.includes(book.id));
+  return orderStore.borrowedBooks.filter((book) =>
+    orderStore.selectedBorrowedBooks.includes(book.id)
+  );
 });
 
 const loading = ref(false);
@@ -91,9 +103,8 @@ onBeforeMount(async () => {
 });
 
 const removeBook = (id: string) => {
-  orderStore.selectedBooks = orderStore.selectedBooks.filter((book) => book.id !== id)
-}
-
+  orderStore.selectedBooks = orderStore.selectedBooks.filter((book) => book.id !== id);
+};
 </script>
 
 <style scoped lang="scss">
@@ -273,7 +284,9 @@ const removeBook = (id: string) => {
 
 .list-leave-active {
   position: absolute;
-  transition: opacity 0.3s ease, transform 0.5s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.5s ease;
 }
 
 .list-enter-active {
