@@ -1,45 +1,32 @@
 <template>
-  <div v-if="isOpen" class="modal-overlay" @click="closeModal">
+  <div v-if="open" class="modal-overlay" @click="open = false">
     <div class="modal-content" @click.stop>
       <div class="info">
         <img src="@/assets/circle-info.svg" style="width: 100px" alt="" />
       </div>
       <h5><strong>Авторизуйтесь, чтобы сделать заказ</strong></h5>
       <div class="buttons">
-        <button @click="goToProfile">Перейти в авторзиации 🔑</button>
-        <button class="close" @click="closeModal">Закрыть</button>
+        <button @click="goToProfile">Перейти к авторизации 🔑</button>
+        <button class="close" @click="open = false">Закрыть</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const isOpen = ref(false);
-
-// Функция для открытия модального окна
-const openModal = () => {
-  isOpen.value = true;
-};
-
-// Функция для закрытия модального окна
-const closeModal = () => {
-  isOpen.value = false;
-};
+const open = defineModel<boolean>();
 
 // Переход на страницу профиля
 const goToProfile = () => {
-  closeModal();
+  open.value = false;
   router.push("/profile");
 };
-
-defineExpose({ openModal });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .modal-overlay {
   position: fixed;
   display: flex;

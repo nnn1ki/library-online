@@ -162,7 +162,7 @@
         </div>
       </div>
       <!-- Модальное окно авторзиации -->
-      <NotAllowedBanner ref="modalNotAllowedRef" />
+      <NotAllowedBanner v-model="modalOpen" />
     </div>
   </div>
 </template>
@@ -175,7 +175,7 @@ import { useBasketStore } from "@/stores/basket";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { useOrderStore } from "@/stores/orderStore";
-import { computed, ref, watch, shallowRef } from "vue";
+import { computed, ref, watch } from "vue";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { useRouter } from "vue-router";
 
@@ -190,7 +190,7 @@ const selectedBooks = ref<string[]>([]);
 const isModalVisible = ref(false);
 const modalBook = ref<Book>();
 
-const modalNotAllowedRef = shallowRef<{ openModal: () => void } | null>(null);
+const modalOpen = ref(false);
 
 const fileFormat = ref<"txt" | "docx" | "pdf">("txt");
 
@@ -353,8 +353,8 @@ function downloadBlob(blob: Blob, defaultFilename: string) {
 }
 
 async function onCreateOrderClick() {
-  if (!auth.isAuthenticated && modalNotAllowedRef.value) {
-    modalNotAllowedRef.value?.openModal();
+  if (!auth.isAuthenticated) {
+    modalOpen.value = true;
     return;
   }
 
