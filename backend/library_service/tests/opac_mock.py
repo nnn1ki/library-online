@@ -85,7 +85,10 @@ BOOKS: list[OpacBook] = [
     ),
 ]
 
-ANNOUNCES = [OpacAnnounce("/opac/index.html?expression=IN=1235"), OpacAnnounce("/opac/index.html?expression=IN=1236")]
+ANNOUNCES = [
+    OpacAnnounce("/opac/index.html?db=ISTU&expression=IN=1235"),
+    OpacAnnounce("/opac/index.html?db=ISTU&expression=IN=1236"),
+]
 
 
 def books_by_id(*ids: BookId) -> list[OpacBook]:
