@@ -79,6 +79,9 @@ export type OrderBook = {
   id: number;
   book: Book;
   status: OrderBookStatus;
+  handed_date: string | null;
+  to_return_date: string | null;
+  returned_date: string | null;
 };
 
 export type Order = {
@@ -92,5 +95,6 @@ export type BorrowedBook = {
   id: number;
   book: Book;
   order: number;
+  handed_date: string;
   to_return_date: string;
 };
