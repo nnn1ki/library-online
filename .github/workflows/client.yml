@@ -2,8 +2,6 @@ name: Frontend job
 
 on:
   pull_request:
-    types:
-      - synchronize
 
 jobs:
   build:

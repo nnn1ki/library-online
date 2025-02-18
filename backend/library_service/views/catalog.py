@@ -2,14 +2,14 @@ from aiohttp import ClientSession
 from rest_framework.decorators import action
 
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 from adrf import mixins as amixins
 
 from library_service.models.catalog import Library
 from library_service.opac.api.scenarios import opac_scenarios
-from library_service.opac.book import book_retrieve, books_announces_list, books_list
+from library_service.opac.book import book_retrieve_safe, books_announces_list, books_list
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer, ScenarioSerializer
 
 
@@ -36,7 +36,9 @@ class BookViewset(amixins.RetrieveModelMixin, AsyncGenericViewSet):
     async def aget_object(self):
         pk = self.kwargs["pk"]
         async with ClientSession() as client:
-            book = await book_retrieve(client, pk)
+            book = await book_retrieve_safe(client, pk)
+            if book is None:
+                raise NotFound(f"Book {pk} not found", "book_not_found")
             return book
 
     @action(url_path="announcement", methods=["GET"], detail=False)
