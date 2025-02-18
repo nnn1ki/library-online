@@ -44,8 +44,6 @@ import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import AboutBookDialog from "./AboutBookDialog.vue";
-import BootstrapVue from "bootstrap-vue";
-import { TooltipPlugin } from "bootstrap-vue";
 
 const props = defineProps<{
   book: Book;

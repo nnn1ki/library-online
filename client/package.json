@@ -17,6 +17,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "bootstrap-vue": "^2.23.1",
     "cookies": "^0.9.1",
     "docx": "^9.1.1",
     "jquery-csrf-token": "^2.2.1",
@@ -30,8 +31,8 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.16.11",
     "@types/lodash": "^4.17.13",
+    "@types/node": "^20.16.11",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.3.0",
