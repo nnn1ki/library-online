@@ -3,7 +3,7 @@
     <!-- Библиотеки -->
     <span>Библиотека</span>
     <select v-model="library" class="form-select form-select-sm" @change="updateSearchParams">
-      <option :value="undefined"></option>
+      <option :value="undefined">Все</option>
       <option v-for="lib in libraries" :key="lib.id" :value="lib.id">
         {{ lib.description }} ({{ lib.address }})
       </option>

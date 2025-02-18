@@ -17,7 +17,6 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "bootstrap-vue": "^2.23.1",
     "cookies": "^0.9.1",
     "docx": "^9.1.1",
     "jquery-csrf-token": "^2.2.1",
