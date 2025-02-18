@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="card shadow-sm border-0"
-    v-b-tooltip.hover.focus.bottom
-    :title="getBookHintInfo(book)"
-  >
+  <div class="card shadow-sm border-0" v-b-tooltip.hover.focus.bottom :title="bookHint">
     <!-- Картинка -->
     <div v-if="book.cover !== null" class="book-image">
       <img :src="book.cover" />
@@ -77,23 +73,23 @@ async function addBook(book: Book) {
     });
 }
 
-function getBookHintInfo(book: Book): string {
-  let hint: string;
+const bookHint = computed(() => {
+  const bookInfo = book.value;
 
-  hint = "";
-
-  if (book.can_be_ordered && book.copies > 0) {
-    hint = `Книга доступна для заказа \nКниг, доступных для заказа: ${book.copies}`;
-  } else if (book.can_be_ordered && book.copies == 0) {
-    hint = "Доступных книг для заказа пока нет, закажите позже или возьмите в читальном зале";
-  } else if (!book.can_be_ordered && book.links.length > 0) {
-    hint = "Можете только прочитать книгу онлайн";
-  } else if (!book.can_be_ordered && book.links.length == 0) {
-    hint = "Книга доступна только в зале";
+  if (bookInfo.can_be_ordered) {
+    if (bookInfo.copies > 0) {
+      return `Книга доступна для заказа \nКниг, доступных для заказа: ${bookInfo.copies}`;
+    } else {
+      return "Доступных книг для заказа пока нет, закажите позже или возьмите в читальном зале";
+    }
+  } else {
+    if (bookInfo.links.length > 0) {
+      return "Можете только прочитать книгу онлайн";
+    } else {
+      return "Книга доступна только в зале";
+    }
   }
-
-  return hint;
-}
+});
 </script>
 
 <style scoped lang="scss">
