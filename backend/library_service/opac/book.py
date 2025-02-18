@@ -60,7 +60,7 @@ class Book:
         self.subject = book.info.subject
         self.keyword = book.info.keyword
         self.cover = (
-            settings.OPAC_HOSTNAME + "/" + book.cover if book.cover else None
+            settings.OPAC_HOSTNAME.removesuffix("/opac") + book.cover if book.cover else None
         )  # TODO: по идее, лучше проксировать
         self.brief = book.brief
         self.created = book.created
@@ -90,6 +90,7 @@ async def books_list(client: ClientSession, libraries: Iterable[Library], expres
 async def books_announces_list(client: ClientSession) -> list[Book]:
     announces = await opac_announces_list(client)
 
+    # NOTE: тут вылетит исключение, если не зарегистрирована БД ISTU
     istu_library = (
         await LibraryDatabase.objects.filter(database="ISTU").prefetch_related("library").afirst()
     ).library  # По идее, все анонсы отсылают на ISTU
@@ -98,7 +99,8 @@ async def books_announces_list(client: ClientSession) -> list[Book]:
     for announce in announces:
 
         async def task(announce=announce) -> Book:
-            expresssion = announce.link.removeprefix("/opac/index.html?expression=")  # Спс за такой удобный апи
+            # TODO: привести это в порядок
+            expresssion = announce.link.removeprefix("/opac/index.html?db=ISTU&expression=")  # Спс за такой удобный апи
             book = (await opac_search(client, "ISTU", expresssion))[0]
             return Book(book, istu_library.id)
 
@@ -115,12 +117,12 @@ async def book_retrieve(client: ClientSession, book_id: str) -> Book:
     return Book(book, library.id)
 
 
-async def book_validate(client: ClientSession, book_id: str, library: Library | None = None) -> Book | None:
+async def book_retrieve_safe(client: ClientSession, book_id: str, library: Library | None = None) -> Book | None:
     try:
         database, _ = split_book_id(book_id)
         if library is not None and not await library.databases.filter(database=database).aexists():
             return None
 
         return await book_retrieve(client, book_id)
-    except Exception:  # pylint: disable=broad-exception-caught
+    except Exception:  # pylint: disable=broad-exception-caught # TODO: на самом деле, pylint здесь прав
         return None

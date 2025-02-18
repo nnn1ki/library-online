@@ -2,8 +2,6 @@ name: Backend job
 
 on:
   pull_request:
-    types:
-      - synchronize
 
 permissions:
   actions: read

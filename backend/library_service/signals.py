@@ -11,19 +11,19 @@ User = get_user_model()
 
 
 @receiver(post_migrate)
-def create_default_groups(sender, **kwargs):
+def create_default_groups(sender, **kwargs):  # pylint: disable=unused-argument
     Group.objects.get_or_create(name="Librarian")
     Group.objects.get_or_create(name="Reader")
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_user_profile(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     if created:
         UserProfile.objects.create(user=instance)
 
 
 @receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
+def save_user_profile(sender, instance, **kwargs):  # pylint: disable=unused-argument
     try:
         instance.profile.save()
     except User.profile.RelatedObjectDoesNotExist:
