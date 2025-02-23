@@ -273,7 +273,7 @@ const pagesToShow = computed(() => {
   }
 
   if (startPage > 2) {
-    pages.push(startPage - 1); // Добавляем страницу перед текущей
+    pages.push(startPage - 1);
   }
 
   for (let i = startPage; i <= endPage; i++) {
@@ -281,7 +281,7 @@ const pagesToShow = computed(() => {
   }
 
   if (endPage < totalPages.value - 1) {
-    pages.push(endPage + 1); // Добавляем страницу после текущей
+    pages.push(endPage + 1);
   }
 
   if (totalPages.value - currentPage.value === 4) {
@@ -317,3 +317,8 @@ function goToPage(page) {
   }
 }
 </script>
+<style scoped lang="scss">
+.pagination {
+  margin: 1rem 0 0 0;
+}
+</style>
