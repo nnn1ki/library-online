@@ -76,7 +76,12 @@
     </form>
 
     <!-- Результаты поиска -->
-    <div v-if="loading" class="mt-3">Загрузка...</div>
+    <div v-if="loading" class="mt-3">
+      <span class="spinner-border spinner-border-sm" role="status"></span>
+      <strong>
+        Загрузка...
+      </strong>
+    </div>
     <div v-else class="mt-3">
       <h3>Результаты поиска</h3>
       <ul v-if="paginatedResults.length" class="list-group">
