@@ -92,7 +92,7 @@
       <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
 
       <!-- Пагинация -->
-      <nav aria-label="Навигация по страницам">
+      <nav v-if="paginatedResults.length" aria-label="Навигация по страницам">
         <ul class="pagination justify-content-center">
           <li class="page-item" :class="{ disabled: currentPage === 1 }">
             <a class="page-link" @click="prevPage" href="#" aria-label="Предыдущая">
