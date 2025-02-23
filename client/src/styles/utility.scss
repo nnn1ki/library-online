@@ -1,0 +1,25 @@
+@use "breakpoints.scss" as *;
+
+.container {
+  width: 100%;
+
+  @include media-sm {
+    max-width: $breakpoint-sm;
+  }
+
+  @include media-md {
+    max-width: $breakpoint-md;
+  }
+
+  @include media-lg {
+    max-width: $breakpoint-lg;
+  }
+
+  @include media-xl {
+    max-width: $breakpoint-xl;
+  }
+
+  @include media-2xl {
+    max-width: $breakpoint-2xl;
+  }
+}

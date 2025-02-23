@@ -1,0 +1,35 @@
+// TODO: данные переменные - это только наброски
+
+@mixin light-theme {
+  --color-background: #f6f3e9;
+  --color-background-content: black;
+  --color-surface: white;
+  --color-surface-content: black;
+}
+
+@mixin dark-theme {
+  --color-background: #242424;
+  --color-background-content: white;
+  --color-surface: #353535;
+  --color-surface-content: white;
+}
+
+@media screen and (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    @include light-theme;
+  }
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    @include dark-theme;
+  }
+}
+
+:root[data-theme="light"] {
+  @include light-theme;
+}
+
+:root[data-theme="dark"] {
+  @include dark-theme;
+}
