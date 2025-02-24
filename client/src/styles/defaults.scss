@@ -1,4 +1,47 @@
+@use "fonts.scss" as *;
+@use "colors.scss" as *;
+
+html {
+  font-size: 100%;
+}
+
 body {
-  background-color: var(--color-background);
-  color: var(--color-background-content);
+  background-color: var(--color-background-50);
+  color: var(--color-text-950);
+  font-size: var(--text-base);
+  font-family: $font-body;
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: $font-heading;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: var(--text-5xl);
+}
+
+h2 {
+  font-size: var(--text-4xl);
+}
+
+h3 {
+  font-size: var(--text-3xl);
+}
+
+h4 {
+  font-size: var(--text-2xl);
+}
+
+h5 {
+  font-size: var(--text-lg);
+}
+
+small {
+  font-size: var(--text-xs);
 }
