@@ -34,7 +34,18 @@
       </div>
       <div v-else class="book-fake-image">
         <!-- <i class="book-image bi bi-image"></i> -->
-        
+        <div class="fake-image-content">
+          <h6>{{ book.title[0] }}</h6>
+          <div v-if="book.author.length > 0">
+            <div v-if="book.author.length <= 2">
+              <h6>{{ book.author.join(", ") }}</h6>
+            </div>
+            <div v-else>
+              <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
+            </div>
+          </div>
+          <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
+        </div>
       </div>
     </div>
   </div>
@@ -134,5 +145,14 @@ async function addBook(book: Book) {
   width: 200px;
   height: 290px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.fake-image-content {
+  padding: 5px;
+  color: #fff;
 }
 </style>
