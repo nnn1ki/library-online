@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
     "@vueuse/core": "^12.4.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
@@ -22,6 +23,7 @@
     "jquery-csrf-token": "^2.2.1",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
+    "modern-normalize": "^3.0.1",
     "pinia": "^2.2.4",
     "vue": "^3.5.12",
     "vue-cookie": "^1.1.4",

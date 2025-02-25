@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <Header></Header>
+    <PageHeader />
 
     <main>
       <div>
@@ -8,27 +8,24 @@
       </div>
     </main>
   </div>
+
   <PageFooter />
 </template>
 
 <script setup lang="ts">
-import Header from "@/layouts/PageHeader.vue";
+import PageHeader from "@/layouts/PageHeader.vue";
 import PageFooter from "@/layouts/PageFooter.vue";
 import { RouterView } from "vue-router";
 </script>
 
 <style scoped lang="scss">
-/* Корневой контейнер для всей страницы */
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  /* Обеспечивает, чтобы футер всегда был внизу страницы */
+  min-height: 100vh; /* Обеспечивает, чтобы футер всегда был внизу страницы */
 }
 
 main {
   flex: 1;
-  /* Это заставляет основной контент занять все доступное пространство */
-  padding: 20px;
 }
 </style>

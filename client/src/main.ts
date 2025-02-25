@@ -2,9 +2,10 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 
 // TODO: снести bootstrap 🤡
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-icons/font/bootstrap-icons.min.css";
-import "bootstrap/dist/js/bootstrap";
+// import "bootstrap/dist/css/bootstrap.css";
+// import "bootstrap-icons/font/bootstrap-icons.min.css";
+// import "bootstrap/dist/js/bootstrap";
+import "modern-normalize/modern-normalize.css";
 import "@/style.scss";
 
 import App from "@/App.vue";

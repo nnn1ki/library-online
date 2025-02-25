@@ -1,5 +1,5 @@
 <template>
-  <div class="search-filter p-3 border rounded bg-light">
+  <div class="search-filter p-3 border rounded">
     <!-- Библиотеки -->
     <span>Библиотека</span>
     <select v-model="library" class="form-select form-select-sm" @change="updateSearchParams">
@@ -209,3 +209,9 @@ onBeforeMount(async () => {
   [scenarios.value, libraries.value] = await Promise.all([scenariosList(), librariesList()]);
 });
 </script>
+
+<style scoped lang="scss">
+.search-filter {
+  background-color: var(--color-background-100);
+}
+</style>
