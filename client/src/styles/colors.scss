@@ -126,22 +126,47 @@
   --color-accent-950: #f5eff2;
 }
 
-@media screen and (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
+@mixin light-theme {
+  @each $selector in & {
+    @at-root :root[data-theme="light"] #{if(#{$selector} == ":root", "", #{$selector})} {
+      @content;
+    }
+
+    @media screen and (prefers-color-scheme: light) {
+      @at-root :root:not([data-theme]) #{if(#{$selector} == ":root", "", #{$selector})} {
+        @content;
+      }
+    }
+  }
+}
+
+@mixin dark-theme {
+  @each $selector in & {
+    @at-root :root[data-theme="dark"] #{if(#{$selector} == ":root", "", #{$selector})} {
+      @content;
+    }
+
+    @media screen and (prefers-color-scheme: dark) {
+      @at-root :root:not([data-theme]) #{if(#{$selector} == ":root", "", #{$selector})} {
+        @content;
+      }
+    }
+  }
+}
+
+:root {
+  @include light-theme {
     @include -light-theme-variables;
   }
 }
 
-@media screen and (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
+:root {
+  @include dark-theme {
     @include -dark-theme-variables;
   }
 }
 
-:root[data-theme="light"] {
+// Fallback to light theme
+:root {
   @include -light-theme-variables;
-}
-
-:root[data-theme="dark"] {
-  @include -dark-theme-variables;
 }

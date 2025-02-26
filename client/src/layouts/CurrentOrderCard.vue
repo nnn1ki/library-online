@@ -4,7 +4,7 @@
       <span class="order-status">● Еще не заказали </span>
     </div>
     <div class="book-list">
-      <div v-for="(book, index) in props.order" :key="book.id" class="book-item">
+      <div v-for="(book, index) in order" :key="book.id" class="book-item">
         <short-book :book="book" :num="index" />
         <hr class="divider" />
       </div>
@@ -21,7 +21,7 @@
 import type { Book } from "@/api/types";
 import ShortBook from "@/components/ShortBook.vue";
 
-const props = defineProps<{
+const { order } = defineProps<{
   order: Book[];
 }>();
 </script>

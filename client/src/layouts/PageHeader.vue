@@ -19,9 +19,9 @@
 
           <!-- TODO: свитчер -->
           <div>
-            <button @click="themeStore.setTheme('light')">Светлая</button>
-            <button @click="themeStore.setTheme('system')">Системная</button>
-            <button @click="themeStore.setTheme('dark')">Темная</button>
+            <StyledButton style="margin-right: 2px;" @click="themeStore.setTheme('light')">Светлая</StyledButton>
+            <StyledButton style="margin-right: 2px;" @click="themeStore.setTheme('system')">Системная</StyledButton>
+            <StyledButton @click="themeStore.setTheme('dark')">Темная</StyledButton>
           </div>
         </div>
       </div>
@@ -56,6 +56,7 @@ import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { Bars3Icon } from "@heroicons/vue/24/outline";
+import StyledButton from "@/components/StyledButton.vue";
 
 const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);

@@ -39,16 +39,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs } from "vue";
+import { computed, ref } from "vue";
 import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import AboutBookDialog from "./AboutBookDialog.vue";
 
-const props = defineProps<{
+const { book } = defineProps<{
   book: Book;
 }>();
-const { book } = toRefs(props);
 
 const basketStore = useBasketStore();
 

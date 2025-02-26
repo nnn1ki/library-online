@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 import { ref, onBeforeMount, computed } from "vue";
-import BorrowedBooks from "@/components/BorrowedBooks.vue";
+import BorrowedBooks from "@/layouts/BorrowedBooks.vue";
 import ShortBook from "@/components/ShortBook.vue";
 import { useOrderStore } from "@/stores/orderStore";
 import { borrowedList } from "@/api/order";

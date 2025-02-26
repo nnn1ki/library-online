@@ -5,13 +5,9 @@
       <span class="order-status" :class="statusClass">● {{ orderStatuses[currentStatus] }}</span>
     </div>
     <div class="book-list">
-      <div
-        v-for="(orderBook, index) in props.order.books"
-        :key="orderBook.book.id"
-        class="book-item"
-      >
+      <div v-for="(orderBook, index) in order.books" :key="orderBook.book.id" class="book-item">
         <short-book :book="orderBook.book" :num="index" />
-        <hr v-if="index < props.order.books.length - 1" class="divider" />
+        <hr v-if="index < order.books.length - 1" class="divider" />
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
@@ -34,7 +30,7 @@ const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const allowedEditStatuses: OrderStatusEnum[] = ["new"];
 const orderStore = useOrderStore();
 
-const props = defineProps<{
+const { order, num } = defineProps<{
   order: Order;
   num: number;
 }>();
@@ -47,7 +43,7 @@ const canEditOrder = computed(() => allowedEditStatuses.includes(currentStatus.v
 const showOrderActions = computed(() => canCancelOrder.value || canEditOrder.value);
 
 const currentStatus = computed(() => {
-  const lastStatus = props.order.statuses[props.order.statuses.length - 1]?.status;
+  const lastStatus = order.statuses[order.statuses.length - 1]?.status;
   return lastStatus;
 });
 
@@ -60,11 +56,11 @@ const statusClass = computed(() => {
 
 async function onCancelOrderClick() {
   emit("delete");
-  await orderStore.handleDeleteOrder(props.order.id);
+  await orderStore.handleDeleteOrder(order.id);
 }
 
 async function onEditOrderClick() {
-  console.log("Edit order:", props.order.id);
+  console.log("Edit order:", order.id);
 }
 </script>
 

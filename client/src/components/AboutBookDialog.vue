@@ -46,17 +46,16 @@
 import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
-import { computed, toRefs } from "vue";
+import { computed } from "vue";
 
-const props = defineProps<{
+const { book } = defineProps<{
   book: Book;
 }>();
-const { book } = toRefs(props);
 
 const basketStore = useBasketStore();
 
 const { books: basketBooks } = storeToRefs(basketStore);
-const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.value.id));
+const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.id));
 
 const visible = defineModel<boolean>();
 </script>
