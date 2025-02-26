@@ -52,7 +52,7 @@ const { book } = defineProps<{
 const basketStore = useBasketStore();
 
 const { books: basketBooks } = storeToRefs(basketStore);
-const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.value.id));
+const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.id));
 
 const isModalVisible = ref(false);
 

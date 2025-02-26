@@ -19,8 +19,12 @@
 
           <!-- TODO: свитчер -->
           <div>
-            <StyledButton style="margin-right: 2px;" @click="themeStore.setTheme('light')">Светлая</StyledButton>
-            <StyledButton style="margin-right: 2px;" @click="themeStore.setTheme('system')">Системная</StyledButton>
+            <StyledButton style="margin-right: 2px" @click="themeStore.setTheme('light')"
+              >Светлая</StyledButton
+            >
+            <StyledButton style="margin-right: 2px" @click="themeStore.setTheme('system')"
+              >Системная</StyledButton
+            >
             <StyledButton @click="themeStore.setTheme('dark')">Темная</StyledButton>
           </div>
         </div>
@@ -106,8 +110,6 @@ header {
 }
 
 nav {
-  margin-left: auto;
-  margin-right: auto;
   display: flex;
   flex-direction: row;
   align-items: center;

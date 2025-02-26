@@ -2,6 +2,8 @@
 
 .container {
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 
   @include media-sm {
     max-width: $breakpoint-sm;

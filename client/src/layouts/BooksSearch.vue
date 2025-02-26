@@ -1,77 +1,68 @@
 <template>
-  <div class="search-filter p-3 border rounded">
-    <!-- Библиотеки -->
-    <span>Библиотека</span>
-    <select v-model="library" class="form-select form-select-sm" @change="updateSearchParams">
-      <option :value="undefined"></option>
-      <option v-for="lib in libraries" :key="lib.id" :value="lib.id">
-        {{ lib.description }} ({{ lib.address }})
-      </option>
-    </select>
+  <!-- TODO: адаптация под мобилки -->
 
-    <form @submit.prevent="search">
-      <!-- Сценарии -->
-      <div v-for="(condition, index) in conditions" :key="index" class="filter-condition mb-3 mt-3">
-        <div class="d-flex align-items-center gap-2">
-          <!-- Операторы И/ИЛИ -->
-          <select
-            v-if="index !== 0"
-            v-model="condition.operator"
-            class="form-select form-select-sm"
-            @change="updateSearchParams"
-          >
-            <option
-              v-for="[description, operator] in [
-                ['И', '*'],
-                ['ИЛИ', '+'],
-              ]"
-              :key="operator"
-              :value="operator"
-            >
-              {{ description }}
-            </option>
-          </select>
+  <div class="search-filter">
+    <form @submit.prevent="search" class="flex flex-col">
+      <SelectList
+        v-model="library"
+        :options="
+          libraries.map((x) => {
+            return { id: x.id, name: `${x.address} (${x.description})` };
+          })
+        "
+        blank-option="Все библиотеки"
+        @change="updateSearchParams"
+      />
 
-          <!-- Тип фильтра -->
-          <select
-            v-model="condition.scenarioPrefix"
-            class="form-select form-select-sm"
-            @change="updateSearchParams"
-          >
-            <option v-for="scenario in scenarios" :key="scenario.prefix" :value="scenario.prefix">
-              {{ scenario.description }}
-            </option>
-          </select>
+      <div v-for="(condition, index) in conditions" :key="index" class="filter-condition">
+        <SelectList
+          v-if="index !== 0"
+          v-model="condition.operator"
+          :options="[
+            { id: '*', name: 'И' },
+            { id: '+', name: 'ИЛИ' },
+          ]"
+          :default-option="'*'"
+          @change="updateSearchParams"
+        />
 
-          <!-- Значение фильтра -->
-          <input
-            v-model="condition.value"
-            type="text"
-            class="form-control form-control-sm"
-            placeholder="Введите значение"
-            @input="updateSearchParams"
-          />
+        <SelectList
+          v-model="condition.scenarioPrefix"
+          :options="
+            scenarios.map((x) => {
+              return {
+                id: x.prefix,
+                name: `${x.description}`,
+              };
+            })
+          "
+          :default-option="defaultScenario"
+          @change="updateSearchParams"
+        />
 
-          <!-- Удалить условие -->
-          <button
-            v-if="index !== 0"
-            type="button"
-            class="btn btn-danger btn-sm"
-            @click="removeCondition(index)"
-          >
-            <i class="bi bi-x-square"></i>
-          </button>
-        </div>
+        <TextField
+          v-model="condition.value"
+          placeholder="Введите значение"
+          @input="updateSearchParams"
+        />
+
+        <StyledButton
+          v-if="index !== 0"
+          theme="accent"
+          class="remove-button"
+          @click="removeCondition(index)"
+        >
+          <XMarkIcon class="button-icon" />
+        </StyledButton>
       </div>
 
-      <!-- Кнопки -->
-      <div class="actions d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="addCondition">
-          Добавить условие <i class="bi bi-plus-square"></i>
-        </button>
-        <button type="submit" class="btn btn-success btn-sm">
-          Поиск <i class="bi bi-search"></i>
-        </button>
+      <div class="actions">
+        <StyledButton theme="secondary" @click="addCondition"
+          >Добавить условие <PlusIcon class="button-icon offset"
+        /></StyledButton>
+        <StyledButton theme="primary" type="submit"
+          >Поиск <MagnifyingGlassIcon class="button-icon offset"
+        /></StyledButton>
       </div>
     </form>
 
@@ -92,11 +83,15 @@
 <script setup lang="ts">
 import { nextTick, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
+import { PlusIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { searchBooks } from "@/api/books";
 import { scenariosList } from "@/api/scenarios";
 import type { Book, Library, Scenario } from "@/api/types";
 import { librariesList } from "@/api/libraries";
 import BookCard from "@/components/BookCard.vue";
+import SelectList from "@/components/SelectList.vue";
+import StyledButton from "@/components/StyledButton.vue";
+import TextField from "@/components/TextField.vue";
 
 // Состояния
 const router = useRouter();
@@ -171,6 +166,8 @@ async function search() {
 }
 
 onBeforeMount(async () => {
+  [scenarios.value, libraries.value] = await Promise.all([scenariosList(), librariesList()]);
+
   const queryParam = router.currentRoute.value.query["query"];
   const libraryParam = router.currentRoute.value.query["library"];
 
@@ -205,13 +202,47 @@ onBeforeMount(async () => {
 
     search();
   }
-
-  [scenarios.value, libraries.value] = await Promise.all([scenariosList(), librariesList()]);
 });
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+
 .search-filter {
   background-color: var(--color-background-100);
+  color: var(--color-text-900);
+  border-radius: 1rem;
+
+  padding: 1rem;
+  @include media-lg {
+    padding: 1rem 4rem;
+  }
+}
+
+.filter-condition {
+  padding-top: 1rem;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 0.5rem;
+}
+
+.actions {
+  padding-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.remove-button {
+  padding: 0.75rem;
+}
+
+.button-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  &.offset {
+    margin-left: 0.5rem;
+  }
 }
 </style>

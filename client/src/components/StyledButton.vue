@@ -1,6 +1,8 @@
 <template>
   <button :disabled="disabled" :type="type" :class="theme">
-    <slot>Button</slot>
+    <div class="flex flex-row items-center justify-center">
+      <slot>Button</slot>
+    </div>
   </button>
 </template>
 
@@ -39,6 +41,8 @@ button {
     cursor: default;
   }
 
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+
   &.primary {
     background-color: var(--color-primary-500);
     &:hover {
@@ -63,10 +67,10 @@ button {
   }
 
   &.secondary {
-    background-color: var(--color-secondary-100);
+    background-color: var(--color-secondary-200);
     color: var(--color-text-950);
     &:hover {
-      background-color: var(--color-secondary-200);
+      background-color: var(--color-secondary-300);
     }
     &:disabled {
       color: var(--color-text-300);
