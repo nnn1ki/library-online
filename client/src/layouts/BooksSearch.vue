@@ -1,7 +1,7 @@
 <template>
   <!-- TODO: адаптация под мобилки -->
 
-  <div class="search-filter">
+  <SurfaceCard>
     <form @submit.prevent="search" class="flex flex-col">
       <SelectList
         v-model="library"
@@ -77,7 +77,7 @@
       </ul>
       <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
     </div>
-  </div>
+  </SurfaceCard>
 </template>
 
 <script setup lang="ts">
@@ -88,6 +88,7 @@ import { searchBooks } from "@/api/books";
 import { scenariosList } from "@/api/scenarios";
 import type { Book, Library, Scenario } from "@/api/types";
 import { librariesList } from "@/api/libraries";
+import SurfaceCard from "@/components/SurfaceCard.vue";
 import BookCard from "@/components/BookCard.vue";
 import SelectList from "@/components/SelectList.vue";
 import StyledButton from "@/components/StyledButton.vue";
@@ -208,17 +209,6 @@ onBeforeMount(async () => {
 <style scoped lang="scss">
 @use "@/styles/breakpoints.scss" as *;
 
-.search-filter {
-  background-color: var(--color-background-100);
-  color: var(--color-text-900);
-  border-radius: 1rem;
-
-  padding: 1rem;
-  @include media-lg {
-    padding: 1rem 4rem;
-  }
-}
-
 .filter-condition {
   padding-top: 1rem;
 
@@ -239,10 +229,10 @@ onBeforeMount(async () => {
 }
 
 .button-icon {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.2em;
+  height: 1.2em;
   &.offset {
-    margin-left: 0.5rem;
+    margin-left: 0.5em;
   }
 }
 </style>

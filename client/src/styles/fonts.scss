@@ -3,7 +3,6 @@
 $font-heading: Inter;
 $font-body: Inter;
 
-// TODO: увеличение размера шрифта для слабовидящих
 :root {
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -14,6 +13,18 @@ $font-body: Inter;
   --text-3xl: 2.25rem;
   --text-4xl: 3rem;
   --text-5xl: 4.25rem;
+}
+
+:root[data-largefont] {
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1.25rem;
+  --text-lg: 1.5rem;
+  --text-xl: 1.875rem;
+  --text-2xl: 2.25rem;
+  --text-3xl: 3rem;
+  --text-4xl: 4.25rem;
+  --text-5xl: 4.75rem;
 }
 
 .text-xs {

@@ -2,31 +2,23 @@
   <div class="switcher">
     <button
       class="switcher-option left"
-      :class="{ active: themeStore.theme === 'light' }"
-      @click="themeStore.setTheme('light')"
+      :class="{ active: themeStore.font === 'large' }"
+      @click="themeStore.setFont('large')"
     >
-      <SunIcon class="switcher-icon" />
-    </button>
-    <button
-      class="switcher-option"
-      :class="{ active: themeStore.theme === 'system' }"
-      @click="themeStore.setTheme('system')"
-    >
-      <ComputerDesktopIcon class="switcher-icon" />
+      A
     </button>
     <button
       class="switcher-option right"
-      :class="{ active: themeStore.theme === 'dark' }"
-      @click="themeStore.setTheme('dark')"
+      :class="{ active: themeStore.font === 'standard' }"
+      @click="themeStore.setFont('standard')"
     >
-      <MoonIcon class="switcher-icon" />
+      A
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useThemeStore } from "@/stores/theme";
-import { SunIcon, MoonIcon, ComputerDesktopIcon } from "@heroicons/vue/24/outline";
 
 const themeStore = useThemeStore();
 </script>
@@ -49,7 +41,7 @@ const themeStore = useThemeStore();
 
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
 }
 
 .switcher-option {
@@ -65,11 +57,13 @@ const themeStore = useThemeStore();
   align-items: center;
 
   &.left {
+    font-size: 1.25em;
     border-top-left-radius: 2rem;
     border-bottom-left-radius: 2rem;
   }
 
   &.right {
+    font-size: 0.75em;
     border-top-right-radius: 2rem;
     border-bottom-right-radius: 2rem;
   }
@@ -87,10 +81,5 @@ const themeStore = useThemeStore();
       background-color: var(--color-background-200);
     }
   }
-}
-
-.switcher-icon {
-  width: 1.25em;
-  height: 1.25em;
 }
 </style>

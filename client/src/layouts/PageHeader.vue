@@ -20,6 +20,7 @@
       </div>
 
       <div class="nav-end">
+        <FontSwitcher />
         <ThemeSwitcher />
         <button class="expand-button" @click="mobileMenuOpen = !mobileMenuOpen">
           <Bars3Icon class="expand-icon nav-link" aria-hidden="true" />
@@ -45,7 +46,8 @@ import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { Bars3Icon } from "@heroicons/vue/24/outline";
-import ThemeSwitcher from "./ThemeSwitcher.vue";
+import FontSwitcher from "@/layouts/FontSwitcher.vue";
+import ThemeSwitcher from "@/layouts/ThemeSwitcher.vue";
 
 const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);
@@ -162,8 +164,8 @@ nav {
 }
 
 .expand-icon {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.5em;
+  height: 1.5em;
 }
 
 .mobile-menu {
