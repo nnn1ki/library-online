@@ -66,16 +66,13 @@
       </div>
     </form>
 
-    <!-- Результаты поиска -->
-    <div v-if="loading" class="mt-3">Загрузка...</div>
-    <div v-else class="mt-3">
+    <div v-if="loading">Загрузка...</div>
+    <div v-else-if="results !== undefined">
       <h3>Результаты поиска</h3>
-      <ul v-if="results.length" class="list-group">
-        <li v-for="book in results" :key="book.id" class="list-group-item">
-          <BookCard :book="book" />
-        </li>
-      </ul>
-      <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
+      <div v-if="results.length > 0" class="books-list">
+        <BookCard v-for="book in results" v-bind:key="book.id" :book="book" />
+      </div>
+      <div v-else class="not-found">Книги не найдены</div>
     </div>
   </SurfaceCard>
 </template>
@@ -117,7 +114,7 @@ const conditions = ref<
   },
 ]);
 
-const results = ref<Book[]>([]);
+const results = ref<Book[]>();
 const loading = ref(false);
 
 // Функции для управления фильтрами
@@ -234,5 +231,18 @@ onBeforeMount(async () => {
   &.offset {
     margin-left: 0.5em;
   }
+}
+
+.books-list {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+.not-found {
+  background-color: var(--color-accent-200);
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>

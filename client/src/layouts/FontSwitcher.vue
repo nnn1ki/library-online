@@ -56,6 +56,8 @@ const themeStore = useThemeStore();
   flex-direction: row;
   align-items: center;
 
+  font-family: "Times New Roman", Times, serif;
+
   &.left {
     font-size: 1.25em;
     border-top-left-radius: 2rem;
