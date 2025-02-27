@@ -170,7 +170,7 @@
 <script setup lang="ts">
 import type { Book } from "@/api/types";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
-import NotAllowedBanner from "@/components/NotAllowedBanner.vue";
+import NotAllowedBanner from "@/layouts/NotAllowedBanner.vue";
 import { useBasketStore } from "@/stores/basket";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";

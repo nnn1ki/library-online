@@ -13,6 +13,10 @@ body {
   font-weight: 400;
 }
 
+* {
+  transition: font-size 0.5s ease;
+}
+
 h1,
 h2,
 h3,
