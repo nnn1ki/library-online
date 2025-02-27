@@ -5,14 +5,14 @@
     </div>
     <div class="book-list">
       <div v-for="(book, index) in order" :key="book.id" class="book-item">
-        <short-book :book="book" :num="index" />
+        <ShortBook :book="book" :num="index" />
         <hr class="divider" />
       </div>
     </div>
     <div class="order-actions-footer">
-      <router-link to="/order">
+      <RouterLink to="/order">
         <button class="btn btn-cancel">Продолжить оформление</button>
-      </router-link>
+      </RouterLink>
     </div>
   </div>
 </template>

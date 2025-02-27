@@ -1,6 +1,6 @@
 <template>
-  <div class="instructions-page container py-5">
-    <h1 class="text-center mb-4">Как использовать наш сервис</h1>
+  <div class="instructions-page container">
+    <h1>Как использовать наш сервис</h1>
 
     <!-- Шаги инструкции -->
     <div class="row row-cols-1 row-cols-md-2 g-4">
@@ -57,13 +57,11 @@ const steps = [
 
 <style scoped lang="scss">
 .instructions-page {
-  padding: 20px;
+  padding-top: 20px;
 }
 
 h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #333;
+  text-align: center;
 }
 
 .card-title {

@@ -2,8 +2,8 @@
   <div class="container">
     <BooksSearch />
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
-      <div v-for="book in announces" :key="book.id" class="col">
+    <div class="announces">
+      <div v-for="book in announces" :key="book.id" class="announce-book">
         <BookCard :book="book" />
       </div>
     </div>
@@ -27,5 +27,17 @@ onMounted(async () => {
 <style scoped lang="scss">
 .container {
   padding-top: 20px;
+}
+
+.announces {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.announce-book {
+  flex-basis: 20%;
 }
 </style>
