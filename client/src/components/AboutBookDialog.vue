@@ -2,40 +2,38 @@
   <div v-if="visible" class="modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Подробнее о книге</h5>
-          <button type="button" class="btn-close" @click="visible = false"></button>
-        </div>
-        <div class="modal-body d-flex">
-          <!-- Левая часть: картинка -->
-          <div v-if="book.cover !== null" class="book-image">
+        <h3>Подробнее о книге</h3>
+
+        <div class="modal-body">
+          <div v-if="book.cover !== null">
             <img :src="book.cover" />
           </div>
-          <i v-else class="book-image bi bi-image"></i>
-          <!-- Правая часть: информация -->
-          <div class="book-details ms-3">
-            <h5 v-for="[index, title] in book.title.entries()" v-bind:key="index">{{ title }}</h5>
-            <h6 class="text-muted">Год: {{ book.year }}</h6>
-            <h6 v-if="book.author.length > 0" class="text-muted">
+          <BookOpenIcon v-else class="book-icon" />
+
+          <div>
+            <h5 v-for="[index, title] in book.title.entries()" v-bind:key="index" class="title">
+              {{ title }}
+            </h5>
+            <p class="text-muted">Год: {{ book.year }}</p>
+
+            <p v-if="book.author.length > 0" class="text-muted">
               Авторы: {{ book.author.join(", ") }}
-            </h6>
-            <h6 v-else-if="book.collective.length > 0" class="text-muted">
+            </p>
+            <p v-else-if="book.collective.length > 0" class="text-muted">
               Коллективы: {{ book.collective.join(", ") }}
-            </h6>
+            </p>
+
             <p>Количество: {{ book.copies }}</p>
-            <button
-              class="btn btn-info btn-sm"
-              type="button"
-              @click="basketStore.addBook(book)"
-              :disabled="isInBasket"
-            >
-              <i class="bi bi-cart3"></i> В Корзину
-            </button>
-            <h6 class="text-muted pt-4">{{ book.keyword.join(", ") }}</h6>
+
+            <StyledButton @click="basketStore.addBook(book)" :disabled="isInBasket">
+              <ShoppingCartIcon class="cart-icon" />В корзину
+            </StyledButton>
+            <h6 class="text-muted">{{ book.keyword.join(", ") }}</h6>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="visible = false">Закрыть</button>
+
+        <div class="text-end">
+          <StyledButton theme="accent" @click="visible = false">Закрыть</StyledButton>
         </div>
       </div>
     </div>
@@ -47,6 +45,8 @@ import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import { BookOpenIcon, ShoppingCartIcon } from "@heroicons/vue/24/outline";
+import StyledButton from "@/components/StyledButton.vue";
 
 const { book } = defineProps<{
   book: Book;
@@ -69,9 +69,7 @@ const visible = defineModel<boolean>();
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  /* Полупрозрачный фон */
   z-index: 1050;
-  /* Убедитесь, что модальное окно поверх всего */
 }
 
 .modal-dialog {
@@ -81,21 +79,34 @@ const visible = defineModel<boolean>();
 }
 
 .modal-content {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
+  background-color: var(--color-background-50);
+  border-radius: 1rem;
+  padding: 1rem;
 }
 
-.modal-header .btn-close {
-  background: none;
-  border: none;
+.modal-body {
+  display: flex;
+  flex-direction: row;
+  column-gap: 1rem;
 }
 
-.modal-footer {
-  text-align: right;
+.title {
+  margin-top: 0rem;
+  margin-bottom: 0rem;
 }
 
-.book-image {
-  font-size: 200px;
+.text-muted {
+  color: var(--color-text-400);
+}
+
+.cart-icon {
+  width: 1.2em;
+  height: 1.2em;
+  margin-right: 0.5em;
+}
+
+.book-icon {
+  width: 32rem;
+  height: 32rem;
 }
 </style>
