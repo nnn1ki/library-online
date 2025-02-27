@@ -128,6 +128,11 @@
 
 @mixin light-theme {
   @each $selector in & {
+    // Fallback to the light theme
+    @at-root #{$selector} {
+      @content;
+    }
+
     @at-root :root[data-theme="light"] #{if(#{$selector} == ":root", "", #{$selector})} {
       @content;
     }
@@ -164,9 +169,4 @@
   @include dark-theme {
     @include -dark-theme-variables;
   }
-}
-
-// Fallback to light theme
-:root {
-  @include -light-theme-variables;
 }

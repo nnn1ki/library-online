@@ -178,7 +178,7 @@ onBeforeMount(async () => {
     }
   }
 
-  if (typeof queryParam === "string") {
+  if (typeof queryParam === "string" && queryParam.length !== 0) {
     conditions.value = queryParam
       .split(")")
       .map((item) => item.replace("(", "").replace("$", ""))

@@ -16,23 +16,15 @@
             active-class="active"
             >{{ link.name }}</RouterLink
           >
-
-          <!-- TODO: свитчер -->
-          <div>
-            <StyledButton style="margin-right: 2px" @click="themeStore.setTheme('light')"
-              >Светлая</StyledButton
-            >
-            <StyledButton style="margin-right: 2px" @click="themeStore.setTheme('system')"
-              >Системная</StyledButton
-            >
-            <StyledButton @click="themeStore.setTheme('dark')">Темная</StyledButton>
-          </div>
         </div>
       </div>
 
-      <button class="expand-button" @click="mobileMenuOpen = !mobileMenuOpen">
-        <Bars3Icon class="expand-icon nav-link" aria-hidden="true" />
-      </button>
+      <div class="nav-end">
+        <ThemeSwitcher />
+        <button class="expand-button" @click="mobileMenuOpen = !mobileMenuOpen">
+          <Bars3Icon class="expand-icon nav-link" aria-hidden="true" />
+        </button>
+      </div>
     </nav>
     <div class="mobile-menu" :class="{ open: mobileMenuOpen }">
       <RouterLink
@@ -43,12 +35,6 @@
         active-class="active"
         >{{ link.name }}</RouterLink
       >
-
-      <div>
-        <button @click="themeStore.setTheme('light')">Светлая</button>
-        <button @click="themeStore.setTheme('system')">Системная</button>
-        <button @click="themeStore.setTheme('dark')">Темная</button>
-      </div>
     </div>
   </header>
 </template>
@@ -56,16 +42,13 @@
 <script setup lang="ts">
 // import Logo from "@/assets/ntb-logo.png";
 import { useAuthStore } from "@/stores/auth";
-import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { Bars3Icon } from "@heroicons/vue/24/outline";
-import StyledButton from "@/components/StyledButton.vue";
+import ThemeSwitcher from "./ThemeSwitcher.vue";
 
 const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);
-
-const themeStore = useThemeStore();
 
 const links = computed(() =>
   [
@@ -114,6 +97,13 @@ nav {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+}
+
+.nav-end {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 1rem;
 }
 
 .logo-link {
