@@ -8,7 +8,7 @@
     </div>
     <LoadingModal v-if="loading" />
   </div>
-  <NotAllowedBanner :v-model="modalOpen" />
+  <NotAllowedBanner v-model="modalOpen" />
 </template>
 
 <script setup lang="ts">
