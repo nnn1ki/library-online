@@ -3,7 +3,7 @@
     <div v-if="orderStore.selectedBooks.length > 0">
       <CurrentOrderCard :order="orderStore.selectedBooks" />
     </div>
-    <div v-for="(order, i) in orders" :key="order.id" class="row">
+    <div v-for="order in orders" :key="order.id" class="row">
       <OrderCard :order="order" :num="order.id" @cancel="openCancelModal" />
     </div>
     <LoadingModal v-if="loading" />

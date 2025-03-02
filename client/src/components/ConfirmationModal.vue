@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-
 const props = defineProps<{
-  title: String,
-  text: String,
+  title: string,
+  text: string,
 }>();
 
 const emit = defineEmits<{
@@ -22,7 +20,8 @@ const confirmCancel = () => {
 <template>
   <div v-if="open" class="modal-overlay" @click="open = false">
     <div class="modal-content" @click.stop>
-      <h5><strong>Вы уверены, что хотите отменить заказ ?</strong></h5>
+      <h5><strong>{{ props.title }}</strong></h5>
+      <p>{{ props.text }}</p>
       <div class="buttons">
         <button @click="confirmCancel">Да</button>
         <button class="close" @click="open = false">Нет</button>
@@ -45,12 +44,13 @@ const confirmCancel = () => {
   justify-content: center;
   z-index: 1000;
 }
+
 .info {
   margin-bottom: 2rem;
 }
 
-.info img:hover { 
-  cursor:help;
+.info img:hover {
+  cursor: help;
 
 }
 
@@ -102,5 +102,4 @@ button.close {
 button.close:hover {
   background: rgb(102, 5, 5);
 }
-
 </style>

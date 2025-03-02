@@ -47,6 +47,13 @@ export const useOrderStore = defineStore("orderStore", () => {
     toast.info("Проверяем сколько у вас книг на руках и в заказах");
     const isValid = await validateOrder();
 
+    if(selectedBooks.value.length > countOfBookInOrder){
+      toast.error(
+        "В заказе максиум 5 книг"
+      );
+      return;
+    }
+
     if (!isValid) {
       toast.error(
         "У вас много заказанных книг и книг на руках, больше заказывать нельзя. Нужно вернуть часть книг в библиотеку."
@@ -87,7 +94,7 @@ export const useOrderStore = defineStore("orderStore", () => {
       selectedBorrowedBooks.value.length +
       selectedBooks.value.length +
       orderedBooksCount;
-    return totalItems > 0 && totalItems <= countOfBookInOrder && librarySet.size === 1;
+    return totalItems > 0 && totalItems <= countOfBookPerPerson && librarySet.size === 1;
   }
 
   // проверка сколько книг в заказах
