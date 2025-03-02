@@ -2,13 +2,23 @@
   <div class="card order-card">
     <div class="order-header">
       <span class="order-number">📦 Заказ #{{ num }} oт {{ orderedDate }}</span>
-      <span class="order-status" :class="statusClass">● {{ orderStatuses[currentStatus] }} {{ lastStatusDate }}</span>
+      <span class="order-status" :class="statusClass"
+        >● {{ orderStatuses[currentStatus] }} {{ lastStatusDate }}</span
+      >
     </div>
     <div class="book-list">
-      <div v-for="(orderBook, index) in props.order.books" :key="orderBook.book.id" class="book-item">
+      <div
+        v-for="(orderBook, index) in props.order.books"
+        :key="orderBook.book.id"
+        class="book-item"
+      >
         <div class="book-info">
           <short-book :book="orderBook.book" :num="index" />
-          <button class="btn btn-add-book" @click="onAddToOrderClick(orderBook.book)" v-if="canReorder">
+          <button
+            class="btn btn-add-book"
+            @click="onAddToOrderClick(orderBook.book)"
+            v-if="canReorder"
+          >
             Заказать
           </button>
         </div>
@@ -27,7 +37,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { OrderStatusEnum, Order, Book } from "@/api/types";
-import {orderStatuses }from "@/api/types" 
+import { orderStatuses } from "@/api/types";
 import ShortBook from "@/components/ShortBook.vue";
 import { useOrderStore } from "@/stores/orderStore";
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
@@ -40,7 +50,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'cancel', orderId: number): number
+  (e: "cancel", orderId: number): number;
 }>();
 
 const canCancelOrder = computed(() => allowedCancelStatuses.includes(currentStatus.value));
@@ -70,16 +80,14 @@ async function onCancelOrderClick() {
 
 const onAddToOrderClick = (bookToOrder: Book) => {
   const isInCurrentOrder = orderStore.selectedBooks.some((book) => {
-    return book.id === bookToOrder.id
+    return book.id === bookToOrder.id;
   });
   if (isInCurrentOrder) {
     return;
-  }
-  else {
+  } else {
     orderStore.addBook(bookToOrder);
   }
-}
-
+};
 </script>
 
 <style scoped lang="scss">
@@ -113,7 +121,9 @@ $background-status-archived: #f3e5f5;
 .order-card {
   border-radius: 12px;
   box-shadow: 0 4px 6px $color-black-5;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
   background: $color-white;
   margin: 1rem 0;
   padding: 1.5rem;
@@ -211,7 +221,9 @@ $background-status-archived: #f3e5f5;
   border-radius: 16px;
   font-size: 0.95rem;
   color: $color-status-archived;
-  transition: color 0.3s ease, background 0.3s ease;
+  transition:
+    color 0.3s ease,
+    background 0.3s ease;
 }
 
 .btn-add-book:hover {

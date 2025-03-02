@@ -47,10 +47,8 @@ export const useOrderStore = defineStore("orderStore", () => {
     toast.info("Проверяем сколько у вас книг на руках и в заказах");
     const isValid = await validateOrder();
 
-    if(selectedBooks.value.length > countOfBookInOrder){
-      toast.error(
-        "В заказе максиум 5 книг"
-      );
+    if (selectedBooks.value.length > countOfBookInOrder) {
+      toast.error("В заказе максиум 5 книг");
       return;
     }
 
@@ -131,12 +129,11 @@ export const useOrderStore = defineStore("orderStore", () => {
   }
 
   function bookInOrders(targetBookId: string): boolean {
-    return userOrders.value.some(order => {
+    return userOrders.value.some((order) => {
       const lastStatus = order.statuses.at(-1);
-      if (!lastStatus || !allowedStatusesToCountOrderedBooks.includes(lastStatus.status)) return false;
-      return order.books.some(bookItem =>
-        bookItem.book.id === targetBookId
-      );
+      if (!lastStatus || !allowedStatusesToCountOrderedBooks.includes(lastStatus.status))
+        return false;
+      return order.books.some((bookItem) => bookItem.book.id === targetBookId);
     });
   }
 
@@ -148,7 +145,7 @@ export const useOrderStore = defineStore("orderStore", () => {
   }
 
   function addBook(newBook: Book) {
-    selectedBooks.value.push(newBook)
+    selectedBooks.value.push(newBook);
   }
 
   function clearAll() {

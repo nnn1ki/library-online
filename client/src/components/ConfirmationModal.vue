@@ -1,26 +1,27 @@
 <script setup lang="ts">
 const props = defineProps<{
-  title: string,
-  text: string,
+  title: string;
+  text: string;
 }>();
 
 const emit = defineEmits<{
-  (e: 'confirm'): void
+  (e: "confirm"): void;
 }>();
 
-const open = defineModel<boolean>({ required: true })
+const open = defineModel<boolean>({ required: true });
 
 const confirmCancel = () => {
-  emit('confirm');
+  emit("confirm");
   open.value = false;
 };
 </script>
 
-
 <template>
   <div v-if="open" class="modal-overlay" @click="open = false">
     <div class="modal-content" @click.stop>
-      <h5><strong>{{ props.title }}</strong></h5>
+      <h5>
+        <strong>{{ props.title }}</strong>
+      </h5>
       <p>{{ props.text }}</p>
       <div class="buttons">
         <button @click="confirmCancel">Да</button>
@@ -51,7 +52,6 @@ const confirmCancel = () => {
 
 .info img:hover {
   cursor: help;
-
 }
 
 .modal-content {

@@ -17,7 +17,7 @@
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const open = defineModel<boolean>({ required: true })
+const open = defineModel<boolean>({ required: true });
 
 // Переход на страницу профиля
 const goToProfile = () => {

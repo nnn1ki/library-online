@@ -9,8 +9,12 @@
     <LoadingModal v-if="loading" />
   </div>
   <NotAllowedBanner v-model="notAllowedModalOpen" />
-  <ConfirmationModal v-model="confirmationModalOpen" title="Отмена заказа" text="Вы точно хотите отменить заказ?"
-    @confirm="handleConfirmCancel" />
+  <ConfirmationModal
+    v-model="confirmationModalOpen"
+    title="Отмена заказа"
+    text="Вы точно хотите отменить заказ?"
+    @confirm="handleConfirmCancel"
+  />
 </template>
 
 <script setup lang="ts">
@@ -37,43 +41,45 @@ onMounted(async () => {
   await fetchOrders();
 });
 
-const fetchOrders = (async () => {
+const fetchOrders = async () => {
   try {
     if (authStore.isAuthenticated) {
       loading.value = true;
       await fetchOrderList();
-    }
-    else {
+    } else {
       notAllowedModalOpen.value = true;
     }
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error("Error fetching orders:", error);
   } finally {
     loading.value = false;
   }
-})
+};
 
 // todo reactivity
 // windowOrders -> no auth -> no orders -> go login
 // windowLogin -> login
 // windowOrders -> fetchOrders
-watch(() => authStore.isAuthenticated, async (newVal) => {
-  if (newVal) {
-    window.location.reload()
+watch(
+  () => authStore.isAuthenticated,
+  async (newVal) => {
+    if (newVal) {
+      window.location.reload();
+    }
   }
-});
+);
 
 async function fetchOrderList() {
   orders.value = (await ordersList()).reverse();
 }
 
-const handleConfirmCancel = (async () => {
+const handleConfirmCancel = async () => {
   console.log(cancelOrderId.value);
   if (cancelOrderId.value !== null && cancelOrderId.value !== undefined) {
     orderStore.handleDeleteOrder(cancelOrderId.value);
   }
   await fetchOrders();
-});
+};
 
 const openCancelModal = (orderId: number) => {
   cancelOrderId.value = orderId;
