@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <SearchFilter />
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 g-4 mt-4">
       <div v-for="book in announces" :key="book.id" class="col">
         <AnnouncementBookCard :book="book" />
       </div>

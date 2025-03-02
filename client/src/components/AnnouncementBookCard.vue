@@ -8,7 +8,8 @@
 
     <div class="card-body">
       <!-- Заголовок книги и автор -->
-      <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
+      <h5 class="card-title">{{ book.title[0] }}</h5>
+      <h5 class="card-year">{{ book.year }} г.</h5>
       <h6 v-if="book.author.length > 0" class="card-subtitle text-muted">
         {{ book.author.join(", ") }}
       </h6>
@@ -80,6 +81,7 @@ async function addBook(book: Book) {
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s ease;
+  align-items: center;
 }
 
 .card:hover {
@@ -98,6 +100,19 @@ async function addBook(book: Book) {
 
 .card-title {
   font-size: 1.2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-pack: end;
+}
+
+.card-year {
+  font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 8px;
 }
@@ -106,6 +121,14 @@ async function addBook(book: Book) {
   font-size: 1rem;
   color: #555;
   margin-bottom: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-pack: end;
 }
 
 .card-text {
@@ -117,4 +140,15 @@ async function addBook(book: Book) {
   font-size: 50px;
   text-align: center;
 }
+
+@media (min-width: 768px) {
+  .card-title {
+    height: 5.9rem;
+  }
+
+  .card-subtitle {
+    height: 2.5rem;
+  }
+}
+
 </style>
