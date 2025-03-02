@@ -1,7 +1,7 @@
 <template>
   <div class="card order-card">
     <div class="order-header">
-      <span class="order-number">📦 Заказ #{{ num }}</span>
+      <span class="order-number">📦 Заказ #{{ num }} on </span>
       <span class="order-status" :class="statusClass">● {{ orderStatuses[currentStatus] }}</span>
     </div>
     <div class="book-list">
