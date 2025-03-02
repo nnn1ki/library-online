@@ -136,11 +136,15 @@ export const useOrderStore = defineStore("orderStore", () => {
     }
   }
 
+  function addBook(newBook: Book){
+    selectedBooks.value.push(newBook)
+  }
   return {
     handleCreateOrder,
     selectedBooks,
     selectedBorrowedBooks,
     borrowedBooks,
     handleDeleteOrder,
+    addBook,
   };
 });

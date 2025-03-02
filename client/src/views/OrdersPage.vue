@@ -4,11 +4,13 @@
       <CurrentOrderCard :order="orderStore.selectedBooks" />
     </div>
     <div v-for="(order, i) in orders" :key="order.id" class="row">
-      <OrderCard :order="order" :num="order.id" @delete="fetchOrderList" />
+      <OrderCard :order="order" :num="order.id" @cancel="openCancelModal" />
     </div>
     <LoadingModal v-if="loading" />
   </div>
-  <NotAllowedBanner v-model="modalOpen" />
+  <NotAllowedBanner v-model="notAllowedModalOpen" />
+  <ConfirmationModal v-model="confirmationModalOpen" title="Отмена заказа" text="Вы точно хотите отменить заказ?"
+    @confirm="handleConfirmCancel" />
 </template>
 
 <script setup lang="ts">
@@ -22,26 +24,34 @@ import OrderCard from "@/components/OrderCard.vue";
 import LoadingModal from "@/components/LoadingModal.vue";
 import CurrentOrderCard from "@/components/CurrentOrderCard.vue";
 import NotAllowedBanner from "@/components/NotAllowedBanner.vue";
+import ConfirmationModal from "@/components/ConfirmationModal.vue";
 const orders = ref<Order[]>([]);
 const loading = ref(false);
 const orderStore = useOrderStore();
 const authStore = useAuthStore();
-const modalOpen = ref(false);
+const notAllowedModalOpen = ref(false);
+const confirmationModalOpen = ref(false);
+const cancelOrderId = ref<number | null>();
+
 onMounted(async () => {
+  await fetchOrders();
+});
+
+const fetchOrders = (async () => {
   try {
     if (authStore.isAuthenticated) {
       loading.value = true;
       await fetchOrderList();
     }
-    else{
-      modalOpen.value = true;
+    else {
+      notAllowedModalOpen.value = true;
     }
   } catch (error) {
     console.error('Error fetching orders:', error);
   } finally {
     loading.value = false;
   }
-});
+})
 
 // todo reactivity
 // windowOrders -> no auth -> no orders -> go login
@@ -57,6 +67,18 @@ async function fetchOrderList() {
   orders.value = (await ordersList()).reverse();
 }
 
+const handleConfirmCancel = (async () => {
+  console.log(cancelOrderId.value);
+  if (cancelOrderId.value !== null && cancelOrderId.value !== undefined) {
+    orderStore.handleDeleteOrder(cancelOrderId.value);
+  }
+  await fetchOrders();
+});
+
+const openCancelModal = (orderId: number) => {
+  cancelOrderId.value = orderId;
+  confirmationModalOpen.value = true;
+};
 </script>
 
 <style scoped lang="scss">
