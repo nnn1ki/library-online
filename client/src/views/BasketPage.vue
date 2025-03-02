@@ -66,7 +66,7 @@
               </div>
             </div>
           </div>
-          <AboutBookDialog v-if="modalBook == book" :book="book" v-model="isModalVisible" />
+          <AboutBookDialog v-if="modalBook == book" :book="book" :v-model="isModalVisible" />
         </div>
       </div>
 
@@ -162,7 +162,7 @@
         </div>
       </div>
       <!-- Модальное окно авторзиации -->
-      <NotAllowedBanner v-model="modalOpen" />
+      <NotAllowedBanner :v-model="modalOpen" />
     </div>
   </div>
 </template>

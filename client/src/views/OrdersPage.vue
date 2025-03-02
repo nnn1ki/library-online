@@ -4,35 +4,59 @@
       <CurrentOrderCard :order="orderStore.selectedBooks" />
     </div>
     <div v-for="(order, i) in orders" :key="order.id" class="row">
-      <OrderCard :order="order" :num="i + 1" @delete="fetchOrderList" />
+      <OrderCard :order="order" :num="order.id" @delete="fetchOrderList" />
     </div>
-    <div v-if="loading">
-      <LoadingModal />
-    </div>
+    <LoadingModal v-if="loading" />
   </div>
+  <NotAllowedBanner :v-model="modalOpen" />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 import { ordersList } from "@/api/order";
 import { type Order } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
+import { useAuthStore } from "@/stores/auth";
 import OrderCard from "@/components/OrderCard.vue";
 import LoadingModal from "@/components/LoadingModal.vue";
 import CurrentOrderCard from "@/components/CurrentOrderCard.vue";
+import NotAllowedBanner from "@/components/NotAllowedBanner.vue";
 const orders = ref<Order[]>([]);
 const loading = ref(false);
 const orderStore = useOrderStore();
+const authStore = useAuthStore();
+const modalOpen = ref(false);
 onMounted(async () => {
-  loading.value = true;
-  await fetchOrderList();
-  loading.value = false;
+  try {
+    if (authStore.isAuthenticated) {
+      loading.value = true;
+      await fetchOrderList();
+    }
+    else{
+      modalOpen.value = true;
+    }
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+  } finally {
+    loading.value = false;
+  }
+});
+
+// todo reactivity
+// windowOrders -> no auth -> no orders -> go login
+// windowLogin -> login
+// windowOrders -> fetchOrders
+watch(() => authStore.isAuthenticated, async (newVal) => {
+  if (newVal) {
+    window.location.reload()
+  }
 });
 
 async function fetchOrderList() {
   orders.value = (await ordersList()).reverse();
 }
+
 </script>
 
 <style scoped lang="scss">
