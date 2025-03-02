@@ -152,10 +152,10 @@ export const useOrderStore = defineStore("orderStore", () => {
   }
 
   function clearAll() {
-    const selectedBooks = [];
-    const selectedBorrowedBooks = [];
-    const borrowedBooks = [];
-    const userOrders = [];
+    selectedBooks.value = [];
+    selectedBorrowedBooks.value = [];
+    borrowedBooks.value = [];
+    userOrders.value = [];
   }
   return {
     handleCreateOrder,
