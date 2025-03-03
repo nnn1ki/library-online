@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Картинки книг и их описание -->
-      <div class="col-9">
+      <div class="col-sm-12 col-md-12 col-lg-9">
         <div v-if="books.length !== 0" class="row align-items-center select-all">
           <div class="col-auto">
             <input
@@ -71,7 +71,7 @@
       </div>
 
       <!-- Блок с итогами и действиями -->
-      <div class="col-3">
+      <div class="col-sm-12 col-md-12 col-lg-3 sticky">
         <div class="summary-box">
           <h5 class="summary-title">Итого: {{ selectedBooks.length }} книг</h5>
           <div class="btn-group-vertical w-100">
@@ -448,5 +448,20 @@ hr {
 
 .row {
   margin-bottom: 30px;
+}
+
+@media  (max-width: 991px) {
+  .sticky {
+    position: sticky;
+    bottom: 20px;
+  }
+
+  .container-fluid {
+    padding-bottom: 0;
+  }
+
+  .summary-box {
+    padding-bottom: 0;
+  }
 }
 </style>
