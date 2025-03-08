@@ -1,5 +1,6 @@
 import asyncio
 from django.db.models import Q
+from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -13,22 +14,24 @@ from library_service.models.catalog import Library
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
 from library_service.serializers.parallel_list import ParallelListSerializer
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
+
 class OrderStatusSerializer(aserializers.ModelSerializer):
     class Meta:
         model = OrderHistory
         fields = ["description", "status", "date"]
-        
-class OrderUserSerializer(aserializers.ModelSerializer):    
-    library_card = serializers.CharField(source='profile.library_card', read_only=True)
-    campus_id = serializers.CharField(source='profile.campus_id', read_only=True)
-    mira_id = serializers.CharField(source='profile.mira_id', read_only=True)
+
+
+class OrderUserSerializer(aserializers.ModelSerializer):
+    library_card = serializers.CharField(source="profile.library_card", read_only=True)
+    campus_id = serializers.CharField(source="profile.campus_id", read_only=True)
+    mira_id = serializers.CharField(source="profile.mira_id", read_only=True)
 
     class Meta:
         model = User
-        fields = ['library_card', 'campus_id', 'mira_id']
+        fields = ["library_card", "campus_id", "mira_id"]
 
 
 class OrderItemSerializer(aserializers.ModelSerializer):
@@ -59,7 +62,7 @@ class OrderSerializer(aserializers.ModelSerializer):
         model = Order
         fields = ["id", "library", "statuses", "books"]
         list_serializer_class = ParallelListSerializer
-        
+
 
 class ShortOrderSerializer(aserializers.ModelSerializer):
     library = LibrarySerializer()
