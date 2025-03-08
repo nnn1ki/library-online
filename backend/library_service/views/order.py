@@ -23,7 +23,7 @@ from library_service.serializers.order import (
     BorrowedBookSerializer, 
     CreateUpdateOrderSerializer, 
     OrderSerializer, 
-    SimpleOrderSerializer
+    ShortOrderSerializer
 )
 
 from django.db import close_old_connections
@@ -49,7 +49,7 @@ class OrderViewset(
         if self.action in ["acreate", "aupdate"]:
             return CreateUpdateOrderSerializer
         elif self.action in ["new_orders", "processing_orders", "ready_orders", "done_orders"]:
-            return SimpleOrderSerializer
+            return ShortOrderSerializer
         else:
             return OrderSerializer
     

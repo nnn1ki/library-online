@@ -61,7 +61,7 @@ class OrderSerializer(aserializers.ModelSerializer):
         list_serializer_class = ParallelListSerializer
         
 
-class SimpleOrderSerializer(aserializers.ModelSerializer):
+class ShortOrderSerializer(aserializers.ModelSerializer):
     library = LibrarySerializer()
     statuses = OrderStatusSerializer(many=True)
     user = OrderUserSerializer()
