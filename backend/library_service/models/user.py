@@ -16,8 +16,7 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Profile for {self.user.username}"
-
-
+    
 class Basket(models.Model):
     created_at = models.DateTimeField(verbose_name="Дата создания", auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

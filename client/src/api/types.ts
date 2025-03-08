@@ -91,10 +91,30 @@ export type Order = {
   library: Library;
 };
 
+export type ShortOrder = {
+  id: number;
+  statuses: OrderStatus[];
+  library: Library;
+  user: UserInfo;
+};
+
+export type UserInfo = {
+  library_card: string;
+  campus_id: string;
+  mira_id: string;
+};
+
 export type BorrowedBook = {
   id: number;
   book: Book;
   order: number;
   handed_date: string;
   to_return_date: string;
+};
+
+export type PaginatedOrders = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: ShortOrder[];
 };
