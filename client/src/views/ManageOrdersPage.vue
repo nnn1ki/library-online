@@ -1,11 +1,17 @@
 <template>
   <div class="container">
-    {{ tabs[0].data }} <br>
-    ============================ <br>
-    {{ tabs[1].data }} <br>
-    ============================ <br>
-    {{ tabs[2].data }} <br>
-    ============================ <br>
+    <div class="tab-buttons">
+      <button type="button" @click="currentTab = tabsNumbers.new">
+        Новые
+      </button>
+      <button type="button" @click="currentTab = tabsNumbers.processing">
+        В работе
+      </button>
+      <button type="button" @click="currentTab = tabsNumbers.ready">
+        Готовые к выдаче
+      </button>
+    </div>
+    <OrderList :orders="currentData"/>
   </div>
 </template>
 
@@ -30,23 +36,30 @@ interface TabConfig {
   timerId?: number;
 }
 
+const currentTab = ref(0)
+
+const tabsNumbers = {
+  new: 0,
+  processing: 1,
+  ready: 2,
+}
 const tabs = ref<TabConfig[]>([
-  { 
+  {
     label: 'Новые',
     fetchFn: fetchNewOrders,
-    interval: 5000, 
+    interval: 5000,
     data: []
   },
   {
     label: 'В работе',
     fetchFn: fetchProcessingOrders,
-    interval: 10000, 
+    interval: 10000,
     data: []
   },
   {
     label: 'Готовы',
     fetchFn: fetchReadyOrders,
-    interval: 10000, 
+    interval: 10000,
     data: []
   }
 ]);
@@ -64,7 +77,7 @@ const startAllIntervals = () => {
         }
       }
     }, tab.interval);
-    
+
     tab.fetchFn().then(data => tabs.value[index].data = data);
   });
 };
@@ -77,10 +90,23 @@ const clearAllIntervals = () => {
   });
 };
 
+const currentData = computed<UserOrder[]>((): UserOrder[] => {
+  switch (currentTab.value) {
+    case tabsNumbers.new:
+      return tabs.value[tabsNumbers.new].data
+    case tabsNumbers.processing:
+      return tabs.value[tabsNumbers.processing].data
+    case tabsNumbers.ready:
+      return tabs.value[tabsNumbers.ready].data
+    default:
+      return []
+  }
+})
+
 onMounted(async () => {
   startAllIntervals();
 });
-onUnmounted(()=>{
+onUnmounted(() => {
   clearAllIntervals();
 });
 
@@ -94,3 +120,12 @@ document.addEventListener('visibilitychange', () => {
 
 
 </script>
+
+
+<style lang="scss" scoped>
+.tab-buttons {
+  display: felx;
+  flex-direction: row;
+  justify-content: space-between;
+}
+</style>
