@@ -1,13 +1,11 @@
 <template>
   <div class="container">
     <div class="tab-buttons">
-      <TabButton label="Новые" :count-new="tabs[tabsNumbers.new].newOrdersCnt" :count-all="newOrdersCount"
-        :is-active="currentTab === tabsNumbers.new" @click="currentTab = tabsNumbers.new" />
-      <TabButton label="В работе" :count-new="tabs[tabsNumbers.processing].newOrdersCnt"
-        :count-all="processingOrdersCount" :is-active="currentTab === tabsNumbers.processing"
+      <TabButton label="Новые" :count-all="newOrdersCount" :is-active="currentTab === tabsNumbers.new"
+        @click="currentTab = tabsNumbers.new" />
+      <TabButton label="В работе" :count-all="processingOrdersCount" :is-active="currentTab === tabsNumbers.processing"
         @click="currentTab = tabsNumbers.processing" />
-      <TabButton label="Готовые к выдаче" :count-new="tabs[tabsNumbers.ready].newOrdersCnt"
-        :count-all="readyOrdersCount" :is-active="currentTab === tabsNumbers.ready"
+      <TabButton label="Готовые к выдаче" :count-all="readyOrdersCount" :is-active="currentTab === tabsNumbers.ready"
         @click="currentTab = tabsNumbers.ready" />
     </div>
     <OrderList :orders="currentData" />
@@ -20,6 +18,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import OrderList from '@/components/OrderList.vue';
 import TabButton from '@/components/TabButton.vue';
 import { useToast } from "vue-toastification";
+import { useNotificationStore } from '@/stores/notificationStore';
 
 import {
   fetchNewOrders,
@@ -30,13 +29,13 @@ import {
 import type { UserOrder } from '@/api/types';
 
 const toast = useToast();
+const notifStore = useNotificationStore();
 
 interface TabConfig {
   label: string;
   fetchFn: () => Promise<UserOrder[]>;
   interval: number;
   data: UserOrder[];
-  newOrdersCnt: number,
   timerId?: number;
 }
 
@@ -54,21 +53,18 @@ const tabs = ref<TabConfig[]>([
     label: 'Новые',
     fetchFn: fetchNewOrders,
     interval: 5000,
-    newOrdersCnt: 0,
     data: []
   },
   {
     label: 'В работе',
     fetchFn: fetchProcessingOrders,
     interval: 10000,
-    newOrdersCnt: 0,
     data: []
   },
   {
     label: 'Готовы',
     fetchFn: fetchReadyOrders,
     interval: 10000,
-    newOrdersCnt: 0,
     data: []
   }
 ]);
@@ -80,35 +76,39 @@ const readyOrdersCount = computed(() => tabs.value[tabsNumbers.ready].data.lengt
 
 const startAllIntervals = () => {
   tabs.value.forEach((tab, index) => {
-    const existingIds = new Set<number>();
 
-    const processNewOrders = (newData: UserOrder[]) => {
-      const newOrders = newData.filter(order => !existingIds.has(order.id));
+    const processNewOrders = (newData: UserOrder[]) : UserOrder[] => {
+      const newOrders = newData.filter(order => !notifStore.loadedOrderIds.has(order.id));
+      newData.forEach((order) => {
+        notifStore.addToLoadedOrders(order.id)
+      })
+      return newOrders;
 
-      existingIds.clear();
-      newData.forEach(order => existingIds.add(order.id));
-
-      if (newOrders.length > 0) {
-        tabs.value[index].newOrdersCnt = newOrders.length;
-        showNotifications(newOrders);
-      } else {
-        tabs.value[index].newOrdersCnt = 0;
-      }
     };
+
     tab.timerId = window.setInterval(async () => {
       if (document.visibilityState === 'visible') {
         try {
           const data = await tab.fetchFn();
           console.log(`Обновли влкадку ${tab.label}:`);
-          processNewOrders(data);
+          const newData = processNewOrders(data);
+          if (newData.length > 0 ){
+            showNotifications(newData);
+          }
+
           tabs.value[index].data = data;
+          console.log("notifStore.loadedOrderIds", notifStore.loadedOrderIds);
         } catch (error) {
           console.error(`Ошибка обновления вкладки ${tab.label}:`, error);
         }
       }
     }, tab.interval);
 
-    tab.fetchFn().then(data => tabs.value[index].data = data);
+    tab.fetchFn().then(data => {
+      tabs.value[index].data = data
+      processNewOrders(tabs.value[index].data);
+    });
+
   });
 };
 
