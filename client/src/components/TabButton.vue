@@ -4,13 +4,13 @@
         <span>
             Всего {{ countAll }}
         </span>
-        <span v-if="!isActive && countNew > 0" class="badge">
-            Новые {{ countNew }} <br>
-        </span>
     </button>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue" 
+import { useNotificationStore } from '@/stores/notificationStore';
+const notifStore = useNotificationStore();
 defineProps({
     label: {
         type: String,
@@ -24,7 +24,7 @@ defineProps({
         type: Boolean,
         default: false
     },
-    countNew: {
+    tabNumber: {
         type: Number,
         default: 0
     }

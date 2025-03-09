@@ -1,12 +1,12 @@
 <template>
   <div class="container">
     <div class="tab-buttons">
-      <TabButton label="Новые" :count-all="newOrdersCount" :is-active="currentTab === tabsNumbers.new"
-        @click="currentTab = tabsNumbers.new" />
-      <TabButton label="В работе" :count-all="processingOrdersCount" :is-active="currentTab === tabsNumbers.processing"
-        @click="currentTab = tabsNumbers.processing" />
-      <TabButton label="Готовые к выдаче" :count-all="readyOrdersCount" :is-active="currentTab === tabsNumbers.ready"
-        @click="currentTab = tabsNumbers.ready" />
+      <TabButton label="Новые" :tabNumber="tabsNumbers.new" :count-all="newOrdersCount"
+        :is-active="currentTab === tabsNumbers.new" @click="currentTab = tabsNumbers.new" />
+      <TabButton label="В работе" :tabNumber="tabsNumbers.processing" :count-all="processingOrdersCount"
+        :is-active="currentTab === tabsNumbers.processing" @click="currentTab = tabsNumbers.processing" />
+      <TabButton label="Готовые к выдаче" :tabNumber="tabsNumbers.ready" :count-all="readyOrdersCount"
+        :is-active="currentTab === tabsNumbers.ready" @click="currentTab = tabsNumbers.ready" />
     </div>
     <OrderList :orders="currentData" />
   </div>
@@ -77,7 +77,7 @@ const readyOrdersCount = computed(() => tabs.value[tabsNumbers.ready].data.lengt
 const startAllIntervals = () => {
   tabs.value.forEach((tab, index) => {
 
-    const processNewOrders = (newData: UserOrder[]) : UserOrder[] => {
+    const processNewOrders = (newData: UserOrder[]): UserOrder[] => {
       const newOrders = newData.filter(order => !notifStore.loadedOrderIds.has(order.id));
       newData.forEach((order) => {
         notifStore.addToLoadedOrders(order.id)
@@ -92,7 +92,7 @@ const startAllIntervals = () => {
           const data = await tab.fetchFn();
           console.log(`Обновли влкадку ${tab.label}:`);
           const newData = processNewOrders(data);
-          if (newData.length > 0 ){
+          if (newData.length > 0) {
             showNotifications(newData);
           }
 

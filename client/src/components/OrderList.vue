@@ -7,12 +7,8 @@
   
   <script setup lang="ts">
   import { ref, onMounted } from 'vue';
-  import type { UserOrder } from '@/api/types';
-  
+  import type { UserOrder } from "@/api/types"
   const props = defineProps<{
     orders: UserOrder[]
-  }>();
-
-
-    
+  }>();    
   </script>
