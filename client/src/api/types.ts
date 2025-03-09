@@ -98,27 +98,3 @@ export type BorrowedBook = {
   handed_date: string;
   to_return_date: string;
 };
-
-export type UserOrder = {
-  id: number;
-  statuses: OrderStatus[];
-  library: Library;
-  user: UserInfo;
-};
-
-export type UserInfo = {
-  id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  library_card: string | null;
-  campus_id: string | null;
-  mira_id: string | null;
-};
-
-export type PaginatedOrders = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: UserOrder[];
-};
