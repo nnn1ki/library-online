@@ -66,19 +66,22 @@
       </div>
     </form>
 
-    <div v-if="loading">Загрузка...</div>
-    <div v-else-if="results !== undefined">
+    <!-- Результаты поиска -->
+    <div v-if="loading" class="mt-3">Загрузка...</div>
+    <div v-else class="mt-3">
       <h3>Результаты поиска</h3>
-      <div v-if="results.length > 0" class="books-list">
-        <BookCard v-for="book in results" v-bind:key="book.id" :book="book" />
-      </div>
-      <div v-else class="not-found">Книги не найдены</div>
+      <ul v-if="results.length" class="list-group">
+        <li v-for="book in results" :key="book.id" class="list-group-item">
+          <BookCard :book="book" />
+        </li>
+      </ul>
+      <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
     </div>
   </SurfaceCard>
 </template>
 
 <script setup lang="ts">
-import { nextTick, onBeforeMount, ref } from "vue";
+import { nextTick, onBeforeMount, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { PlusIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { searchBooks } from "@/api/books";
@@ -201,48 +204,71 @@ onBeforeMount(async () => {
     search();
   }
 });
-</script>
 
-<style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
+// Пагинация найденных книг
+const currentPage = ref(1);
+const itemsPerPage = 10;
 
-.filter-condition {
-  padding-top: 1rem;
+const totalPages = computed(() => {
+  return Math.ceil(results.value.length / itemsPerPage);
+});
 
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  column-gap: 0.5rem;
-}
+const paginatedResults = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return results.value.slice(start, start + itemsPerPage);
+});
 
-.actions {
-  padding-top: 2rem;
-  display: flex;
-  justify-content: space-between;
-}
+const pagesToShow = computed(() => {
+  const pages = [];
+  const startPage = Math.max(2, currentPage.value - 1);
+  const endPage = Math.min(totalPages.value - 1, currentPage.value + 1);
 
-.remove-button {
-  padding: 0.75rem;
-}
+  if (currentPage.value === 5) {
+    pages.push(startPage - 2);
+  }
 
-.button-icon {
-  width: 1.2em;
-  height: 1.2em;
-  &.offset {
-    margin-left: 0.5em;
+  if (startPage > 2) {
+    pages.push(startPage - 1);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+
+  if (endPage < totalPages.value - 1) {
+    pages.push(endPage + 1);
+  }
+
+  if (totalPages.value - currentPage.value === 4) {
+    pages.push(endPage + 2);
+  }
+
+  return pages;
+});
+
+const showEllipsisLeft = computed(() => {
+  return currentPage.value > 5;
+});
+
+const showEllipsisRight = computed(() => {
+  return currentPage.value < totalPages.value - 4;
+});
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
   }
 }
 
-.books-list {
-  display: flex;
-  flex-direction: column;
-  row-gap: 0.5rem;
+function prevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
 }
 
-.not-found {
-  background-color: var(--color-accent-200);
-  padding: 1rem;
-  border-radius: 1rem;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+function goToPage(page) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
 }
-</style>
+</script>
