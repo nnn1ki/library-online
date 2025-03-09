@@ -4,7 +4,21 @@
     <div v-if="book.cover !== null" class="book-image">
       <img :src="book.cover" />
     </div>
-    <i v-else class="book-image bi bi-image"></i>
+
+    <div v-else class="book-fake-image">
+      <div class="fake-image-content">
+        <h6>{{ book.title[0] }}</h6>
+        <div v-if="book.author.length > 0">
+          <div v-if="book.author.length <= 2">
+            <h6>{{ book.author.join(", ") }}</h6>
+          </div>
+          <div v-else>
+            <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
+          </div>
+        </div>
+        <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
+      </div>
+    </div>
 
     <div class="card-body">
       <!-- Заголовок книги и автор -->
@@ -14,6 +28,9 @@
       </h6>
       <h6 v-else-if="book.collective.length > 0" class="card-subtitle text-muted">
         {{ book.collective.join(", ") }}
+      </h6>
+      <h6 class="card-subtitle text-muted">
+        {{ book.brief }}
       </h6>
 
       <div class="d-flex justify-content-between align-items-center">
@@ -30,6 +47,11 @@
         <!-- Кнопка для подробного описания -->
         <button class="btn btn-primary btn-sm" type="button" @click="isModalVisible = true">
           Подробнее
+        </button>
+
+        <!-- Кнопка для чтения онлайн -->
+        <button v-if="getReadLink(book) !== undefined" class="btn btn-primary btn-sm" type="button" @click="redirectTo(getReadLink(book))">
+          Читать онлайн
         </button>
       </div>
     </div>
@@ -72,6 +94,25 @@ async function addBook(book: Book) {
       if (!isInBasket.value) isAdding.value = false;
     });
 }
+
+
+function getReadLink(book: Book): string | undefined {
+  let url: string | undefined = undefined
+    
+  book.links.forEach(link => {
+    if (link.description === "Электронная библиотека ИРНИТУ") {
+      url = link.url;
+    }
+  })
+
+  return url;
+}
+ 
+function redirectTo(url: string | undefined) {
+  if (url !== undefined){
+    window.location.href=url;      
+  }
+} 
 </script>
 
 <style scoped lang="scss">
@@ -116,5 +157,21 @@ async function addBook(book: Book) {
 .book-image {
   font-size: 50px;
   text-align: center;
+}
+
+.book-fake-image {
+  background: #c0c0c0;
+  width: 200px;
+  height: 290px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.fake-image-content {
+  padding: 5px;
+  color: #fff;
 }
 </style>

@@ -32,8 +32,23 @@
               />
             </div>
             <div class="col-auto">
-              <img v-if="book.cover !== null" :src="book.cover" class="book-image img-fluid" />
-              <i v-else class="book-image bi bi-image"></i>
+              <div v-if="book.cover !== null">
+                <img :src="book.cover" class="book-image img-fluid" />
+              </div>
+              <div v-else class="book-fake-image">
+                <div class="fake-image-content">
+                  <h6>{{ book.title[0] }}</h6>
+                  <div v-if="book.author.length > 0">
+                    <div v-if="book.author.length <= 2">
+                      <h6>{{ book.author.join(", ") }}</h6>
+                    </div>
+                    <div v-else>
+                      <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
+                    </div>
+                  </div>
+                  <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
+                </div>
+              </div>
             </div>
             <div class="col">
               <div class="book-info">
@@ -448,5 +463,22 @@ hr {
 
 .row {
   margin-bottom: 30px;
+}
+
+.book-fake-image {
+  background: #c0c0c0;
+  max-width: 120px;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.fake-image-content {
+  color: #fff;
 }
 </style>
