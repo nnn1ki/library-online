@@ -4,7 +4,7 @@
       <!-- Картинки книг и их описание -->
       <div class="col-sm-12 col-md-12 col-lg-9">
         <div v-if="books.length !== 0" class="row align-items-center select-all">
-          <div class="col-auto">
+          <div class="col-md-auto col-sm-0 col=0">
             <input
               class="form-check-input"
               type="checkbox"
@@ -506,6 +506,19 @@ hr {
   }
 
   .btn-group {
+    width: 100%;
+  }
+
+  .select-all {
+    padding-left: 30px;
+    padding-right: 19px;
+  }
+
+  .select-all input {
+    display: none;
+  }
+
+  .select-all button {
     width: 100%;
   }
 }
