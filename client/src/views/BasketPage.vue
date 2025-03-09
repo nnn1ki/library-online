@@ -21,7 +21,7 @@
         </div>
         <div v-for="book in books" :key="book.description" class="book-card">
           <div class="row align-items-center">
-            <div class="col-auto">
+            <div class="col col-md-auto col-sm-12 col-12 check">
               <input
                 class="form-check-input"
                 type="checkbox"
@@ -31,7 +31,7 @@
                 aria-label="Выбрать книгу"
               />
             </div>
-            <div class="col-auto">
+            <div class="col col-md-auto col-sm-12 col-12">
               <img v-if="book.cover !== null" :src="book.cover" class="book-image img-fluid" />
               <i v-else class="book-image bi bi-image"></i>
             </div>
@@ -47,8 +47,11 @@
                 <p v-if="book.author.length > 0" class="book-author">
                   {{ book.author.join(", ") }}
                 </p>
-                <p v-else class="book-author">{{ book.collective.join(", ") }}</p>
-                <div class="btn-group">
+                <p v-else class="book-author">{{ book.collective.join(", ")
+                }}</p>
+              </div>
+              <div class="col">
+                <div class="btn-group book-info">
                   <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
                     Удалить
                   </button>
@@ -462,6 +465,38 @@ hr {
 
   .summary-box {
     padding-bottom: 0;
+  }
+
+  .btn-group {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .col-12 {
+    padding-bottom: 12px;
+  }
+
+  .col-sm-12 {
+    padding-bottom: 12px;
+  }
+
+  .col img {
+    margin: auto;
+    display: block;
+  }
+
+  .col .form-check-input {
+    width: 100%;
+    margin: auto;
+    display: block;
+    height: 2em;
+  }
+
+  .check {
+    order: 1;
+    padding-left: 27px;
+    padding-right: 15px;
+    margin-top: 12px;
   }
 }
 </style>
