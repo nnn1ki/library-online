@@ -64,7 +64,6 @@
         </div>
       </div>
 
-      <!-- Кнопки -->
       <div class="actions d-flex justify-content-between">
         <button type="button" class="btn btn-outline-primary btn-sm" @click="addCondition">
           Добавить условие <i class="bi bi-plus-square"></i>
