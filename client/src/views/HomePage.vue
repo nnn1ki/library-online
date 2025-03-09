@@ -16,7 +16,6 @@ import BooksSearch from "@/layouts/BooksSearch.vue";
 import BookCard from "@/components/BookCard.vue";
 import type { Book } from "@/api/types";
 import { announcesList } from "@/api/announces";
-
 const announces = ref<Book[]>([]);
 
 onMounted(async () => {
