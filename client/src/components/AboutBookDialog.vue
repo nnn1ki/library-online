@@ -99,4 +99,19 @@ const visible = defineModel<boolean>();
 .book-image {
   font-size: 200px;
 }
+
+@media (max-width: 991px) {
+  .modal-body {
+    flex-wrap: wrap;
+  }
+
+  .book-image {
+    margin: auto;
+    display: block;
+  }
+
+  .book-details {
+    margin-top: 24px;
+  }
+}
 </style>
