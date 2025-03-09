@@ -23,7 +23,7 @@ from library_service.serializers.order import (
     BorrowedBookSerializer,
     CreateUpdateOrderSerializer,
     OrderSerializer,
-    ShortOrderSerializer,
+    UserOrderSerializer,
 )
 
 ACCEPTABLE_STATUSES = [
@@ -48,7 +48,7 @@ class OrderViewset(
         if self.action in ["acreate", "aupdate"]:
             return CreateUpdateOrderSerializer
         elif self.action in ["new_orders", "processing_orders", "ready_orders", "done_orders"]:
-            return ShortOrderSerializer
+            return UserOrderSerializer
         else:
             return OrderSerializer
 

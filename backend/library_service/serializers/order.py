@@ -28,10 +28,13 @@ class OrderUserSerializer(aserializers.ModelSerializer):
     library_card = serializers.CharField(source="profile.library_card", read_only=True)
     campus_id = serializers.CharField(source="profile.campus_id", read_only=True)
     mira_id = serializers.CharField(source="profile.mira_id", read_only=True)
+    username = serializers.CharField(read_only=True)
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = User
-        fields = ["library_card", "campus_id", "mira_id"]
+        fields = ["id", "username", "first_name", "last_name", "library_card", "campus_id", "mira_id"]
 
 
 class OrderItemSerializer(aserializers.ModelSerializer):
@@ -64,7 +67,7 @@ class OrderSerializer(aserializers.ModelSerializer):
         list_serializer_class = ParallelListSerializer
 
 
-class ShortOrderSerializer(aserializers.ModelSerializer):
+class UserOrderSerializer(aserializers.ModelSerializer):
     library = LibrarySerializer()
     statuses = OrderStatusSerializer(many=True)
     user = OrderUserSerializer()
