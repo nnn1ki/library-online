@@ -13,7 +13,7 @@ export const useNotificationStore = defineStore('orders', () => {
   };
 
   const addToLoadedOrders = (id: number) => {
-      loadedOrderIds.add(id);
+    loadedOrderIds.add(id);
   };
 
   const markAsSeen = (orderId: number) => {
@@ -21,7 +21,7 @@ export const useNotificationStore = defineStore('orders', () => {
   };
 
   const getNewOrdersCount = (orders: { id: number }[]) => {
-    return orders.filter(order => 
+    return orders.filter(order =>
       !seenOrderIds.has(order.id) && loadedOrderIds.has(order.id)
     ).length;
   };
