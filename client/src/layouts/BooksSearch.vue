@@ -14,29 +14,51 @@
       <div v-for="(condition, index) in conditions" :key="index" class="filter-condition mb-3 mt-3">
         <div class="d-flex align-items-center gap-2">
           <!-- Операторы И/ИЛИ -->
-          <select v-if="index !== 0" v-model="condition.operator" class="form-select form-select-sm"
-            @change="updateSearchParams">
-            <option v-for="[description, operator] in [
-              ['И', '*'],
-              ['ИЛИ', '+'],
-            ]" :key="operator" :value="operator">
+          <select
+            v-if="index !== 0"
+            v-model="condition.operator"
+            class="form-select form-select-sm"
+            @change="updateSearchParams"
+          >
+            <option
+              v-for="[description, operator] in [
+                ['И', '*'],
+                ['ИЛИ', '+'],
+              ]"
+              :key="operator"
+              :value="operator"
+            >
               {{ description }}
             </option>
           </select>
 
           <!-- Тип фильтра -->
-          <select v-model="condition.scenarioPrefix" class="form-select form-select-sm" @change="updateSearchParams">
+          <select
+            v-model="condition.scenarioPrefix"
+            class="form-select form-select-sm"
+            @change="updateSearchParams"
+          >
             <option v-for="scenario in scenarios" :key="scenario.prefix" :value="scenario.prefix">
               {{ scenario.description }}
             </option>
           </select>
 
           <!-- Значение фильтра -->
-          <input v-model="condition.value" type="text" class="form-control form-control-sm"
-            placeholder="Введите значение" @input="updateSearchParams" />
+          <input
+            v-model="condition.value"
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Введите значение"
+            @input="updateSearchParams"
+          />
 
           <!-- Удалить условие -->
-          <button v-if="index !== 0" type="button" class="btn btn-danger btn-sm" @click="removeCondition(index)">
+          <button
+            v-if="index !== 0"
+            type="button"
+            class="btn btn-danger btn-sm"
+            @click="removeCondition(index)"
+          >
             <i class="bi bi-x-square"></i>
           </button>
         </div>
