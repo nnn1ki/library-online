@@ -6,11 +6,14 @@ import {
   fetchReadyOrders,
   fetchDoneOrders,
 } from "@/api/order";
-import type { ShortOrder, PaginatedOrders } from "@/api/types";
-const newOrders = ref<ShortOrder>();
-const processingOrders = ref<ShortOrder>();
-const readyOrders = ref<ShortOrder>();
+
+import type { UserOrder, PaginatedOrders } from "@/api/types";
+
+const newOrders = ref<UserOrder>();
+const processingOrders = ref<UserOrder>();
+const readyOrders = ref<UserOrder>();
 const doneOrders = ref<PaginatedOrders>();
+
 onMounted(async () => {
   newOrders.value = await fetchNewOrders();
   processingOrders.value = await fetchProcessingOrders();
