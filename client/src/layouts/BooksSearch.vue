@@ -67,22 +67,20 @@
     </form>
 
     <!-- Результаты поиска -->
-    <div v-if="loading" class="mt-3">
-      <span class="spinner-border spinner-border-sm" role="status"></span>
+    <div v-if="loading" class="loading">
       <strong> Загрузка... </strong>
+      <!-- TODO: спиннер (компонент) -->
     </div>
-    <div v-else class="mt-3">
+    <div v-else>
       <h3>Результаты поиска</h3>
-      <ul v-if="paginatedResults.length" class="list-group">
-        <li v-for="book in paginatedResults" :key="book.id" class="list-group-item">
-          <BookCard :book="book" />
-        </li>
-      </ul>
-      <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
+      <div v-if="paginatedResults.length" class="books-list">
+        <BookCard v-for="book in paginatedResults" :key="book.id" :book="book" />
+      </div>
+      <div v-else class="not-found">Книги не найдены</div>
 
-      <!-- Пагинация -->
+      <!-- Пагинация; TODO: пофиксить -->
       <nav v-if="paginatedResults.length" aria-label="Навигация по страницам">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination">
           <li class="page-item" :class="{ disabled: currentPage === 1 }">
             <a class="page-link" @click="prevPage" href="#" aria-label="Предыдущая">
               <span aria-hidden="true">&laquo;</span>
@@ -347,6 +345,10 @@ function goToPage(page: number) {
   }
 }
 
+.loading {
+  margin-top: 1rem;
+}
+
 .books-list {
   display: flex;
   flex-direction: column;
@@ -362,5 +364,6 @@ function goToPage(page: number) {
 
 .pagination {
   margin: 1rem 0 0 0;
+  justify-content: center;
 }
 </style>
