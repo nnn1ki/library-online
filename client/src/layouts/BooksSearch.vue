@@ -52,7 +52,6 @@
             @input="updateSearchParams"
           />
 
-          <!-- Удалить условие -->
           <button
             v-if="index !== 0"
             type="button"
