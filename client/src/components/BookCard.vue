@@ -1,5 +1,27 @@
 <template>
   <div class="card shadow-sm border-0 d-flex flex-row">
+      <!-- Картинка -->
+      <div class="col-2">
+        <div v-if="book.cover !== null" class="book-image">
+          <img :src="book.cover" />
+        </div>
+          
+        <div v-else class="book-fake-image">
+          <div class="fake-image-content">
+            <h6>{{ book.title[0] }}</h6>
+            <div v-if="book.author.length > 0">
+              <div v-if="book.author.length <= 2">
+                <h6>{{ book.author.join(", ") }}</h6>
+              </div>
+              <div v-else>
+                <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
+              </div>
+            </div>
+            <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
+          </div>
+        </div>
+      </div>
+
     <div class="card-body col-10">
       <!-- Заголовок книги и автор -->
       <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
@@ -8,6 +30,9 @@
       </h6>
       <h6 v-else-if="book.collective.length > 0" class="card-subtitle text-muted">
         {{ book.collective.join(", ") }}
+      </h6>
+      <h6 class="card-subtitle text-muted">
+        {{ book.brief }}
       </h6>
 
       <div>
@@ -25,27 +50,11 @@
         <button class="btn btn-primary btn-sm" type="button" @click="isModalVisible = true">
           Подробнее
         </button>
-      </div>
-    </div>
-    <!-- Картинка -->
-    <div class="col">
-      <div v-if="book.cover !== null" class="book-image">
-        <img :src="book.cover" />
-      </div>
-      <div v-else class="book-fake-image">
-        <!-- <i class="book-image bi bi-image"></i> -->
-        <div class="fake-image-content">
-          <h6>{{ book.title[0] }}</h6>
-          <div v-if="book.author.length > 0">
-            <div v-if="book.author.length <= 2">
-              <h6>{{ book.author.join(", ") }}</h6>
-            </div>
-            <div v-else>
-              <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
-            </div>
-          </div>
-          <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
-        </div>
+
+        <!-- Кнопка для чтения онлайн -->
+        <button v-if="getReadLink(book) !== undefined" class="btn btn-primary btn-sm" type="button" @click="redirectTo(getReadLink(book))">
+          Читать онлайн
+        </button>
       </div>
     </div>
   </div>
@@ -86,6 +95,25 @@ async function addBook(book: Book) {
       if (!isInBasket.value) isAdding.value = false;
     });
 }
+
+
+function getReadLink(book: Book): string | undefined {
+  let url: string | undefined = undefined
+    
+  book.links.forEach(link => {
+    if (link.description === "Электронная библиотека ИРНИТУ") {
+      url = link.url;
+    }
+  })
+
+  return url;
+}
+ 
+function redirectTo(url: string | undefined) {
+  if (url !== undefined){
+    window.location.href=url;      
+  }
+} 
 </script>
 
 <style scoped lang="scss">

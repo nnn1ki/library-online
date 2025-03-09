@@ -8,7 +8,22 @@
           <div v-if="book.cover !== null">
             <img :src="book.cover" />
           </div>
-          <BookOpenIcon v-else class="book-icon" />
+
+          <div v-else class="book-fake-image">
+            <div class="fake-image-content">
+              <h6>{{ book.title[0] }}</h6>
+              <div v-if="book.author.length > 0">
+                <div v-if="book.author.length <= 2">
+                  <h6>{{ book.author.join(", ") }}</h6>
+                </div>
+                <div v-else>
+                  <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
+                </div>
+              </div>
+              <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
+            </div>
+          </div>
+          <!-- <BookOpenIcon v-else class="book-icon" /> -->
 
           <div>
             <h5 v-for="[index, title] in book.title.entries()" v-bind:key="index" class="title">
@@ -24,6 +39,13 @@
             </p>
 
             <p>Количество: {{ book.copies }}</p>
+
+            <p>{{ book.description }}</p>
+
+            <p>
+              Ссылки:
+              <a v-for="link in book.links" :href="link.url"> {{ link.description }} </a>
+            </p>
 
             <StyledButton @click="basketStore.addBook(book)" :disabled="isInBasket">
               <ShoppingCartIcon class="cart-icon" />В корзину
@@ -108,5 +130,21 @@ const visible = defineModel<boolean>();
 .book-icon {
   width: 32rem;
   height: 32rem;
+}
+
+.book-fake-image {
+  background: #c0c0c0;
+  min-width: 200px;
+  height: 290px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.fake-image-content {
+  padding: 5px;
+  color: #fff;
 }
 </style>
