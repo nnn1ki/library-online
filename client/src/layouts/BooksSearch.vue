@@ -66,54 +66,16 @@
       </div>
     </form>
 
-    <div v-if="loading">Загрузка...</div>
-    <div v-else-if="results !== undefined">
+    <!-- Результаты поиска -->
+    <div v-if="loading" class="mt-3">Загрузка...</div>
+    <div v-else class="mt-3">
       <h3>Результаты поиска</h3>
-      <div v-if="results.length > 0" class="books-list">
-        <BookCard v-for="book in results" v-bind:key="book.id" :book="book" />
-      </div>
-      <div v-else class="not-found">Книги не найдены</div>
-
-      <!-- Пагинация -->
-      <nav v-if="paginatedResults.length" aria-label="Навигация по страницам">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" @click="prevPage" href="#" aria-label="Предыдущая">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" @click="goToPage(1)" href="#">1</a>
-          </li>
-          
-          <li v-if="showEllipsisLeft" class="page-item disabled">
-            <span class="page-link">...</span>
-          </li>
-
-          <template v-for="page in pagesToShow" :key="page">
-            <li 
-              v-if="page > 0 && page <= totalPages" 
-              class="page-item" 
-              :class="{ active: currentPage === page }"
-            >
-              <a class="page-link" @click="goToPage(page)" href="#">{{ page }}</a>
-            </li>
-          </template>
-
-          <li v-if="showEllipsisRight" class="page-item disabled">
-            <span class="page-link">...</span>
-          </li>
-          
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <a class="page-link" @click="goToPage(totalPages)" href="#">{{ totalPages }}</a>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <a class="page-link" @click="nextPage" href="#" aria-label="Следующая">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+      <ul v-if="results.length" class="list-group">
+        <li v-for="book in results" :key="book.id" class="list-group-item">
+          <BookCard :book="book" />
+        </li>
+      </ul>
+      <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
     </div>
   </SurfaceCard>
 </template>
@@ -310,51 +272,3 @@ function goToPage(page) {
   }
 }
 </script>
-
-<style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
-
-.filter-condition {
-  padding-top: 1rem;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  column-gap: 0.5rem;
-}
-
-.actions {
-  padding-top: 2rem;
-  display: flex;
-  justify-content: space-between;
-}
-
-.remove-button {
-  padding: 0.75rem;
-}
-
-.button-icon {
-  width: 1.2em;
-  height: 1.2em;
-  &.offset {
-    margin-left: 0.5em;
-  }
-}
-
-.books-list {
-  display: flex;
-  flex-direction: column;
-  row-gap: 0.5rem;
-}
-
-.not-found {
-  background-color: var(--color-accent-200);
-  padding: 1rem;
-  border-radius: 1rem;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.pagination {
-  margin: 1rem 0 0 0;
-}
-</style>
