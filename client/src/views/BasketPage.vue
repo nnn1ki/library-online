@@ -485,6 +485,19 @@ hr {
     display: block;
   }
 
+  .options {
+    order: 2;
+  }
+}
+
+@media  (max-width: 575px) {
+  .check {
+    order: 1;
+    padding-left: 27px;
+    padding-right: 15px;
+    margin-top: 12px;
+  }
+
   .col .form-check-input {
     width: 100%;
     margin: auto;
@@ -492,11 +505,8 @@ hr {
     height: 2em;
   }
 
-  .check {
-    order: 1;
-    padding-left: 27px;
-    padding-right: 15px;
-    margin-top: 12px;
+  .btn-group {
+    width: 100%;
   }
 }
 </style>
