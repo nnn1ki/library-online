@@ -4,7 +4,7 @@
 
     <div class="announces">
       <div v-for="book in announces" :key="book.id" class="announce-book">
-        <BookCard :book="book" />
+        <AnnouncementBookCard :book="book" />
       </div>
     </div>
   </div>
@@ -12,11 +12,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import AnnouncementBookCard from "@/components/AnnouncementBookCard.vue";
 import BooksSearch from "@/layouts/BooksSearch.vue";
-import BookCard from "@/components/BookCard.vue";
 import type { Book } from "@/api/types";
 import { announcesList } from "@/api/announces";
-
 const announces = ref<Book[]>([]);
 
 onMounted(async () => {
