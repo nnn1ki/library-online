@@ -12,7 +12,7 @@ export async function ordersList(): Promise<Order[]> {
   }
 }
 
-export async function fetchNewOrders(): Promise<UserOrder> {
+export async function fetchNewOrders(): Promise<UserOrder[]> {
   try {
     const response = await axios.get("/api/order/new/");
     return response.data;
@@ -22,7 +22,7 @@ export async function fetchNewOrders(): Promise<UserOrder> {
   }
 }
 
-export async function fetchProcessingOrders(): Promise<UserOrder> {
+export async function fetchProcessingOrders(): Promise<UserOrder[]> {
   try {
     const response = await axios.get("/api/order/processing/");
     return response.data;
@@ -32,7 +32,7 @@ export async function fetchProcessingOrders(): Promise<UserOrder> {
   }
 }
 
-export async function fetchReadyOrders(): Promise<UserOrder> {
+export async function fetchReadyOrders(): Promise<UserOrder[]> {
   try {
     const response = await axios.get("/api/order/ready/");
     return response.data;
@@ -54,6 +54,7 @@ export async function fetchDoneOrders(page: number = 1): Promise<PaginatedOrders
     throw error;
   }
 }
+
 export async function getOrder(orderId: number): Promise<Order> {
   try {
     const { data } = await axios.get(`/api/order/${orderId}/`);
