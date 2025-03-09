@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { BorrowedBook, Order, PaginatedOrders, ShortOrder } from "@/api/types";
+import type { BorrowedBook, Order, PaginatedOrders, UserOrder } from "@/api/types";
 
 export async function ordersList(): Promise<Order[]> {
   try {
@@ -12,7 +12,7 @@ export async function ordersList(): Promise<Order[]> {
   }
 }
 
-export async function fetchNewOrders(): Promise<ShortOrder> {
+export async function fetchNewOrders(): Promise<UserOrder> {
   try {
     const response = await axios.get("/api/order/new/");
     return response.data;
@@ -22,7 +22,7 @@ export async function fetchNewOrders(): Promise<ShortOrder> {
   }
 }
 
-export async function fetchProcessingOrders(): Promise<ShortOrder> {
+export async function fetchProcessingOrders(): Promise<UserOrder> {
   try {
     const response = await axios.get("/api/order/processing/");
     return response.data;
@@ -32,7 +32,7 @@ export async function fetchProcessingOrders(): Promise<ShortOrder> {
   }
 }
 
-export async function fetchReadyOrders(): Promise<ShortOrder> {
+export async function fetchReadyOrders(): Promise<UserOrder> {
   try {
     const response = await axios.get("/api/order/ready/");
     return response.data;
