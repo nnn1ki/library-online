@@ -37,6 +37,11 @@ export const useOrderStore = defineStore("orderStore", () => {
       toast.error("Необходимо зарегистрироваться");
       return;
     }
+    
+    if(selectedBorrowedBooks.value.length < borrowedBooks.value.length){
+      toast.error("Отметьте книги, которае принесете");  
+      return;
+    }
 
     toast.info("Проверяем все ли книги, можно заказать");
     userOrders.value = await ordersList();
