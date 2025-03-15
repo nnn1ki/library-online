@@ -119,10 +119,11 @@ const bookLink = computed(
 .book-image {
   flex-shrink: 0;
   flex-grow: 0;
-  flex-basis: 200px;
+  flex-basis: 290px;
   height: 290px;
 
   &.announcement {
+    flex-basis: 490px;
     height: 490px;
   }
 
