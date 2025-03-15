@@ -4,7 +4,7 @@
 
     <div class="announces">
       <div v-for="book in announces" :key="book.id" class="announce-book">
-        <AnnouncementBookCard :book="book" />
+        <BookCard :book="book" :announcement="true" />
       </div>
     </div>
   </div>
@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import AnnouncementBookCard from "@/components/AnnouncementBookCard.vue";
+import BookCard from "@/components/BookCard.vue";
 import BooksSearch from "@/layouts/BooksSearch.vue";
 import type { Book } from "@/api/types";
 import { announcesList } from "@/api/announces";
@@ -34,6 +34,7 @@ onMounted(async () => {
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
+  margin-top: 2rem;
 }
 
 .announce-book {

@@ -1,7 +1,10 @@
 <template>
-  <div class="card">
-    <div class="book-image">
-      <BookImage class="book-image-rounded" :book="book" />
+  <div class="card" :class="{ announcement: announcement }">
+    <div class="book-image" :class="{ announcement: announcement }">
+      <BookImage
+        :class="{ 'rounded-left': !announcement, 'rounded-top': announcement }"
+        :book="book"
+      />
     </div>
 
     <div class="card-body">
@@ -47,8 +50,9 @@ import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import BookImage from "@/components/BookImage.vue";
 
-const { book } = defineProps<{
+const { book, announcement = false } = defineProps<{
   book: Book;
+  announcement?: boolean;
 }>();
 
 const basketStore = useBasketStore();
@@ -91,6 +95,10 @@ const bookLink = computed(
 
   display: flex;
   flex-direction: row;
+
+  &.announcement {
+    flex-direction: column;
+  }
 }
 
 .card-body {
@@ -113,11 +121,20 @@ const bookLink = computed(
   flex-grow: 0;
   flex-basis: 200px;
   height: 290px;
-}
 
-.book-image-rounded {
-  border-top-left-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
+  &.announcement {
+    height: 490px;
+  }
+
+  .rounded-left {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  .rounded-top {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
 }
 
 .buttons {

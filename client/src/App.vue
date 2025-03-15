@@ -9,7 +9,7 @@
     </main>
   </div>
 
-  <PageFooter />
+  <PageFooter class="footer" />
 </template>
 
 <script setup lang="ts">
@@ -27,5 +27,9 @@ import { RouterView } from "vue-router";
 
 main {
   flex: 1;
+}
+
+.footer {
+  margin-top: 2rem;
 }
 </style>
