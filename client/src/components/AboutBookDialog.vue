@@ -5,25 +5,9 @@
         <h3>Подробнее о книге</h3>
 
         <div class="modal-body">
-          <div v-if="book.cover !== null">
-            <img :src="book.cover" />
+          <div class="book-image">
+            <BookImage :book="book" />
           </div>
-
-          <div v-else class="book-fake-image">
-            <div class="fake-image-content">
-              <h6>{{ book.title[0] }}</h6>
-              <div v-if="book.author.length > 0">
-                <div v-if="book.author.length <= 2">
-                  <h6>{{ book.author.join(", ") }}</h6>
-                </div>
-                <div v-else>
-                  <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
-                </div>
-              </div>
-              <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
-            </div>
-          </div>
-          <!-- <BookOpenIcon v-else class="book-icon" /> -->
 
           <div>
             <h5 v-for="[index, title] in book.title.entries()" v-bind:key="index" class="title">
@@ -44,7 +28,9 @@
 
             <p>
               Ссылки:
-              <a v-for="link in book.links" :href="link.url"> {{ link.description }} </a>
+              <a v-for="[index, link] in book.links.entries()" v-bind:key="index" :href="link.url">
+                {{ link.description }}
+              </a>
             </p>
 
             <StyledButton @click="basketStore.addBook(book)" :disabled="isInBasket">
@@ -67,8 +53,9 @@ import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
-import { BookOpenIcon, ShoppingCartIcon } from "@heroicons/vue/24/outline";
+import { ShoppingCartIcon } from "@heroicons/vue/24/outline";
 import StyledButton from "@/components/StyledButton.vue";
+import BookImage from "./BookImage.vue";
 
 const { book } = defineProps<{
   book: Book;
@@ -127,24 +114,10 @@ const visible = defineModel<boolean>();
   margin-right: 0.5em;
 }
 
-.book-icon {
-  width: 32rem;
-  height: 32rem;
-}
-
-.book-fake-image {
-  background: #c0c0c0;
-  min-width: 200px;
+.book-image {
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 200px;
   height: 290px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.fake-image-content {
-  padding: 5px;
-  color: #fff;
 }
 </style>

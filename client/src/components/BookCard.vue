@@ -1,22 +1,7 @@
 <template>
   <div class="card">
-    <div v-if="book.cover !== null" class="book-image">
-      <img :src="book.cover" />
-    </div>
-
-    <div v-else class="book-fake-image">
-      <div class="fake-image-content">
-        <h6>{{ book.title[0] }}</h6>
-        <div v-if="book.author.length > 0">
-          <div v-if="book.author.length <= 2">
-            <h6>{{ book.author.join(", ") }}</h6>
-          </div>
-          <div v-else>
-            <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
-          </div>
-        </div>
-        <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
-      </div>
+    <div class="book-image">
+      <BookImage class="book-image-rounded" :book="book" />
     </div>
 
     <div class="card-body">
@@ -60,6 +45,7 @@ import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import StyledButton from "@/components/StyledButton.vue";
+import BookImage from "@/components/BookImage.vue";
 
 const { book } = defineProps<{
   book: Book;
@@ -93,8 +79,6 @@ const bookLink = computed(
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/colors.scss" as *;
-
 .card {
   width: 100%;
 
@@ -128,42 +112,12 @@ const bookLink = computed(
   flex-shrink: 0;
   flex-grow: 0;
   flex-basis: 200px;
-  height: auto;
-  overflow: hidden;
-  
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-top-left-radius: 0.5rem;
-    border-bottom-left-radius: 0.5rem;
-  }
-}
-
-.book-fake-image {
-  background-color: var(--color-background-200);
-  flex-shrink: 0;
-  flex-grow: 0;
-  flex-basis: 200px;
   height: 290px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
 }
 
-.fake-image-content {
-  padding: 0.25rem;
-  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-
-  @include light-theme {
-    color: var(--color-text-50);
-  }
-
-  @include dark-theme {
-    color: var(--color-text-950);
-  }
+.book-image-rounded {
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
 }
 
 .buttons {
