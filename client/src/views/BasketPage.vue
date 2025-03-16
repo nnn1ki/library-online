@@ -31,7 +31,7 @@
       </div>
     </SurfaceCard>
 
-    <SurfaceCard>
+    <SurfaceCard class="sticky">
       <div class="options-card">
         <h5>Итого: {{ selectedBooksText }}</h5>
 
@@ -340,6 +340,11 @@ hr {
   margin: 0.5rem 0;
   border-width: 1px;
   border-color: var(--color-text-950);
+}
+
+.sticky {
+  position: sticky;
+  top: 1rem;
 }
 
 .options-card {
