@@ -69,7 +69,7 @@
     <!-- Результаты поиска -->
     <div v-if="loading" class="loading">
       <strong> Загрузка... </strong>
-      <!-- TODO: спиннер (компонент) -->
+      <LoadingSpinner />
     </div>
     <div v-else class="flex flex-col">
       <h3>Результаты поиска</h3>
@@ -114,6 +114,7 @@ import BookCard from "@/components/BookCard.vue";
 import SelectList from "@/components/SelectList.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import TextField from "@/components/TextField.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 // Состояния
 const router = useRouter();
@@ -297,6 +298,10 @@ onBeforeMount(async () => {
 
 .loading {
   margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 1rem;
 }
 
 .books-list {
