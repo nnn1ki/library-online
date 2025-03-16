@@ -7,25 +7,25 @@
 
       <div class="book-list">
         <h5 class="section-subtitle">Выбранные книги</h5>
-        <transition-group name="list" tag="div">
+        <TransitionGroup name="list" tag="div">
           <div v-for="(book, i) in orderStore.selectedBooks" :key="book.id" class="book-item card">
             <div class="book-activities">
-              <ShortBook :book="book" :num="i" />
+              <ShortBookCard :book="book" :num="i" />
               <i class="remove-icon" @click="removeBook(book.id)"> ❌ </i>
             </div>
           </div>
-        </transition-group>
+        </TransitionGroup>
       </div>
 
       <div class="book-list" v-if="booksToreturn.length !== 0">
         <h5 class="section-subtitle">Книги которые вы принесете</h5>
-        <transition-group name="list" tag="div">
+        <TransitionGroup name="list" tag="div">
           <div v-for="(book, i) in booksToreturn" :key="book.id" class="book-item card">
             <div class="book-activities">
-              <ShortBook :book="book.book" :num="i" />
+              <ShortBookCard :book="book.book" :num="i" />
             </div>
           </div>
-        </transition-group>
+        </TransitionGroup>
       </div>
 
       <!-- Информация о заказе -->
@@ -76,7 +76,7 @@
 <script setup lang="ts">
 import { ref, onBeforeMount, computed } from "vue";
 import BorrowedBooks from "@/layouts/BorrowedBooks.vue";
-import ShortBook from "@/components/ShortBook.vue";
+import ShortBookCard from "@/components/ShortBookCard.vue";
 import { useOrderStore } from "@/stores/orderStore";
 import { borrowedList } from "@/api/order";
 

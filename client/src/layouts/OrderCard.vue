@@ -6,7 +6,7 @@
     </div>
     <div class="book-list">
       <div v-for="(orderBook, index) in order.books" :key="orderBook.book.id" class="book-item">
-        <short-book :book="orderBook.book" :num="index" />
+        <ShortBookCard :book="orderBook.book" :num="index" />
         <hr v-if="index < order.books.length - 1" class="divider" />
       </div>
     </div>
@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { type OrderStatusEnum, type Order, orderStatuses } from "@/api/types";
-import ShortBook from "@/components/ShortBook.vue";
+import ShortBookCard from "@/components/ShortBookCard.vue";
 import { useOrderStore } from "@/stores/orderStore";
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const allowedEditStatuses: OrderStatusEnum[] = ["new"];
