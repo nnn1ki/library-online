@@ -20,7 +20,12 @@
       </h6>
 
       <div class="buttons">
-        <StyledButton theme="primary" @click="addBook" :disabled="isAdding || isInBasket">
+        <StyledButton
+          v-if="showCart"
+          theme="primary"
+          @click="addBook"
+          :disabled="isAdding || isInBasket"
+        >
           В Корзину <ShoppingCartIcon class="button-icon" />
         </StyledButton>
 
@@ -50,9 +55,14 @@ import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import BookImage from "@/components/BookImage.vue";
 
-const { book, announcement = false } = defineProps<{
+const {
+  book,
+  announcement = false,
+  showCart = true,
+} = defineProps<{
   book: Book;
   announcement?: boolean;
+  showCart?: boolean;
 }>();
 
 const basketStore = useBasketStore();

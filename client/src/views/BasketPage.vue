@@ -1,184 +1,97 @@
 <template>
-  <div class="container-fluid">
-    <div class="row">
-      <!-- Картинки книг и их описание -->
-      <div class="col-9">
-        <div v-if="books.length !== 0" class="row align-items-center select-all">
-          <div class="col-auto">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              :checked="allSelected"
-              @change="toggleSelectAll"
-              aria-label="Выбрать все книги"
-            />
-          </div>
-          <div class="col">
-            <button class="btn btn-primary" @click="toggleSelectAll">
-              {{ allSelected ? "Снять выделение" : "Выбрать все" }}
-            </button>
-          </div>
-        </div>
-        <div v-for="book in books" :key="book.description" class="book-card">
-          <div class="row align-items-center">
-            <div class="col-auto">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                :value="book"
-                :checked="selectedBooks.includes(book.id)"
-                @change="toggleBookSelection(book.id)"
-                aria-label="Выбрать книгу"
-              />
-            </div>
-            <div class="col-auto">
-              <div v-if="book.cover !== null">
-                <img :src="book.cover" class="book-image img-fluid" />
-              </div>
-              <div v-else class="book-fake-image">
-                <div class="fake-image-content">
-                  <h6>{{ book.title[0] }}</h6>
-                  <div v-if="book.author.length > 0">
-                    <div v-if="book.author.length <= 2">
-                      <h6>{{ book.author.join(", ") }}</h6>
-                    </div>
-                    <div v-else>
-                      <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
-                    </div>
-                  </div>
-                  <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="book-info">
-                <h6 class="book-title">
-                  {{ book.title[0] }}
-                  <span class="other-titles" v-if="book.title.length > 1"
-                    >({{ book.title.slice(1).join(", ") }})</span
-                  >
-                  ({{ book.year }})
-                </h6>
-                <p v-if="book.author.length > 0" class="book-author">
-                  {{ book.author.join(", ") }}
-                </p>
-                <p v-else class="book-author">{{ book.collective.join(", ") }}</p>
-                <div class="btn-group">
-                  <button class="btn btn-secondary" @click="basketStore.removeBook(book)">
-                    Удалить
-                  </button>
-                  <button
-                    class="btn btn-info"
-                    @click="
-                      modalBook = book;
-                      isModalVisible = true;
-                    "
-                  >
-                    Подробнее
-                  </button>
-                  <button class="btn btn-primary">Читать онлайн</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <AboutBookDialog v-if="modalBook == book" :book="book" v-model="isModalVisible" />
-        </div>
-      </div>
+  <!-- TODO: адаптация под мобилки -->
 
-      <!-- Блок с итогами и действиями -->
-      <div class="col-3">
-        <div class="summary-box">
-          <h5 class="summary-title">Итого: {{ selectedBooks.length }} книг</h5>
-          <div class="btn-group-vertical w-100">
-            <button
-              class="btn btn-success"
-              :disabled="books.length === 0 || selectedBooks.length === 0"
-              @click="onCreateOrderClick"
-            >
-              Оформить заказ
-            </button>
-            <button
-              class="btn btn-warning"
-              :disabled="books.length === 0 || selectedBooks.length === 0"
-              data-bs-toggle="modal"
-              data-bs-target="#confirmationModal"
-            >
-              Сохранить в файл
-            </button>
-            <button
-              class="btn btn-danger"
-              :disabled="books.length === 0"
-              @click="basketStore.clearBooks()"
-            >
-              Очистить корзину
-            </button>
-          </div>
+  <div class="container">
+    <SurfaceCard v-if="books.length !== 0">
+      <div class="books">
+        <div class="select-all">
+          <input
+            type="checkbox"
+            :checked="allSelected"
+            @change="toggleSelectAll"
+            aria-label="Выбрать все книги"
+          />
+          <StyledButton theme="secondary" @click="toggleSelectAll">{{
+            allSelected ? "Снять выделение" : "Выбрать все"
+          }}</StyledButton>
         </div>
+
+        <div v-for="book in books" :key="book.description" class="book-card">
+          <input
+            type="checkbox"
+            :value="book"
+            :checked="selectedBooks.includes(book.id)"
+            @change="toggleBookSelection(book.id)"
+            aria-label="Выбрать книгу"
+          />
+          <BookCard :book="book" :show-cart="false" />
+        </div>
+
+        <AboutBookDialog v-if="modalBook !== undefined" :book="modalBook" v-model="bookModalOpen" />
+      </div>
+    </SurfaceCard>
+
+    <SurfaceCard>
+      <div class="options-card">
+        <h5>Итого: {{ selectedBooksText }}</h5>
+
+        <StyledButton
+          theme="primary"
+          :disabled="books.length === 0 || selectedBooks.length === 0"
+          @click="onCreateOrderClick"
+        >
+          Оформить заказ
+        </StyledButton>
+
+        <StyledButton
+          theme="secondary"
+          :disabled="books.length === 0 || selectedBooks.length === 0"
+          @click="saveModalOpen = true"
+        >
+          Сохранить в файл
+        </StyledButton>
+
+        <StyledButton
+          theme="accent"
+          :disabled="books.length === 0"
+          @click="basketStore.clearBooks()"
+        >
+          Очистить корзину
+        </StyledButton>
       </div>
 
       <!-- Модальное окно для подтверждения сохранения -->
-      <div>
-        <div
-          class="modal fade"
-          id="confirmationModal"
-          data-bs-backdrop="static"
-          data-bs-keyboard="false"
-          tabindex="-1"
-          aria-labelledby="confirmationModalLabel"
-          aria-hidden="true"
-        >
-          <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">Подтверждение сохранения</h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Закрыть"
-                ></button>
-              </div>
-              <div class="modal-body">
-                <p>Вы хотите распечатать книги:</p>
-                <hr />
-                <!-- Разделительная полоска -->
-                <div v-html="bookList"></div>
-                <hr />
-                <!-- Разделительная полоска -->
-                <p>Всего книг: {{ selectedBooks.length }}</p>
-              </div>
-              <div class="modal-footer">
-                <label>
-                  <input type="radio" value="txt" v-model="fileFormat" checked />
-                  Текстовый файл (.txt)
-                </label>
-                <label>
-                  <input type="radio" value="docx" v-model="fileFormat" />
-                  Word файл (.docx)
-                </label>
-                <label>
-                  <input disabled="true" type="radio" value="pdf" v-model="fileFormat" />
-                  PDF файл (.pdf)
-                </label>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                  Отмена
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-primary"
-                  data-bs-dismiss="modal"
-                  @click="saveBooks"
-                >
-                  Сохранить
-                </button>
-              </div>
-            </div>
-          </div>
+      <ModalDialog v-model="saveModalOpen">
+        <p>Вы хотите распечатать книги:</p>
+        <hr />
+        <div v-html="bookList"></div>
+        <hr />
+        <p>Всего книг: {{ selectedBooks.length }}</p>
+
+        <label>
+          <input type="radio" value="txt" v-model="fileFormat" checked />
+          Текстовый файл (.txt)
+        </label>
+
+        <label>
+          <input type="radio" value="docx" v-model="fileFormat" />
+          Word файл (.docx)
+        </label>
+
+        <label>
+          <input disabled="true" type="radio" value="pdf" v-model="fileFormat" />
+          PDF файл (.pdf)
+        </label>
+
+        <div class="save-buttons">
+          <StyledButton theme="primary" @click="saveBooks"> Сохранить </StyledButton>
+          <StyledButton theme="accent" @click="saveModalOpen = false"> Отмена </StyledButton>
         </div>
-      </div>
+      </ModalDialog>
+
       <!-- Модальное окно авторзиации -->
-      <NotAllowedBanner v-model="modalOpen" />
-    </div>
+      <NotAllowedBanner v-model="authModalOpen" />
+    </SurfaceCard>
   </div>
 </template>
 
@@ -193,6 +106,10 @@ import { useOrderStore } from "@/stores/orderStore";
 import { computed, ref, watch } from "vue";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { useRouter } from "vue-router";
+import ModalDialog from "@/components/ModalDialog.vue";
+import SurfaceCard from "@/components/SurfaceCard.vue";
+import StyledButton from "@/components/StyledButton.vue";
+import BookCard from "@/components/BookCard.vue";
 
 const router = useRouter();
 const basketStore = useBasketStore();
@@ -201,11 +118,27 @@ const auth = useAuthStore();
 
 const { books } = storeToRefs(basketStore);
 const selectedBooks = ref<string[]>([]);
+const selectedBooksText = computed(() => {
+  // Прекрасный русский язык
+  const amount = selectedBooks.value.length;
+  const lastDigit = amount % 10;
 
-const isModalVisible = ref(false);
+  if (amount >= 10 && amount <= 19) {
+    return `${amount} книг`;
+  } else if (lastDigit === 1) {
+    return `${amount} книга`;
+  } else if (lastDigit >= 2 && lastDigit <= 4) {
+    return `${amount} книги`;
+  } else {
+    return `${amount} книг`;
+  }
+});
+
+const bookModalOpen = ref(false);
 const modalBook = ref<Book>();
 
-const modalOpen = ref(false);
+const saveModalOpen = ref(false);
+const authModalOpen = ref(false);
 
 const fileFormat = ref<"txt" | "docx" | "pdf">("txt");
 
@@ -266,15 +199,6 @@ const bookList = computed(() => {
   // Формируем список литературы
   return combinedBooks
     .map((book, index) => {
-      // const mainTitle = book.title[0];
-      // const authors = book.author;
-      // const year = book.year;
-      // const city = book.city;
-      // const publisher = book.publisher;
-      // const subject = book.subject;
-      // return `${index + 1}. ${authors[0]} ${mainTitle} : ${subject} / ${authors.join(", ")} - ${city} : ${publisher}, ${year}.`;
-
-      // Используем brief, т.к. он содержит нужную информацию
       const brief = book.brief;
 
       if (brief !== null) {
@@ -299,6 +223,8 @@ const bookList = computed(() => {
 
 // Функция для сохранения книг
 function saveBooks() {
+  saveModalOpen.value = false;
+
   if (fileFormat.value === "txt") {
     // Сохранение в текстовый файл
     // Получаем текстовое содержимое из уже сформированного bookList
@@ -369,7 +295,7 @@ function downloadBlob(blob: Blob, defaultFilename: string) {
 
 async function onCreateOrderClick() {
   if (!auth.isAuthenticated) {
-    modalOpen.value = true;
+    authModalOpen.value = true;
     return;
   }
 
@@ -382,103 +308,51 @@ async function onCreateOrderClick() {
 </script>
 
 <style scoped lang="scss">
-/* Основной контейнер для карточек */
+.container {
+  padding-top: 20px;
+
+  display: flex;
+  flex-direction: row;
+  column-gap: 3rem;
+  align-items: start;
+  justify-content: center;
+}
+
+.books {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+}
+
+.select-all {
+  display: flex;
+  flex-direction: row;
+  column-gap: 1rem;
+}
+
 .book-card {
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 15px;
-}
-
-/* Стиль для изображения книги */
-.book-image {
-  max-width: 120px;
-  max-height: 160px;
-  object-fit: cover;
-  border-radius: 8px;
-  font-size: 120px;
-  text-align: center;
-}
-
-/* Информация о книге */
-.book-info {
-  padding-left: 15px;
-}
-
-.book-title {
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.book-title .other-titles {
-  font-style: italic;
-}
-
-.book-author {
-  color: #777;
-  font-size: 0.9rem;
-  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  column-gap: 1rem;
 }
 
 hr {
-  margin: 10px 0;
-  border-width: 3px;
-  border-color: #000000;
+  margin: 0.5rem 0;
+  border-width: 1px;
+  border-color: var(--color-text-950);
 }
 
-/* Кнопки в карточке книги */
-.btn-group button {
-  margin-right: 5px;
-}
-
-/* Блок с итогами корзины */
-.summary-box {
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.summary-title {
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-  font-weight: bold;
-}
-
-.btn-group-vertical .btn {
-  margin-bottom: 10px;
-}
-
-/* Кнопка и чекбокс для "Выбрать все книги" */
-.select-all {
-  padding: 15px;
-  margin-bottom: 0 !important;
-}
-
-/* Дополнительные стили */
-.container-fluid {
-  padding: 30px;
-}
-
-.row {
-  margin-bottom: 30px;
-}
-
-.book-fake-image {
-  background: #c0c0c0;
-  max-width: 120px;
-  max-height: 160px;
-  object-fit: cover;
-  border-radius: 8px;
-  text-align: center;
+.options-card {
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
+  row-gap: 1rem;
+  min-width: 14rem;
 }
 
-.fake-image-content {
-  color: #fff;
+.save-buttons {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  column-gap: 1rem;
 }
 </style>
