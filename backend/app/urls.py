@@ -25,6 +25,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from library_service.views.catalog import *
 from library_service.views.basket import *
+from library_service.views.librarySettings import LibrarySettingsViewSet
 from library_service.views.profile import *
 from library_service.views.order import *
 
@@ -36,6 +37,8 @@ router.register("basket", BasketViewset, basename="basket")
 router.register("profile", ProfileViewset, basename="profile")
 router.register("order", OrderViewset, basename="order")
 router.register("borrowed", BorrowedViewset, basename="borrowed")
+router.register(r'library-settings', LibrarySettingsViewSet, basename="library-settings")
+
 
 
 urlpatterns = [
