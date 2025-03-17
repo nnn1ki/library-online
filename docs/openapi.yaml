@@ -15,6 +15,8 @@ tags:
     description: Методы, связанные с корзиной
   - name: order
     description: Методы, связанные с заказами
+  - name: library-settings
+    description: Методы, связанные с параметрами системы
 
 paths:
   /api/auth/login/:
@@ -475,6 +477,40 @@ paths:
         '401':
           description: Unauthorized
 
+  /api/library-settings/:
+    get:
+      tags:
+        - library-settings
+      summary: Получение всех параметров системы
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LibraryParams"
+
+    post:
+      tags:
+        - library-settings
+      security:
+        - bearer: []
+      summary: Изменение параметров системы
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LibraryParams"
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+
 components:
   securitySchemes:
     bearer:
@@ -730,3 +766,30 @@ components:
           type: string
           description: Срок сдачи книги
           format: date
+
+    LibraryParams:
+      type: object
+      properties:
+        max_books_per_order:
+          type: number
+          description: Максимальное количество книг в одном заказе
+          example: 5
+        max_books_per_reader:
+          type: number
+          description: Максимальное количество книг на руках читателя
+          example: 15
+        max_borrow_day:
+          type: number
+          description: Максимальное количество рабочих дней ожидания книг на выдачу
+          example: 2
+        max_extansions:
+          type: number
+          description: Максимальное количество продлений книг
+          example: 5
+        holidays:
+          description: Список праздничных дней
+          type: array
+          items:
+            type: string
+            description: Праздничный день
+            format: date
