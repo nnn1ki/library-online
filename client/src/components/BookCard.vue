@@ -38,6 +38,13 @@
             Читать онлайн <BookOpenIcon class="button-icon" />
           </StyledButton>
         </a>
+
+        <StyledButton
+          v-if="basketCart"
+          theme="primary"
+        >
+          Удалить <TrashIcon class="button-icon" />
+        </StyledButton>
       </div>
     </div>
   </div>
@@ -48,7 +55,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { Book } from "@/api/types";
-import { ShoppingCartIcon, Bars3Icon, BookOpenIcon } from "@heroicons/vue/24/outline";
+import { ShoppingCartIcon, Bars3Icon, BookOpenIcon, TrashIcon } from "@heroicons/vue/24/outline";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
@@ -59,10 +66,12 @@ const {
   book,
   announcement = false,
   showCart = true,
+  basketCart = false,
 } = defineProps<{
   book: Book;
   announcement?: boolean;
   showCart?: boolean;
+  basketCart?: boolean;
 }>();
 
 const basketStore = useBasketStore();
