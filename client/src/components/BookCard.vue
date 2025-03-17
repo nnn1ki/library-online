@@ -41,7 +41,8 @@
 
         <StyledButton
           v-if="basketCart"
-          theme="primary"
+          theme="accent"
+          @click="basketStore.removeBook(book)"
         >
           Удалить <TrashIcon class="button-icon" />
         </StyledButton>
