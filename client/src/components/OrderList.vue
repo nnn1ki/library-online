@@ -25,6 +25,7 @@
           :key="order.id"
           :class="[selectedOrderId === order.id ? 'table-primary' : getRowClass(order)]"
           @click="selectOrder(order.id)"
+          @dblclick="handleUpdateOrderStatus(order.id, 'processing')"
         >
           <th scope="row">{{ order.id }}</th>
           <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
@@ -33,18 +34,58 @@
         </tr>
       </tbody>
     </table>
+    <div>
+      <button
+        class="btn btn-primary"
+        :disabled="selectedOrderId === null"
+        data-bs-toggle="modal"
+        data-bs-target="#orderDetailsModal"
+        @click="showOrderDetails(selectedOrderId)"
+      >
+        Подробнее
+      </button>
+    </div>
+    <div
+      class="modal fade"
+      id="orderDetailsModal"
+      tabindex="-1"
+      aria-labelledby="orderDetailsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="orderDetailsModalLabel">Детали заказа</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div class="modal-body">
+            <h6>Книги в заказе:</h6>
+            <ul>
+              <li v-for="book in selectedOrderBooks" :key="book.id">
+                {{ book.title }} ({{ book.year }}) - {{ book.author.join(", ") }}
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { defineProps, ref, computed } from "vue";
-import type { UserOrder } from "@/api/types";
+import type { UserOrder, OrderStatusEnum, Order } from "@/api/types";
+import { updateOrderStatus } from "@/api/order";
 
 const props = defineProps<{
   orders: UserOrder[];
 }>();
 
 const selectedOrderId = ref<number | null>(null);
+const selectedOrderBooks = ref<any[]>([]);
 const sortKey = ref<string>("id");
 const sortOrder = ref<number>(1);
 
@@ -81,7 +122,7 @@ function getRowClass(order: UserOrder) {
     }
   }
 
-  return ""; // Для других статусов нужно добавить
+  return "";
 }
 
 // Функция сортировки
@@ -116,6 +157,24 @@ const sortedOrders = computed(() => {
     return 0;
   });
 });
+
+// Функция для обновления статуса заказа
+async function handleUpdateOrderStatus(orderId: number, newStatus: OrderStatusEnum) {
+  const description = "Статус заказа обновлен";
+  try {
+    await updateOrderStatus(orderId, newStatus, description); // Или передайте описание, если нужно
+  } catch (error) {
+    console.error("Ошибка при обновлении статуса заказа", error);
+  }
+}
+
+// Функция для отображения деталей заказа
+function showOrderDetails(orderId: number | null) {
+  if (orderId !== null) {
+    const order = props.orders.find(o => o.id === orderId);
+    selectedOrderBooks.value = order ? order.books : [];
+  }
+}
 </script>
 
 <style scoped>

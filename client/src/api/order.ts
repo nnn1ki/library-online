@@ -1,5 +1,28 @@
 import axios from "axios";
-import type { BorrowedBook, Order, PaginatedOrders, UserOrder } from "@/api/types";
+import type { BorrowedBook, Order, PaginatedOrders, UserOrder, OrderStatusEnum } from "@/api/types";
+
+export async function updateOrderStatus(orderId: number, newStatus: OrderStatusEnum, description?: string) {
+  const statusUpdate = {
+    status: newStatus,
+    date: new Date().toISOString(),
+    description: description,
+  };
+
+  try {
+    const response = await axios.get(`/api/order/${orderId}/`);
+    const currentOrder: Order = response.data;
+    console.log(currentOrder);
+
+    const updatedStatuses = [...currentOrder.statuses, statusUpdate];
+    console.log(updatedStatuses);
+
+    await axios.patch(`/api/order/${orderId}/`, { statuses: updatedStatuses });
+    console.log(`Статус заказа ${orderId} добавлен: "${newStatus}"`);
+  } catch (error) {
+    console.error("Ошибка при обновлении статуса заказа", error);
+    throw error;
+  }
+}
 
 export async function ordersList(): Promise<Order[]> {
   try {
