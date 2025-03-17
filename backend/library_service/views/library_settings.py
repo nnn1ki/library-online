@@ -4,8 +4,8 @@ from rest_framework import mixins
 from rest_framework.exceptions import APIException
 
 
-from library_service.models import LibrarySettings
-from library_service.serializers.librarySettings import LibrarySettingsSerializer, CreateUpdateLibrarySettingsSerializer
+from library_service.models.library_settings import LibrarySettings
+from library_service.serializers.library_settings import LibrarySettingsSerializer, CreateUpdateLibrarySettingsSerializer
 
 class LibrarySettingsViewSet(
     mixins.ListModelMixin,
