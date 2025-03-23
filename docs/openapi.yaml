@@ -1147,7 +1147,7 @@ components:
           type: number
           description: Максимальное количество рабочих дней ожидания книг на выдачу
           example: 2
-        max_extansions:
+        max_extensions:
           type: number
           description: Максимальное количество продлений книг
           example: 5
