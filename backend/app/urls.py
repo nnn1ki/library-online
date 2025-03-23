@@ -28,6 +28,11 @@ from rest_framework_simplejwt.views import (
 
 from adrf.routers import DefaultRouter as AsyncDefaultRouter
 
+from library_service.views.catalog import *
+from library_service.views.basket import *
+from library_service.views.profile import *
+from library_service.views.order import *
+from library_service.views.library_settings import *
 from library_service.views.basket import BasketViewset
 from library_service.views.bitrix import BitrixAuthView
 from library_service.views.catalog import BookViewset, LibraryViewset, ScenarioViewset
@@ -42,6 +47,8 @@ router.register("basket", BasketViewset, basename="basket")
 router.register("profile", ProfileViewset, basename="profile")
 router.register("order", OrderViewset, basename="order")
 router.register("borrowed", BorrowedViewset, basename="borrowed")
+router.register("library-settings", LibrarySettingsViewSet, basename="library-settings")
+
 
 
 urlpatterns = [
