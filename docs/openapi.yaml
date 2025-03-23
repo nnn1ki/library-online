@@ -485,15 +485,19 @@ paths:
         - staff
       security:
         - bearer: []
-      summary: получение списка заказов для сотрудника библиотеки
+      summary: Получение списка заказов для сотрудника библиотеки
       parameters:
         - name: status
           in: query
           required: true
-          description: Фильтрация с использованием сценариев поиска. Передается напрямую в ИРБИС. Символ $ используется для неполного совпадения. Символы + и * используются соответственно как ИЛИ и И.
+          description: Фильтрация заказов по их статусу
           schema:
             type: string
-            example: new
+            enum:
+            - new
+            - processing
+            - ready
+            - done
       responses:
         '200':
           description: OK
@@ -530,7 +534,7 @@ paths:
         - staff
       security:
         - bearer: []
-      summary: получение подробной информции о заказе и его получателе
+      summary: Получение подробной информции о заказе и его получателе
       parameters:
         - name: id
           in: path
@@ -572,14 +576,13 @@ paths:
         - staff
       security:
         - bearer: []
-      summary: изменение состояния заказа
+      summary: Изменение состояния заказа
       parameters:
         - name: id
           in: path
           required: true
           schema:
-            type: number
-            description: ID заказа
+            $ref: "#/components/schemas/OrderId"
       requestBody:
         required: true
         content:
@@ -609,6 +612,7 @@ paths:
                         description: Комментарий по ненайденной книге
                       analogous_order_item_id:
                         type: number
+                        nullable: true
                         description: ID элемента заказа, на который заменена книга
       responses:
         '200':
@@ -618,7 +622,7 @@ paths:
         '403':
           description: Forbidden
         '404':
-          description: Unfound
+          description: Not Found
 
   /api/staff/order/check/{id}/:
     get:
@@ -632,8 +636,7 @@ paths:
           in: path
           required: true
           schema:
-            type: number
-            description: ID заказа
+            $ref: "#/components/schemas/OrderId"
       responses:
         '200':
           description: OK
@@ -646,7 +649,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/OrderBook"
-                  unfound_books:
+                  notfound_books:
                     type: array
                     items:
                       $ref: "#/components/schemas/OrderBook"
@@ -659,7 +662,7 @@ paths:
         '403':
           description: Forbidden
         '404':
-          description: Unfound                      
+          description: Not Found                  
   
   /api/admin/settings/:
     get:
@@ -762,7 +765,7 @@ paths:
         '403':
           description: Forbidden
         '404':
-          description: Unfound
+          description: Not Found
 
   /api/resons/unfound/:
     get:
@@ -832,7 +835,7 @@ paths:
         '403':
           description: Forbidden
         '404':
-          description: Unfound
+          description: Not Found
 
 components:
   securitySchemes:
