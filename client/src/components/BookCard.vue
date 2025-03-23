@@ -1,60 +1,51 @@
 <template>
-  <div class="card shadow-sm border-0 d-flex flex-row">
-      <!-- Картинка -->
-      <div class="col-2">
-        <div v-if="book.cover !== null" class="book-image">
-          <img :src="book.cover" />
-        </div>
-          
-        <div v-else class="book-fake-image">
-          <div class="fake-image-content">
-            <h6>{{ book.title[0] }}</h6>
-            <div v-if="book.author.length > 0">
-              <div v-if="book.author.length <= 2">
-                <h6>{{ book.author.join(", ") }}</h6>
-              </div>
-              <div v-else>
-                <h6>{{ book.author.slice(0, 2).join(", ") }} и другие</h6>
-              </div>
-            </div>
-            <h6 v-else-if="book.collective.length > 0">{{ book.collective.join(", ") }}</h6>
-          </div>
-        </div>
-      </div>
+  <div class="card" :class="{ announcement: announcement }">
+    <div class="book-image" :class="{ announcement: announcement }">
+      <BookImage
+        :class="{ 'rounded-left': !announcement, 'rounded-top': announcement }"
+        :book="book"
+      />
+    </div>
 
-    <div class="card-body col-10">
-      <!-- Заголовок книги и автор -->
+    <div class="card-body">
       <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
-      <h6 v-if="book.author.length > 0" class="card-subtitle text-muted">
+      <h6 v-if="book.author.length > 0" class="card-subtitle">
         {{ book.author.join(", ") }}
       </h6>
-      <h6 v-else-if="book.collective.length > 0" class="card-subtitle text-muted">
+      <h6 v-else-if="book.collective.length > 0" class="card-subtitle">
         {{ book.collective.join(", ") }}
       </h6>
-      <h6 class="card-subtitle text-muted">
+      <h6 class="card-subtitle">
         {{ book.brief }}
       </h6>
 
-      <div>
-        <!-- Кнопка добавления в корзину -->
-        <button
-          class="btn btn-info btn-sm me-2"
-          type="button"
-          @click="addBook(book)"
+      <div class="buttons">
+        <StyledButton
+          v-if="showCart"
+          theme="primary"
+          @click="addBook"
           :disabled="isAdding || isInBasket"
         >
-          <i class="bi bi-cart3"></i> В Корзину
-        </button>
+          В Корзину <ShoppingCartIcon class="button-icon" />
+        </StyledButton>
 
-        <!-- Кнопка для подробного описания -->
-        <button class="btn btn-primary btn-sm" type="button" @click="isModalVisible = true">
-          Подробнее
-        </button>
+        <StyledButton theme="secondary" type="button" @click="isModalVisible = true">
+          Подробнее <Bars3Icon class="button-icon" />
+        </StyledButton>
 
-        <!-- Кнопка для чтения онлайн -->
-        <button v-if="getReadLink(book) !== undefined" class="btn btn-primary btn-sm" type="button" @click="redirectTo(getReadLink(book))">
-          Читать онлайн
-        </button>
+        <a v-if="bookLink !== undefined" :href="bookLink">
+          <StyledButton theme="accent">
+            Читать онлайн <BookOpenIcon class="button-icon" />
+          </StyledButton>
+        </a>
+
+        <StyledButton
+          v-if="basketCart"
+          theme="accent"
+          @click="basketStore.removeBook(book)"
+        >
+          Удалить <TrashIcon class="button-icon" />
+        </StyledButton>
       </div>
     </div>
   </div>
@@ -65,12 +56,23 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { Book } from "@/api/types";
+import { ShoppingCartIcon, Bars3Icon, BookOpenIcon, TrashIcon } from "@heroicons/vue/24/outline";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
-import AboutBookDialog from "./AboutBookDialog.vue";
+import AboutBookDialog from "@/components/AboutBookDialog.vue";
+import StyledButton from "@/components/StyledButton.vue";
+import BookImage from "@/components/BookImage.vue";
 
-const { book } = defineProps<{
+const {
+  book,
+  announcement = false,
+  showCart = true,
+  basketCart = false,
+} = defineProps<{
   book: Book;
+  announcement?: boolean;
+  showCart?: boolean;
+  basketCart?: boolean;
 }>();
 
 const basketStore = useBasketStore();
@@ -79,10 +81,9 @@ const { books: basketBooks } = storeToRefs(basketStore);
 const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.id));
 
 const isModalVisible = ref(false);
-
 const isAdding = ref(false);
 
-async function addBook(book: Book) {
+async function addBook() {
   if (isInBasket.value || isAdding.value) return;
   isAdding.value = true;
 
@@ -96,90 +97,76 @@ async function addBook(book: Book) {
     });
 }
 
-
-function getReadLink(book: Book): string | undefined {
-  let url: string | undefined = undefined
-    
-  book.links.forEach(link => {
-    if (link.description === "Электронная библиотека ИРНИТУ") {
-      url = link.url;
-    }
-  })
-
-  return url;
-}
- 
-function redirectTo(url: string | undefined) {
-  if (url !== undefined){
-    window.location.href=url;      
-  }
-} 
+const bookLink = computed(
+  () => book.links.filter((link) => link.description === "Электронная библиотека ИРНИТУ")[0]?.url
+);
 </script>
 
 <style scoped lang="scss">
 .card {
   width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-}
 
-.card:hover {
-  transform: scale(1.05);
+  background-color: var(--color-background-50);
+  border-style: solid;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--color-text-300);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: row;
+
+  &.announcement {
+    flex-direction: column;
+  }
 }
 
 .card-body {
-  padding: 16px;
+  padding: 1rem;
 }
 
 .card-title {
-  font-size: 1.2rem;
+  font-size: var(--text-lg);
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .card-subtitle {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 16px;
-}
-
-.card-text {
-  font-size: 1rem;
-  color: #888;
+  color: var(--color-text-700);
+  margin-bottom: 1rem;
 }
 
 .book-image {
-  width: 200px;
-  height: auto;
-  text-align: center;
-  overflow: hidden;
-}
-
-.book-image img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
-
-.book-image i {
-  font-size: 50px;
-  color: #888;
-}
-
-.book-fake-image {
-  background: #c0c0c0;
-  width: 200px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 190px;
   height: 290px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+
+  &.announcement {
+    flex-basis: 490px;
+    height: 490px;
+  }
+
+  .rounded-left {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  .rounded-top {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
 }
 
-.fake-image-content {
-  padding: 5px;
-  color: #fff;
+.buttons {
+  display: flex;
+  flex-direction: row;
+  column-gap: 1rem;
+}
+
+.button-icon {
+  width: 1.2em;
+  height: 1.2em;
+  margin-left: 0.5em;
 }
 </style>

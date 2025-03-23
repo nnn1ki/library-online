@@ -5,7 +5,7 @@
     </div>
     <div class="book-list">
       <div v-for="(book, index) in order" :key="book.id" class="book-item">
-        <ShortBook :book="book" :num="index" />
+        <ShortBookCard :book="book" :num="index" />
         <hr class="divider" />
       </div>
     </div>
@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import type { Book } from "@/api/types";
-import ShortBook from "@/components/ShortBook.vue";
+import ShortBookCard from "@/components/ShortBookCard.vue";
 
 const { order } = defineProps<{
   order: Book[];

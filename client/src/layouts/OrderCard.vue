@@ -13,7 +13,7 @@
         class="book-item"
       >
         <div class="book-info">
-          <short-book :book="orderBook.book" :num="index" />
+          <ShortBookCard :book="orderBook.book" :num="index" />
           <button
             class="btn btn-add-book"
             @click="onAddToOrderClick(orderBook.book)"
@@ -23,7 +23,6 @@
           </button>
         </div>
 
-        <hr v-if="index < order.books.length - 1" class="divider" />
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
@@ -36,10 +35,10 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { OrderStatusEnum, Order, Book } from "@/api/types";
-import { orderStatuses } from "@/api/types";
-import ShortBook from "@/components/ShortBook.vue";
+import { type OrderStatusEnum, type Order, orderStatuses } from "@/api/types";
+import ShortBookCard from "@/components/ShortBookCard.vue";
 import { useOrderStore } from "@/stores/orderStore";
+import type { Book } from "@/api/types";
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];
 const orderStore = useOrderStore();

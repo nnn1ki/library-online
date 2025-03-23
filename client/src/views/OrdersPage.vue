@@ -61,6 +61,7 @@ const fetchOrders = async () => {
 // windowOrders -> no auth -> no orders -> go login
 // windowLogin -> login
 // windowOrders -> fetchOrders
+
 watch(
   () => authStore.isAuthenticated,
   async (newVal) => {

@@ -69,55 +69,34 @@
     <!-- Результаты поиска -->
     <div v-if="loading" class="loading">
       <strong> Загрузка... </strong>
-      <!-- TODO: спиннер (компонент) -->
+      <LoadingSpinner />
     </div>
-    <div v-else>
+    <div v-else class="flex flex-col">
       <h3>Результаты поиска</h3>
-      <div v-if="paginatedResults.length" class="books-list">
+      <div v-if="paginatedResults.length > 0" class="books-list">
         <BookCard v-for="book in paginatedResults" :key="book.id" :book="book" />
       </div>
       <div v-else class="not-found">Книги не найдены</div>
 
-      <!-- Пагинация; TODO: пофиксить -->
-      <nav v-if="paginatedResults.length" aria-label="Навигация по страницам">
-        <ul class="pagination">
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" @click="prevPage" href="#" aria-label="Предыдущая">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" @click="goToPage(1)" href="#">1</a>
-          </li>
-
-          <li v-if="showEllipsisLeft" class="page-item disabled">
-            <span class="page-link">...</span>
-          </li>
-
-          <template v-for="page in pagesToShow" :key="page">
-            <li
-              v-if="page > 0 && page <= totalPages"
-              class="page-item"
-              :class="{ active: currentPage === page }"
+      <div v-if="pageEntries.length > 1" class="pagination">
+        <span>Отображено {{ paginatedResults.length }} из {{ results.length }} результатов</span>
+        <nav class="pagination-slider" aria-label="Навигация по страницам">
+          <template v-for="page in pageEntries" v-bind:key="page">
+            <button
+              v-if="page !== -1"
+              :class="{
+                left: page === 1,
+                right: page === totalPages,
+                active: page === currentPage,
+              }"
+              @click="currentPage = page"
             >
-              <a class="page-link" @click="goToPage(page)" href="#">{{ page }}</a>
-            </li>
+              {{ page }}
+            </button>
+            <span v-else>...</span>
           </template>
-
-          <li v-if="showEllipsisRight" class="page-item disabled">
-            <span class="page-link">...</span>
-          </li>
-
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <a class="page-link" @click="goToPage(totalPages)" href="#">{{ totalPages }}</a>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <a class="page-link" @click="nextPage" href="#" aria-label="Следующая">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+        </nav>
+      </div>
     </div>
   </SurfaceCard>
 </template>
@@ -135,6 +114,7 @@ import BookCard from "@/components/BookCard.vue";
 import SelectList from "@/components/SelectList.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import TextField from "@/components/TextField.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 // Состояния
 const router = useRouter();
@@ -200,6 +180,7 @@ async function search() {
   try {
     const query = buildQuery();
     results.value = await searchBooks(query, library.value);
+    currentPage.value = 1;
   } catch (error) {
     console.error("Ошибка поиска:", error);
     results.value = [];
@@ -207,6 +188,42 @@ async function search() {
     loading.value = false;
   }
 }
+
+// Пагинация найденных книг
+const currentPage = ref(1);
+const itemsPerPage = 10;
+
+const totalPages = computed(() => {
+  return Math.ceil(results.value.length / itemsPerPage);
+});
+
+const paginatedResults = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return results.value.slice(start, start + itemsPerPage);
+});
+
+const pageEntries = computed(() => {
+  const current = currentPage.value;
+  const total = totalPages.value;
+
+  if (current === undefined || total === undefined) {
+    return [];
+  }
+
+  const pages = new Set(
+    [1, 2, current - 1, current, current + 1, total - 1, total].filter((x) => x >= 1 && x <= total)
+  );
+  const result = [...pages];
+
+  for (let i = 0; i < result.length - 1; i++) {
+    if (result[i] + 1 !== result[i + 1]) {
+      result.splice(i + 1, 0, -1);
+      i += 1;
+    }
+  }
+
+  return result;
+});
 
 onBeforeMount(async () => {
   [scenarios.value, libraries.value] = await Promise.all([scenariosList(), librariesList()]);
@@ -246,77 +263,11 @@ onBeforeMount(async () => {
     search();
   }
 });
-
-// Пагинация найденных книг
-const currentPage = ref(1);
-const itemsPerPage = 10;
-
-const totalPages = computed(() => {
-  return Math.ceil(results.value.length / itemsPerPage);
-});
-
-const paginatedResults = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return results.value.slice(start, start + itemsPerPage);
-});
-
-const pagesToShow = computed(() => {
-  const pages = [];
-  const startPage = Math.max(2, currentPage.value - 1);
-  const endPage = Math.min(totalPages.value - 1, currentPage.value + 1);
-
-  if (currentPage.value === 5) {
-    pages.push(startPage - 2);
-  }
-
-  if (startPage > 2) {
-    pages.push(startPage - 1);
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i);
-  }
-
-  if (endPage < totalPages.value - 1) {
-    pages.push(endPage + 1);
-  }
-
-  if (totalPages.value - currentPage.value === 4) {
-    pages.push(endPage + 2);
-  }
-
-  return pages;
-});
-
-const showEllipsisLeft = computed(() => {
-  return currentPage.value > 5;
-});
-
-const showEllipsisRight = computed(() => {
-  return currentPage.value < totalPages.value - 4;
-});
-
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-  }
-}
-
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
-}
-
-function goToPage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-}
 </script>
 
 <style scoped lang="scss">
 @use "@/styles/breakpoints.scss" as *;
+@use "@/styles/colors.scss" as *;
 
 .filter-condition {
   padding-top: 1rem;
@@ -347,6 +298,10 @@ function goToPage(page: number) {
 
 .loading {
   margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 1rem;
 }
 
 .books-list {
@@ -363,7 +318,67 @@ function goToPage(page: number) {
 }
 
 .pagination {
-  margin: 1rem 0 0 0;
-  justify-content: center;
+  align-self: end;
+  margin-top: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  row-gap: 0.25rem;
+}
+
+.pagination-slider {
+  width: fit-content;
+
+  background-color: var(--color-background-50);
+  color: var(--color-text-950);
+
+  border-style: solid;
+  border-radius: 2rem;
+  border-width: 1px;
+  border-color: var(--color-text-300);
+
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  button {
+    border: 0;
+    background-color: var(--color-background-50);
+    color: var(--color-text-950);
+
+    cursor: pointer;
+
+    padding: 0.25rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &.left {
+      border-top-left-radius: 2rem;
+      border-bottom-left-radius: 2rem;
+    }
+
+    &.right {
+      border-top-right-radius: 2rem;
+      border-bottom-right-radius: 2rem;
+    }
+
+    transition: 0.05s;
+    @include light-theme {
+      &:hover,
+      &.active {
+        background-color: var(--color-background-100);
+      }
+    }
+    @include dark-theme {
+      &:hover,
+      &.active {
+        background-color: var(--color-background-200);
+      }
+    }
+  }
 }
 </style>
