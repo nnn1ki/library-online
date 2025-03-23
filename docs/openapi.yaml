@@ -505,30 +505,68 @@ paths:
                   type: object
                   properties:
                     reader:
-                      type: string
-                      description: ФИО читателя
-                      example: "Иванов Иван Иваныч"
+                      $ref: "#/components/schemas/Reader"
                     order_id:        
                       $ref: "#/components/schemas/OrderId"
-                    books:
-                      description: список шифров книг заказа
-                      type: array
-                      items:
-                        $ref: "#/components/schemas/OrderBookId"
-                    books_to_return:
-                      description: спсиок книг на возврат
-                      type: array
-                      items:
-                        $ref: "#/components/schemas/OrderBookId"
-                    library:
-                      $ref: "#/components/schemas/Library"
+                    order_date:
+                      type: string
+                      description: Дата создания заказа
+                      format: date
+                    current_status_date:
+                      type: string
+                      description: Дата выставления текущего статуса
+                      format: date
+                    staff:
+                      type: string
+                      description: Сотрудник, который сменил статус заказа
         '401':
           description: Unauthorized
         '403':
           description: Forbidden
 
+  /api/staff/order/{id}/:
+    get:
+      tags:
+        - staff
+      security:
+        - bearer: []
+      summary: получение подробной информции о заказе и его получателе
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+            description: ID заказа
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reader:
+                    $ref: "#/components/schemas/Reader"
+                  order_id:        
+                    $ref: "#/components/schemas/OrderId"
+                  books:
+                    description: список книг заказа
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OrderBook"
+                  books_to_return:
+                    description: спсиок книг на возврат
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BorrowedBook"
+                  library:
+                    $ref: "#/components/schemas/Library"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
 
-  /api/staff/order/{id}:
     put:
       tags:
         - staff
@@ -559,8 +597,16 @@ paths:
                       book_id:
                         $ref: "#/components/schemas/OrderBookId"
                       status:
-                        description: Статус книги заказа
                         type: string
+                        description: Статус книги
+                        enum:
+                          - handed
+                          - returned
+                          - cancelled
+                          - analogous
+                      description:
+                        type: string
+                        description: Комментарий по ненайденной книге
                       analogous_order_item_id:
                         type: number
                         description: ID элемента заказа, на который заменена книга
@@ -571,7 +617,50 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '404':
+          description: Unfound
 
+  /api/staff/order/check/{id}/:
+    get:
+      tags:
+        - staff
+      security:
+        - bearer: []
+      summary: Проверка Найденных книг по заказу
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+            description: ID заказа
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  found_books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OrderBook"
+                  unfound_books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OrderBook"
+                  additional_books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Exemplar"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Unfound                      
+  
   /api/admin/settings/:
     get:
       tags:
@@ -605,6 +694,145 @@ paths:
         '403':
           description: Forbidden
 
+  /api/resons/cancel/:
+    get:
+      tags:
+        - admin
+      security:
+        - bearer: []
+      summary: Получения списка причин отмены заказа
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: Читатель не принес долги
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+    post:
+      tags:
+        - admin
+      security:
+        - bearer: []
+      summary: Добавление новой причины отмены заказа
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: Новая причина отмены
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /api/resons/cancel/{id}:
+    delete:
+      tags:
+        - admin
+      security:
+        - bearer: []
+      summary: Удаление причины отмены заказа
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+            description: ID причины отмены заказа
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Unfound
+
+  /api/resons/unfound/:
+    get:
+      tags:
+        - admin
+      security:
+        - bearer: []
+      summary: Получение списка причин отсутствия книги из заказа
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: Отсутствуют свободные экземпляры
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+    post:
+      tags:
+        - admin
+      security:
+        - bearer: []
+      summary: Добавление новой причины отсутствия книги из заказа
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: Новая причина отсутствия книги из заказа
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /api/resons/unfound/{id}:
+    delete:
+      tags:
+        - admin
+      security:
+        - bearer: []
+      summary: Удаление причины отсутствия книги заказа
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+            description: ID причины отсутствия книги заказа
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Unfound
 
 components:
   securitySchemes:
@@ -738,6 +966,31 @@ components:
           description: Обложка книги
           type: string
           nullable: true
+
+    ExemplarId:
+      type: string
+      description: ID экземпляра
+      example: L711
+    Exemplar:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/ExemplarId"
+        book_id:
+          $ref: "#/components/schemas/BookId"
+        author:
+          description: Авторы
+          type: array
+          items:
+            type: string
+        title:
+          description: Заглавия
+          type: array
+          items:
+            type: string
+        year:
+          description: Год издания книги
+          type: number        
     
     LibraryId:
       type: number
@@ -779,7 +1032,7 @@ components:
           type: string
           enum:
            - new
-           - processing # Пока отсутствует
+           - processing
            - ready
            - done
            - cancelled
@@ -865,6 +1118,19 @@ components:
           type: string
           description: Срок сдачи книги
           format: date
+
+    Reader:
+      type: object
+      properties:
+        ticket:
+          type: string
+          description: Номер читательского билета
+        first_name:
+          description: Имя 
+          type: string
+        last_name:
+          description: Фамилия
+          type: string
 
     LibraryParams:
       type: object

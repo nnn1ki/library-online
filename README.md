@@ -94,6 +94,7 @@ erDiagram
         varchar exemplar_id
         varchar book_id
         varchar status
+        varchar description
         date handed_date
         date to_return_date
         date returned_date
