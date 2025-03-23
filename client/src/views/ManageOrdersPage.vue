@@ -1,28 +1,37 @@
 <template>
   <div class="container">
-    <div class="tab-buttons">
-      <TabButton
-        label="Новые"
-        :tabNumber="tabsNumbers.new"
-        :count-all="newOrdersCount"
-        :is-active="currentTab === tabsNumbers.new"
-        @click="currentTab = tabsNumbers.new"
-      />
-      <TabButton
-        label="В работе"
-        :tabNumber="tabsNumbers.processing"
-        :count-all="processingOrdersCount"
-        :is-active="currentTab === tabsNumbers.processing"
-        @click="currentTab = tabsNumbers.processing"
-      />
-      <TabButton
-        label="Готовые к выдаче"
-        :tabNumber="tabsNumbers.ready"
-        :count-all="readyOrdersCount"
-        :is-active="currentTab === tabsNumbers.ready"
-        @click="currentTab = tabsNumbers.ready"
-      />
-    </div>
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentTab === tabsNumbers.new }"
+          @click="currentTab = tabsNumbers.new"
+          href="#"
+        >
+          Новые <span class="badge bg-danger">{{ newOrdersCount }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentTab === tabsNumbers.processing }"
+          @click="currentTab = tabsNumbers.processing"
+          href="#"
+        >
+          В работе <span class="badge bg-danger">{{ processingOrdersCount }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentTab === tabsNumbers.ready }"
+          @click="currentTab = tabsNumbers.ready"
+          href="#"
+        >
+          Готовые к выдаче <span class="badge bg-danger">{{ readyOrdersCount }}</span>
+        </a>
+      </li>
+    </ul>
     <OrderList :orders="currentData" />
   </div>
 </template>
@@ -30,12 +39,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import OrderList from "@/components/OrderList.vue";
-import TabButton from "@/components/TabButton.vue";
 import { useToast } from "vue-toastification";
 import { useNotificationStore } from "@/stores/notificationStore";
-
 import { fetchNewOrders, fetchProcessingOrders, fetchReadyOrders } from "@/api/order";
-
 import type { UserOrder } from "@/api/types";
 
 const toast = useToast();
@@ -56,7 +62,6 @@ const tabsNumbers = {
 };
 
 const currentTab = ref(tabsNumbers.new);
-
 const tabs = ref<TabConfig[]>([
   {
     label: "Новые",
@@ -96,7 +101,7 @@ const startAllIntervals = () => {
       if (document.visibilityState === "visible") {
         try {
           const data = await tab.fetchFn();
-          console.log(`Обновли влкадку ${tab.label}:`);
+          console.log(`Обновление вкладки ${tab.label}:`);
           const newData = processNewOrders(data);
           if (newData.length > 0) {
             showNotifications(newData);
@@ -160,7 +165,6 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 </script>
-
 
 <style lang="scss" scoped>
 .tab-buttons {
