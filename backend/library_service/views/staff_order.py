@@ -19,6 +19,10 @@ from library_service.mixins import (
 
 from library_service.models.order import Order, OrderHistory, OrderItem
 
+from library_service.serializers.staff_order import (
+    UserOrderSerializer,
+)
+
 ACCEPTABLE_STATUSES = [
     OrderHistory.Status.NEW,
     OrderHistory.Status.PROCESSING,
@@ -36,3 +40,40 @@ class StaffOrderViewset(
 ):
     permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
+    
+    def get_serializer_class(self):
+        return UserOrderSerializer
+    
+    @sync_to_async
+    def get_data(self, target_status):
+        queryset = self.get_queryset()
+
+        last_status_subquery = OrderHistory.objects.filter(order=OuterRef("pk")).order_by("-date").values("status")[:1]
+
+        queryset = queryset.annotate(last_status=Subquery(last_status_subquery)).filter(last_status=target_status)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return serializer.data
+
+    @action(detail=False, methods=["get"], url_path="new")
+    async def new_orders(self, request):
+        data = await self.get_data(OrderHistory.Status.NEW)
+        return Response(data)
+
+    @action(detail=False, methods=["get"], url_path="processing")
+    async def processing_orders(self, request):
+        data = await self.get_data(OrderHistory.Status.PROCESSING)
+        return Response(data)
+
+    @action(detail=False, methods=["get"], url_path="ready")
+    async def ready_orders(self, request):
+        data = await self.get_data(OrderHistory.Status.READY)
+        return Response(data)
+
+    @action(detail=False, methods=["get"], url_path="done")
+    async def done_orders(self, request):
+        data = await self.get_data(OrderHistory.Status.DONE)
+        paginator = PageNumberPagination()
+        paginator.page_size = 5
+        paginated_queryset = paginator.paginate_queryset(data, request)
+        return paginator.get_paginated_response(paginated_queryset)

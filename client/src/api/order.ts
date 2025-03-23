@@ -37,17 +37,20 @@ export async function ordersList(): Promise<Order[]> {
 
 export async function fetchNewOrders(): Promise<UserOrder[]> {
   try {
-    const response = await axios.get("/api/order/new/");
+    const response = await axios.get("/api/staff/order/new/");
+    console.log("Ответ сервера:", response);
     return response.data;
-  } catch (error) {
-    console.error("Ошибка при получении новых заказов:", error);
+  } catch (error: unknown) {
+    console.error("Ошибка при получении новых заказов:", 
+      error instanceof Error ? error.message : String(error));
     throw error;
   }
 }
 
+
 export async function fetchProcessingOrders(): Promise<UserOrder[]> {
   try {
-    const response = await axios.get("/api/order/processing/");
+    const response = await axios.get("/api/staff/order/processing/");
     return response.data;
   } catch (error) {
     console.error("Ошибка при получении заказов в процессе:", error);
@@ -57,7 +60,7 @@ export async function fetchProcessingOrders(): Promise<UserOrder[]> {
 
 export async function fetchReadyOrders(): Promise<UserOrder[]> {
   try {
-    const response = await axios.get("/api/order/ready/");
+    const response = await axios.get("/api/staff/order/ready/");
     return response.data;
   } catch (error) {
     console.error("Ошибка при получении готовых заказов:", error);
@@ -67,10 +70,10 @@ export async function fetchReadyOrders(): Promise<UserOrder[]> {
 
 export async function fetchDoneOrders(page: number = 1): Promise<PaginatedOrders> {
   try {
-    const { data } = await axios.get(`/api/order/done/`, {
+    const { data } = await axios.get(`/api/staff/order/done/`, {
       params: { page },
     });
-    console.log(`/api/order/done/?page=${page}`, data);
+    console.log(`/api/staff/order/done/?page=${page}`, data);
     return data;
   } catch (error) {
     console.error(`Ошибка при получении заказов со статусом ${status}`, error);
