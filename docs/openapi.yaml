@@ -697,7 +697,7 @@ paths:
         '403':
           description: Forbidden
 
-  /api/resons/cancel/:
+  /api/reasons/cancel/:
     get:
       tags:
         - admin
@@ -743,7 +743,7 @@ paths:
         '403':
           description: Forbidden
 
-  /api/resons/cancel/{id}:
+  /api/reasons/cancel/{id}:
     delete:
       tags:
         - admin
@@ -767,7 +767,7 @@ paths:
         '404':
           description: Not Found
 
-  /api/resons/unfound/:
+  /api/reasons/notfound/:
     get:
       tags:
         - admin
@@ -813,7 +813,7 @@ paths:
         '403':
           description: Forbidden
 
-  /api/resons/unfound/{id}:
+  /api/reasons/notfound/{id}:
     delete:
       tags:
         - admin
