@@ -8,7 +8,8 @@
     </div>
 
     <div class="card-body">
-      <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
+      <h5 class="card-title">{{ book.title[0] }}</h5>
+      <h5 class="card-year">{{ book.year }} г.</h5>
       <h6 v-if="book.author.length > 0" class="card-subtitle">
         {{ book.author.join(", ") }}
       </h6>
@@ -39,11 +40,7 @@
           </StyledButton>
         </a>
 
-        <StyledButton
-          v-if="basketCart"
-          theme="accent"
-          @click="basketStore.removeBook(book)"
-        >
+        <StyledButton v-if="basketCart" theme="accent" @click="basketStore.removeBook(book)">
           Удалить <TrashIcon class="button-icon" />
         </StyledButton>
       </div>
@@ -115,6 +112,7 @@ const bookLink = computed(
 
   display: flex;
   flex-direction: row;
+  align-items: center;
 
   &.announcement {
     flex-direction: column;
@@ -128,12 +126,36 @@ const bookLink = computed(
 .card-title {
   font-size: var(--text-lg);
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
+  margin-top: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-pack: end;
+}
+
+.card-year {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0;
+  margin-top: 0.5rem;
 }
 
 .card-subtitle {
   color: var(--color-text-700);
   margin-bottom: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-pack: end;
 }
 
 .book-image {
@@ -145,6 +167,7 @@ const bookLink = computed(
   &.announcement {
     flex-basis: 490px;
     height: 490px;
+    margin-top: 16px;
   }
 
   .rounded-left {
@@ -168,5 +191,29 @@ const bookLink = computed(
   width: 1.2em;
   height: 1.2em;
   margin-left: 0.5em;
+}
+
+@media (min-width: 768px) {
+  .card-title {
+    min-height: calc(var(--text-lg) * 3.5);
+  }
+
+  .card-subtitle {
+    min-height: calc(0.67em * 3.5);
+  }
+}
+
+@media (max-width: 767px) {
+  .book-image {
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: 10px;
+    // height: 290px;
+
+    &.announcement {
+      flex-basis: 100px;
+      max-height: 200px;
+    }
+  }
 }
 </style>
