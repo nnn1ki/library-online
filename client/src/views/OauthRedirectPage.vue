@@ -20,6 +20,7 @@ const states = {
   auth: "Авторизация...",
   success: "Успешно",
 };
+
 const state = ref<keyof typeof states>("loading");
 
 onBeforeMount(async () => {

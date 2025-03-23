@@ -23,6 +23,8 @@ export const useOrderStore = defineStore("orderStore", () => {
   const selectedBorrowedBooks = ref<number[]>([]);
   const borrowedBooks = ref<BorrowedBook[]>([]);
   const userOrders = ref<Order[]>([]);
+  const countOfBookInOrder = 5;
+  const countOfBookPerPerson = 15;
   const allowedStatusesToCountOrderedBooks: OrderStatusEnum[] = [
     "new",
     "processing",
@@ -36,13 +38,24 @@ export const useOrderStore = defineStore("orderStore", () => {
       return;
     }
 
+    if (selectedBorrowedBooks.value.length < borrowedBooks.value.length) {
+      toast.error("Отметьте книги, которае принесете");
+      return;
+    }
+
     toast.info("Проверяем все ли книги, можно заказать");
     userOrders.value = await ordersList();
+    console.log("userOrders.value", userOrders.value);
     const canBeOrdered = await checkCanBeOrdered();
     if (!canBeOrdered) return;
 
     toast.info("Проверяем сколько у вас книг на руках и в заказах");
     const isValid = await validateOrder();
+
+    if (selectedBooks.value.length > countOfBookInOrder) {
+      toast.error("В заказе максиум 5 книг");
+      return;
+    }
 
     if (!isValid) {
       toast.error(
@@ -57,7 +70,7 @@ export const useOrderStore = defineStore("orderStore", () => {
       await createOrder(selectedBooks.value[0].library, bookIds, selectedBorrowedBooks.value);
 
       await clearBasket(bookIds);
-      selectedBooks.value = [];
+      clearAll();
       await basketStore.updateBooks();
       toast.success("Заказ принят");
       await nextTick();
@@ -84,7 +97,7 @@ export const useOrderStore = defineStore("orderStore", () => {
       selectedBorrowedBooks.value.length +
       selectedBooks.value.length +
       orderedBooksCount;
-    return totalItems > 0 && totalItems <= 7 && librarySet.size === 1;
+    return totalItems > 0 && totalItems <= countOfBookPerPerson && librarySet.size === 1;
   }
 
   // проверка сколько книг в заказах
@@ -122,10 +135,10 @@ export const useOrderStore = defineStore("orderStore", () => {
 
   function bookInOrders(targetBookId: string): boolean {
     return userOrders.value.some((order) => {
-      const lastStatus = order.statuses[order.statuses.length - 1];
-      if (lastStatus && allowedStatusesToCountOrderedBooks.includes(lastStatus.status)) {
-        order.books.some((orderBook) => orderBook.book.id === targetBookId);
-      }
+      const lastStatus = order.statuses.at(-1);
+      if (!lastStatus || !allowedStatusesToCountOrderedBooks.includes(lastStatus.status))
+        return false;
+      return order.books.some((bookItem) => bookItem.book.id === targetBookId);
     });
   }
 
@@ -136,11 +149,22 @@ export const useOrderStore = defineStore("orderStore", () => {
     }
   }
 
+  function addBook(newBook: Book) {
+    selectedBooks.value.push(newBook);
+  }
+
+  function clearAll() {
+    selectedBooks.value = [];
+    selectedBorrowedBooks.value = [];
+    borrowedBooks.value = [];
+    userOrders.value = [];
+  }
   return {
     handleCreateOrder,
     selectedBooks,
     selectedBorrowedBooks,
     borrowedBooks,
     handleDeleteOrder,
+    addBook,
   };
 });

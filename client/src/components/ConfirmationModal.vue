@@ -1,32 +1,37 @@
+<script setup lang="ts">
+const props = defineProps<{
+  title: string;
+  text: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "confirm"): void;
+}>();
+
+const open = defineModel<boolean>({ required: true });
+
+const confirmCancel = () => {
+  emit("confirm");
+  open.value = false;
+};
+</script>
+
 <template>
   <div v-if="open" class="modal-overlay" @click="open = false">
     <div class="modal-content" @click.stop>
-      <div class="info">
-        <img src="@/assets/circle-info.svg" style="width: 100px" alt="" />
-      </div>
-      <h5><strong>Авторизуйтесь, чтобы сделать заказ</strong></h5>
+      <h5>
+        <strong>{{ props.title }}</strong>
+      </h5>
+      <p>{{ props.text }}</p>
       <div class="buttons">
-        <button @click="goToProfile">Перейти к авторизации 🔑</button>
-        <button class="close" @click="open = false">Закрыть</button>
+        <button @click="confirmCancel">Да</button>
+        <button class="close" @click="open = false">Нет</button>
       </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { useRouter } from "vue-router";
-
-const router = useRouter();
-const open = defineModel<boolean>({ required: true });
-
-// Переход на страницу профиля
-const goToProfile = () => {
-  open.value = false;
-  router.push("/profile");
-};
-</script>
-
-<style scoped lang="scss">
+<style scoped>
 .modal-overlay {
   position: fixed;
   display: flex;
@@ -68,7 +73,7 @@ const goToProfile = () => {
 }
 
 button {
-  padding: 8px 16px;
+  padding: 8px 32px;
   border: none;
   border-radius: 4px;
   cursor: pointer;

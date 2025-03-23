@@ -3,37 +3,89 @@
     <div v-if="orderStore.selectedBooks.length > 0">
       <CurrentOrderCard :order="orderStore.selectedBooks" />
     </div>
-    <div v-for="(order, i) in orders" :key="order.id" class="row">
-      <OrderCard :order="order" :num="i + 1" @delete="fetchOrderList" />
+    <div v-for="order in orders" :key="order.id" class="row">
+      <OrderCard :order="order" :num="order.id" @cancel="openCancelModal" />
     </div>
-    <div v-if="loading">
-      <LoadingModal />
-    </div>
+    <LoadingModal v-if="loading" />
   </div>
+  <NotAllowedBanner v-model="notAllowedModalOpen" />
+  <ConfirmationModal
+    v-model="confirmationModalOpen"
+    title="Отмена заказа"
+    text="Вы точно хотите отменить заказ?"
+    @confirm="handleConfirmCancel"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 import { ordersList } from "@/api/order";
 import { type Order } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
+import { useAuthStore } from "@/stores/auth";
 import OrderCard from "@/layouts/OrderCard.vue";
 import LoadingModal from "@/components/LoadingModal.vue";
 import CurrentOrderCard from "@/layouts/CurrentOrderCard.vue";
+import NotAllowedBanner from "@/layouts/NotAllowedBanner.vue";
+import ConfirmationModal from "@/components/ConfirmationModal.vue";
 
 const orders = ref<Order[]>([]);
 const loading = ref(false);
 const orderStore = useOrderStore();
+const authStore = useAuthStore();
+const notAllowedModalOpen = ref(false);
+const confirmationModalOpen = ref(false);
+const cancelOrderId = ref<number | null>();
+
 onMounted(async () => {
-  loading.value = true;
-  await fetchOrderList();
-  loading.value = false;
+  await fetchOrders();
 });
+
+const fetchOrders = async () => {
+  try {
+    if (authStore.isAuthenticated) {
+      loading.value = true;
+      await fetchOrderList();
+    } else {
+      notAllowedModalOpen.value = true;
+    }
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// todo reactivity
+// windowOrders -> no auth -> no orders -> go login
+// windowLogin -> login
+// windowOrders -> fetchOrders
+watch(
+  () => authStore.isAuthenticated,
+  async (newVal) => {
+    if (newVal) {
+      window.location.reload();
+    }
+  }
+);
 
 async function fetchOrderList() {
   orders.value = (await ordersList()).reverse();
 }
+
+const handleConfirmCancel = async () => {
+  console.log(cancelOrderId.value);
+  if (cancelOrderId.value !== null && cancelOrderId.value !== undefined) {
+    orderStore.handleDeleteOrder(cancelOrderId.value);
+  }
+  await fetchOrders();
+};
+
+const openCancelModal = (orderId: number) => {
+  cancelOrderId.value = orderId;
+  confirmationModalOpen.value = true;
+};
 </script>
 
 <style scoped lang="scss">

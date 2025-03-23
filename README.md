@@ -38,6 +38,12 @@ erDiagram
     Order ||--|{ OrderItem : contains
     Order ||--|{ OrderHistory : has
     Basket ||--o{ BasketItem : contains
+<<<<<<< HEAD
+=======
+    OrderItem ||--o| OrderItem : references
+    OrderItem ||--o| Order : returns
+    Order }o--|| Library : references
+>>>>>>> 3f90c66b0d17263462c87090ae8b7abfc5a08b35
 
     LibraryDatabase }|--|| Library : includes
 
@@ -74,6 +80,7 @@ erDiagram
     Order {
         int id PK
         int user_id FK
+        int libary_id FK
     }
 
     OrderHistory {
@@ -90,10 +97,12 @@ erDiagram
         varchar exemplar_id
         varchar book_id
         varchar status
+        varchar description
         date handed_date
         date to_return_date
         date returned_date
         int order_id_to_return FK
+        int analogous_order_item_id FK
     }
 
     Library {
@@ -107,6 +116,15 @@ erDiagram
         int id PK
         varchar database
         int library_id FK
+    }
+
+    LibrarySettings {
+        bool id PK
+        int max_books_per_order
+        int max_books_per_reader
+        int max_borrows_days
+        int max_extensions
+        date[] holidays
     }
 ```
 
