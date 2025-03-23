@@ -6,6 +6,8 @@ export type Group = keyof typeof groups;
 
 export type ProfileInfo = {
   username: string;
+  first_name: string;
+  last_name: string;
   groups: Group[];
 };
 
@@ -48,7 +50,7 @@ export type Book = {
   created: string | null;
 };
 
-export const statuses = {
+export const orderStatuses = {
   new: "Новый",
   processing: "Собирается",
   ready: "Готов к выдаче",
@@ -57,19 +59,29 @@ export const statuses = {
   error: "Ошибка",
   archived: "Заархивирован",
 } as const;
-export type Status = keyof typeof statuses;
+export type OrderStatusEnum = keyof typeof orderStatuses;
 
 export type OrderStatus = {
-  status: Status;
+  status: OrderStatusEnum;
   date: string;
   description: string;
 };
 
+export const orderBookStatuses = {
+  ordered: "Заказана",
+  handed: "Выдана",
+  returned: "Возвращена",
+  cancelled: "Заказ отменен",
+} as const;
+export type OrderBookStatus = keyof typeof orderBookStatuses;
+
 export type OrderBook = {
   id: number;
   book: Book;
-  handed: boolean;
-  returned: boolean;
+  status: OrderBookStatus;
+  handed_date: string | null;
+  to_return_date: string | null;
+  returned_date: string | null;
 };
 
 export type Order = {
@@ -83,4 +95,30 @@ export type BorrowedBook = {
   id: number;
   book: Book;
   order: number;
+  handed_date: string;
+  to_return_date: string;
+};
+
+export type UserOrder = {
+  id: number;
+  statuses: OrderStatus[];
+  library: Library;
+  user: UserInfo;
+};
+
+export type UserInfo = {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  library_card: string | null;
+  campus_id: string | null;
+  mira_id: string | null;
+};
+
+export type PaginatedOrders = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: UserOrder[];
 };

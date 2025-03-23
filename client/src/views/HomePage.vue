@@ -4,19 +4,18 @@
 
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
       <div v-for="book in announces" :key="book.id" class="col">
-        <BookCard :book="book" />
+        <AnnouncementBookCard :book="book" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import SearchFilter from "@/layouts/BooksSearch.vue";
-import BookCard from "@/components/BookCard.vue";
+import AnnouncementBookCard from "@/components/AnnouncementBookCard.vue";
 import type { Book } from "@/api/types";
 import { announcesList } from "@/api/announces";
-
 const announces = ref<Book[]>([]);
 
 onMounted(async () => {
@@ -24,7 +23,7 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Убираем паддинг у контейнера */
 .container {
   padding: 20px;

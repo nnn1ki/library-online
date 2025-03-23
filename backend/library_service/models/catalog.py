@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Library(models.Model):
     description = models.TextField(verbose_name="Описание")
     address = models.CharField(max_length=255, verbose_name="Место")
@@ -10,6 +11,7 @@ class Library(models.Model):
 
     def __str__(self):
         return f"{self.description} {self.address}"
+
 
 class LibraryDatabase(models.Model):
     database = models.CharField(max_length=255, verbose_name="База данных")

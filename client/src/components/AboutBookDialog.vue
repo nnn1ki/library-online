@@ -14,13 +14,21 @@
           <i v-else class="book-image bi bi-image"></i>
           <!-- Правая часть: информация -->
           <div class="book-details ms-3">
-            <h5 v-for="title in book.title">{{ title }}</h5>
+            <h5 v-for="[index, title] in book.title.entries()" v-bind:key="index">{{ title }}</h5>
             <h6 class="text-muted">Год: {{ book.year }}</h6>
-            <h6 v-if="book.author.length > 0" class="text-muted">Авторы: {{ book.author.join(", ") }}</h6>
-            <h6 v-else-if="book.collective.length > 0" class="text-muted">Коллективы: {{ book.collective.join(", ") }}
+            <h6 v-if="book.author.length > 0" class="text-muted">
+              Авторы: {{ book.author.join(", ") }}
+            </h6>
+            <h6 v-else-if="book.collective.length > 0" class="text-muted">
+              Коллективы: {{ book.collective.join(", ") }}
             </h6>
             <p>Количество: {{ book.copies }}</p>
-            <button class="btn btn-info btn-sm" type="button" @click="basketStore.addBook(book)" :disabled="isInBasket">
+            <button
+              class="btn btn-info btn-sm"
+              type="button"
+              @click="basketStore.addBook(book)"
+              :disabled="isInBasket"
+            >
               <i class="bi bi-cart3"></i> В Корзину
             </button>
             <h6 class="text-muted pt-4">{{ book.keyword.join(", ") }}</h6>
@@ -38,22 +46,22 @@
 import type { Book } from "@/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
-import { computed, ref, toRefs, useModel } from "vue";
+import { computed, toRefs } from "vue";
 
 const props = defineProps<{
-  book: Book
+  book: Book;
 }>();
 const { book } = toRefs(props);
 
 const basketStore = useBasketStore();
 
 const { books: basketBooks } = storeToRefs(basketStore);
-const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.value.id))
+const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.value.id));
 
 const visible = defineModel<boolean>();
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .modal {
   display: block;
   position: fixed;

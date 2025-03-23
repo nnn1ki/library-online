@@ -1,47 +1,50 @@
+import asyncio
+from aiohttp import ClientSession
 from django.http import Http404
+
 from rest_framework.decorators import action
-from rest_framework import mixins
-from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from library_service.serializers.basket import *
+from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
+from adrf import mixins as amixins
+
+from library_service.mixins import SessionCreateModelMixin
+from library_service.models.user import BasketItem
+from library_service.serializers.basket import AddBasketSerializer
 from library_service.serializers.catalog import BookSerializer
 from library_service.opac.book import book_retrieve
 
-class BasketViewset(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    GenericViewSet
-):
+
+class BasketViewset(SessionCreateModelMixin, amixins.DestroyModelMixin, AsyncGenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = BasketItem.objects.all()
 
     def get_serializer_class(self):
-        if self.action == "list":
-            return BookSerializer
-        elif self.action in ["create", "replace"]:
+        if self.action in ["acreate", "replace"]:
             return AddBasketSerializer
-    
+        else:
+            return BookSerializer
+
     def get_queryset(self):
-        basket = Basket.objects.filter(user=self.request.user).first()
-        return super().get_queryset().filter(basket=basket)
+        return super().get_queryset().filter(basket__user=self.request.user)
 
-    def get_object(self):
-        id = self.kwargs["pk"]
-        object = self.get_queryset().filter(book_id=id)
+    async def aget_object(self):
+        pk = self.kwargs["pk"]
+        item = await self.get_queryset().filter(book_id=pk).afirst()
 
-        if object.count() == 0:
+        if item is None:
             raise Http404("Book not found")
-        
-        return object
-    
-    def list(self, request, *args, **kwargs):
-        books = [book_retrieve(book.book_id) for book in self.get_queryset()]
-        serializer = self.get_serializer(books, many=True)
-        return Response(serializer.data)
+
+        return item
+
+    async def alist(self, request, *args, **kwargs):
+        async with ClientSession() as client:
+            books = await asyncio.gather(*[book_retrieve(client, book.book_id) async for book in self.get_queryset()])
+            serializer = self.get_serializer(books, many=True)
+            return Response(serializer.data)
 
     @action(detail=False, url_path="replace", methods=["put"])
-    def replace(self, request, *args, **kwargs):
-        self.get_queryset().delete()
-        return self.create(request, *args, **kwargs)
+    async def replace(self, request, *args, **kwargs):
+        await self.get_queryset().adelete()
+        return await self.acreate(request, *args, **kwargs)

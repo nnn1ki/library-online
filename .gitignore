@@ -2,6 +2,7 @@
 .conda
 .venv
 .pytest_cache
+.coverage
 
 prod_settings.py
 .env

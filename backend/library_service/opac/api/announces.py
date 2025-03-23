@@ -1,15 +1,17 @@
-import requests
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json, Undefined
+from dataclasses_json import DataClassJsonMixin, config, Undefined
+from aiohttp import ClientSession
 from django.conf import settings
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
+
 @dataclass
-class OpacAnnounce:
+class OpacAnnounce(DataClassJsonMixin):
+    dataclass_json_config = config(undefined=Undefined.EXCLUDE)["dataclasses_json"]
     link: str
 
-def opac_announces_list() -> list[OpacAnnounce]:
-    r = requests.get(f"{settings.OPAC_HOSTNAME}/api/announces")
+
+async def opac_announces_list(client: ClientSession) -> list[OpacAnnounce]:
+    r = await client.get(f"{settings.OPAC_HOSTNAME}/api/announces")
     r.raise_for_status()
 
-    return OpacAnnounce.schema().load(r.json(), many=True)
+    return OpacAnnounce.schema().load(await r.json(), many=True)

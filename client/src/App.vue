@@ -4,21 +4,20 @@
 
     <main>
       <div>
-        <router-view />
+        <RouterView />
       </div>
     </main>
-
-
   </div>
-  <Footer />
+  <PageFooter />
 </template>
 
 <script setup lang="ts">
-import Header from "@/layouts/Header.vue";
-import Footer from "@/layouts/Footer.vue";
+import Header from "@/layouts/PageHeader.vue";
+import PageFooter from "@/layouts/PageFooter.vue";
+import { RouterView } from "vue-router";
 </script>
 
-<style>
+<style scoped lang="scss">
 /* Корневой контейнер для всей страницы */
 .app {
   display: flex;
