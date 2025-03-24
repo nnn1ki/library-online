@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StyledButton from '@/components/StyledButton.vue';
 const props = defineProps<{
   title: string;
   text: string;
@@ -14,6 +15,7 @@ const confirmCancel = () => {
   emit("confirm");
   open.value = false;
 };
+
 </script>
 
 <template>
@@ -24,8 +26,8 @@ const confirmCancel = () => {
       </h5>
       <p>{{ props.text }}</p>
       <div class="buttons">
-        <button @click="confirmCancel">Да</button>
-        <button class="close" @click="open = false">Нет</button>
+        <StyledButton theme="secondary" @click="confirmCancel">Да</StyledButton>
+        <StyledButton theme="accent" @click="open = false">Нет</StyledButton>
       </div>
     </div>
   </div>
@@ -69,37 +71,7 @@ const confirmCancel = () => {
   margin-top: 15px;
   display: flex;
   display: flex;
-  flex-direction: column;
-}
-
-button {
-  padding: 8px 32px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-  margin-top: 1rem;
-}
-
-button:hover {
-  cursor: pointer;
-}
-
-button:first-child {
-  background-color: #1eb742;
-  color: white;
-}
-
-button:first-child:hover {
-  background-color: #165300;
-}
-
-button.close {
-  background: rgb(215, 2, 31);
-  color: white;
-}
-
-button.close:hover {
-  background: rgb(102, 5, 5);
+  flex-direction: row;
+  gap: 1rem;
 }
 </style>

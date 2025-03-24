@@ -39,7 +39,8 @@ const { book, num } = defineProps<{
 .book-index {
   min-width: 32px;
   height: 32px;
-  background: #f8f9fa;
+  background-color: none;
+  color: var(--color-text-700);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -54,7 +55,7 @@ const { book, num } = defineProps<{
 .book-title {
   margin: 0;
   font-size: 1.1rem;
-  color: #34495e;
+  color: var(--color-text-700);
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
@@ -62,13 +63,13 @@ const { book, num } = defineProps<{
 
 .book-year {
   font-size: 0.9rem;
-  color: #7f8c8d;
+  color: var(--color-text-700);
 }
 
 .book-authors {
   margin-top: 0.5rem;
   font-size: 0.95rem;
-  color: #7f8c8d;
+  color: var(--color-text-700);
   display: flex;
   align-items: center;
   gap: 0.5rem;
