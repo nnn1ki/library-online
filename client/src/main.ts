@@ -24,11 +24,7 @@ axios.interceptors.request.use(async (config) => {
 
 const app = createApp(App);
 
-if (screen.width < 768) {
-  app.use(Toast, { timeout: 3000 });
-} else {
-  app.use(Toast);
-}
+app.use(Toast);
 
 app.use(createPinia());
 app.use(router);
