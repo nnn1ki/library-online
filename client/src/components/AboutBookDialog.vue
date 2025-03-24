@@ -1,5 +1,5 @@
 <template>
-  <ModalDialog v-model="open">
+  <ModalDialog v-model="visible">
     <div class="dialog">
       <h3>Подробнее о книге</h3>
 
@@ -40,7 +40,7 @@
       </div>
 
       <div class="text-end">
-        <StyledButton theme="accent" @click="open = false">Закрыть</StyledButton>
+        <StyledButton theme="accent" @click="visible = false">Закрыть</StyledButton>
       </div>
     </div>
   </ModalDialog>
@@ -64,12 +64,7 @@ const basketStore = useBasketStore();
 
 const { books: basketBooks } = storeToRefs(basketStore);
 const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.id));
-
-<<<<<<< HEAD
-const open = defineModel<boolean>();
-=======
 const visible = defineModel<boolean>({ required: true });
->>>>>>> main
 </script>
 
 <style scoped lang="scss">

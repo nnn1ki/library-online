@@ -23,19 +23,12 @@ import { ref, onMounted, watch } from "vue";
 import { ordersList } from "@/api/order";
 import { type Order } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
-<<<<<<< HEAD
+import { useAuthStore } from "@/stores/auth";
 import OrderCard from "@/layouts/OrderCard.vue";
 import LoadingModal from "@/components/LoadingModal.vue";
 import CurrentOrderCard from "@/layouts/CurrentOrderCard.vue";
-
-=======
-import { useAuthStore } from "@/stores/auth";
-import OrderCard from "@/components/OrderCard.vue";
-import LoadingModal from "@/components/LoadingModal.vue";
-import CurrentOrderCard from "@/components/CurrentOrderCard.vue";
-import NotAllowedBanner from "@/components/NotAllowedBanner.vue";
+import NotAllowedBanner from "@/layouts/NotAllowedBanner.vue";
 import ConfirmationModal from "@/components/ConfirmationModal.vue";
->>>>>>> main
 const orders = ref<Order[]>([]);
 const loading = ref(false);
 const orderStore = useOrderStore();

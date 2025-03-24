@@ -7,11 +7,6 @@
       >
     </div>
     <div class="book-list">
-<<<<<<< HEAD:client/src/layouts/OrderCard.vue
-      <div v-for="(orderBook, index) in order.books" :key="orderBook.book.id" class="book-item">
-        <ShortBookCard :book="orderBook.book" :num="index" />
-        <hr v-if="index < order.books.length - 1" class="divider" />
-=======
       <div
         v-for="(orderBook, index) in props.order.books"
         :key="orderBook.book.id"
@@ -29,7 +24,6 @@
         </div>
 
         <hr v-if="index < props.order.books.length - 1" class="divider" />
->>>>>>> main:client/src/components/OrderCard.vue
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
@@ -42,20 +36,15 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-<<<<<<< HEAD:client/src/layouts/OrderCard.vue
-import { type OrderStatusEnum, type Order, orderStatuses } from "@/api/types";
-import ShortBookCard from "@/components/ShortBookCard.vue";
-=======
 import type { OrderStatusEnum, Order, Book } from "@/api/types";
 import { orderStatuses } from "@/api/types";
-import ShortBook from "@/components/ShortBook.vue";
->>>>>>> main:client/src/components/OrderCard.vue
+import ShortBook from "@/components/ShortBookCard.vue";
 import { useOrderStore } from "@/stores/orderStore";
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];
 const orderStore = useOrderStore();
 
-const { order, num } = defineProps<{
+const props = defineProps<{
   order: Order;
   num: number;
 }>();
@@ -73,7 +62,7 @@ const orderedDate = props.order.statuses.at(0)?.date.slice(0, 10);
 const lastStatusDate = props.order.statuses.at(-1)?.date.slice(0, 10);
 
 const currentStatus = computed(() => {
-  const lastStatus = order.statuses[order.statuses.length - 1]?.status;
+  const lastStatus = props.order.statuses[props.order.statuses.length - 1]?.status;
   return lastStatus;
 });
 
@@ -85,15 +74,6 @@ const statusClass = computed(() => {
 });
 
 async function onCancelOrderClick() {
-<<<<<<< HEAD:client/src/layouts/OrderCard.vue
-  emit("delete");
-  await orderStore.handleDeleteOrder(order.id);
-}
-
-async function onEditOrderClick() {
-  console.log("Edit order:", order.id);
-}
-=======
   emit("cancel", props.order.id);
   // await orderStore.handleDeleteOrder(props.order.id);
 }
@@ -108,7 +88,6 @@ const onAddToOrderClick = (bookToOrder: Book) => {
     orderStore.addBook(bookToOrder);
   }
 };
->>>>>>> main:client/src/components/OrderCard.vue
 </script>
 
 <style scoped lang="scss">
