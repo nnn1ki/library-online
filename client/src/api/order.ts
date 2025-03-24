@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { BorrowedBook, Order } from "@/api/types";
+import type { BorrowedBook, Order, PaginatedOrders, UserOrder } from "@/api/types";
 
 export async function ordersList(): Promise<Order[]> {
   try {
@@ -12,6 +12,48 @@ export async function ordersList(): Promise<Order[]> {
   }
 }
 
+export async function fetchNewOrders(): Promise<UserOrder> {
+  try {
+    const response = await axios.get("/api/order/new/");
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при получении новых заказов:", error);
+    throw error;
+  }
+}
+
+export async function fetchProcessingOrders(): Promise<UserOrder> {
+  try {
+    const response = await axios.get("/api/order/processing/");
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при получении заказов в процессе:", error);
+    throw error;
+  }
+}
+
+export async function fetchReadyOrders(): Promise<UserOrder> {
+  try {
+    const response = await axios.get("/api/order/ready/");
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при получении готовых заказов:", error);
+    throw error;
+  }
+}
+
+export async function fetchDoneOrders(page: number = 1): Promise<PaginatedOrders> {
+  try {
+    const { data } = await axios.get(`/api/order/done/`, {
+      params: { page },
+    });
+    console.log(`/api/order/done/?page=${page}`, data);
+    return data;
+  } catch (error) {
+    console.error(`Ошибка при получении заказов со статусом ${status}`, error);
+    throw error;
+  }
+}
 export async function getOrder(orderId: number): Promise<Order> {
   try {
     const { data } = await axios.get(`/api/order/${orderId}/`);
