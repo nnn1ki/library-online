@@ -100,4 +100,23 @@ const open = defineModel<boolean>();
   flex-basis: 200px;
   height: 290px;
 }
+
+@media (max-width: 767px) {
+  .dialog {
+    width: 90vw;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    column-gap: 1rem;
+    align-items: center;
+  }
+
+  .book-image {
+    height: auto;
+    width: 50%;
+    margin-bottom: 16px;
+  }
+}
 </style>
