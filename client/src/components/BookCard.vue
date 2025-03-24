@@ -171,12 +171,25 @@ const bookLink = computed(
   }
 }
 
-.books-list .card {
-  .book-image {
-    height: auto;
-    width: 40%;
-    max-width: 40%;
-    min-width: 40%;
+.book-image {
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 190px;
+  height: 290px;
+
+  &.announcement {
+    flex-basis: 490px;
+    height: 490px;
+  }
+
+  .rounded-left {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  .rounded-top {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
   }
 }
 
@@ -230,6 +243,15 @@ const bookLink = computed(
       flex-basis: 100px;
       max-height: 200px;
       padding-top: 16px;
+    }
+  }
+
+  .books-list .card {
+    .book-image {
+      height: auto;
+      width: 40%;
+      max-width: 40%;
+      min-width: 40%;
     }
   }
 
