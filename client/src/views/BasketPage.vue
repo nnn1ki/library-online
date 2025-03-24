@@ -366,6 +366,10 @@ hr {
     position: sticky;
     bottom: 20px;
     top: 0;
+    border-style: solid;
+    border-radius: 0.5rem;
+    border-width: 1px;
+    border-color: var(--color-text-300);
   }
 
   .surface {
