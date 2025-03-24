@@ -15,16 +15,15 @@ const confirmCancel = () => {
   emit("confirm");
   open.value = false;
 };
-
 </script>
 
 <template>
   <div v-if="open" class="modal-overlay" @click="open = false">
     <div class="modal-content" @click.stop>
       <h5>
-        <strong>{{ props.title }}</strong>
+        <strong class="title">{{ props.title }}</strong>
       </h5>
-      <p>{{ props.text }}</p>
+      <p class="content">{{ props.text }}</p>
       <div class="buttons">
         <StyledButton theme="secondary" @click="confirmCancel">Да</StyledButton>
         <StyledButton theme="accent" @click="open = false">Нет</StyledButton>
@@ -56,8 +55,14 @@ const confirmCancel = () => {
   cursor: help;
 }
 
+.title {
+  color: var(--color-text-800);
+}
+.content {
+  color: var(--color-text-700);
+}
 .modal-content {
-  background: white;
+  background: var(--color-background-200);
   padding: 50px;
   max-width: fit-content;
   border-radius: 8px;
