@@ -360,4 +360,25 @@ hr {
   flex-direction: row;
   column-gap: 1rem;
 }
+
+@media (max-width: 767px) {
+  .sticky {
+    position: sticky;
+    bottom: 20px;
+    top: 0;
+  }
+
+  .surface {
+    width: 90%;
+  }
+
+  .container {
+    padding-top: 16px;
+
+    display: flex;
+    flex-direction: column;
+    column-gap: 3rem;
+    align-items: center;
+  }
+}
 </style>

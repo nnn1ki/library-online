@@ -236,6 +236,9 @@ const bookLink = computed(
 
   .book-image {
     height: auto;
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: 90px;
 
     &.announcement {
       flex-shrink: 0;
@@ -258,6 +261,11 @@ const bookLink = computed(
   .buttons {
     flex-direction: column;
     gap: 8px;
+  }
+
+  button {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 </style>
