@@ -283,7 +283,11 @@ onBeforeMount(async () => {
 
 .actions {
   padding-top: 2rem;
+
   display: flex;
+  flex-direction: row;
+  column-gap: 0.5rem;
+
   justify-content: space-between;
 }
 
@@ -429,6 +433,18 @@ onBeforeMount(async () => {
 
     input {
       width: 100%;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .actions {
+    button {
+      width: 50%;
+      padding-right: 16px;
+      padding-left: 16px;
     }
   }
 }
