@@ -261,6 +261,10 @@ const bookLink = computed(
   .buttons {
     flex-direction: column;
     gap: 8px;
+
+    button {
+      width: 100%;
+    }
   }
 
   button {
