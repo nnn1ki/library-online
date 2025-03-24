@@ -15,30 +15,33 @@
       />
 
       <div v-for="(condition, index) in conditions" :key="index" class="filter-condition">
-        <SelectList
-          v-if="index !== 0"
-          v-model="condition.operator"
-          :options="[
-            { id: '*', name: 'И' },
-            { id: '+', name: 'ИЛИ' },
-          ]"
-          :default-option="'*'"
-          @change="updateSearchParams"
-        />
+        <div class="filter-parameter">
+          <SelectList
+            class="and-or"
+            v-if="index !== 0"
+            v-model="condition.operator"
+            :options="[
+              { id: '*', name: 'И' },
+              { id: '+', name: 'ИЛИ' },
+            ]"
+            :default-option="'*'"
+            @change="updateSearchParams"
+          />
 
-        <SelectList
-          v-model="condition.scenarioPrefix"
-          :options="
-            scenarios.map((x) => {
-              return {
-                id: x.prefix,
-                name: `${x.description}`,
-              };
-            })
-          "
-          :default-option="defaultScenario"
-          @change="updateSearchParams"
-        />
+          <SelectList
+            v-model="condition.scenarioPrefix"
+            :options="
+              scenarios.map((x) => {
+                return {
+                  id: x.prefix,
+                  name: `${x.description}`,
+                };
+              })
+            "
+            :default-option="defaultScenario"
+            @change="updateSearchParams"
+          />
+        </div>
 
         <TextField
           v-model="condition.value"
@@ -378,6 +381,54 @@ onBeforeMount(async () => {
       &.active {
         background-color: var(--color-background-200);
       }
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .filter-parameter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 0.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .filter-condition {
+    padding-top: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    column-gap: 0.5rem;
+
+    .filter-parameter {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      column-gap: 0.5rem;
+    }
+
+    .and-or {
+      width: 30%;
+    }
+
+    .and-or:hover {
+      width: 30%;
+    }
+
+    select {
+      width: 100%;
+    }
+
+    select:focus {
+      width: 100%;
+    }
+
+    input {
+      width: 100%;
     }
   }
 }
