@@ -40,4 +40,10 @@ onMounted(async () => {
 .announce-book {
   flex-basis: 20%;
 }
+
+@media (max-width: 767px) {
+  .announce-book {
+    flex-basis: 90%;
+  }
+}
 </style>

@@ -112,7 +112,6 @@ const bookLink = computed(
 
   display: flex;
   flex-direction: row;
-  align-items: center;
 
   &.announcement {
     flex-direction: column;
@@ -158,26 +157,26 @@ const bookLink = computed(
   -webkit-box-pack: end;
 }
 
-.book-image {
-  flex-shrink: 0;
-  flex-grow: 0;
-  flex-basis: 190px;
-  height: 290px;
+.card .announcement {
+  .book-image {
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: 190px;
+    height: 290px;
 
-  &.announcement {
-    flex-basis: 490px;
-    height: 490px;
-    margin-top: 16px;
+    &.announcement {
+      flex-basis: 490px;
+      height: 490px;
+    }
   }
+}
 
-  .rounded-left {
-    border-top-left-radius: 0.5rem;
-    border-bottom-left-radius: 0.5rem;
-  }
-
-  .rounded-top {
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+.books-list .card {
+  .book-image {
+    height: auto;
+    width: 40%;
+    max-width: 40%;
+    min-width: 40%;
   }
 }
 
@@ -194,6 +193,16 @@ const bookLink = computed(
 }
 
 @media (min-width: 768px) {
+  .card {
+    align-items: center;
+  }
+
+  .book-image {
+    &.announcement {
+      margin-top: 16px;
+    }
+  }
+
   .card-title {
     min-height: calc(var(--text-lg) * 3.5);
   }
@@ -204,16 +213,29 @@ const bookLink = computed(
 }
 
 @media (max-width: 767px) {
-  .book-image {
-    flex-shrink: 0;
-    flex-grow: 0;
-    flex-basis: 10px;
-    // height: 290px;
+  .card {
+    word-break: break-word;
 
     &.announcement {
+      align-items: center;
+    }
+  }
+
+  .book-image {
+    height: auto;
+
+    &.announcement {
+      flex-shrink: 0;
+      flex-grow: 0;
       flex-basis: 100px;
       max-height: 200px;
+      padding-top: 16px;
     }
+  }
+
+  .buttons {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 </style>
