@@ -30,7 +30,7 @@ import CurrentOrderCard from "@/layouts/CurrentOrderCard.vue";
 import NotAllowedBanner from "@/layouts/NotAllowedBanner.vue";
 import ConfirmationModal from "@/components/ConfirmationModal.vue";
 import { useAuthentication } from "@/composables/auth";
-import router from "@/router";
+import { useRouter } from "vue-router";
 
 const orders = ref<Order[]>([]);
 const loading = ref(false);
@@ -39,6 +39,8 @@ const authStore = useAuthStore();
 const notAllowedModalOpen = ref(false);
 const confirmationModalOpen = ref(false);
 const cancelOrderId = ref<number | null>();
+
+const router = useRouter();
 
 onMounted(async () => {
   await fetchOrders();
