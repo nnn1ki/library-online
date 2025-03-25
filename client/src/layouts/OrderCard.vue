@@ -162,6 +162,7 @@ const onAddToOrderClick = (bookToOrder: Book) => {
   color: var(--color-status-archived);
   background: var(--background-status-archived);
 }
+
 .book-list {
   display: flex;
   flex-direction: column;
