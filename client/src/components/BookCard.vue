@@ -39,11 +39,7 @@
           </StyledButton>
         </a>
 
-        <StyledButton
-          v-if="basketCart"
-          theme="accent"
-          @click="basketStore.removeBook(book)"
-        >
+        <StyledButton v-if="basketCart" theme="accent" @click="basketStore.removeBook(book)">
           Удалить <TrashIcon class="button-icon" />
         </StyledButton>
       </div>

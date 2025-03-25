@@ -7,11 +7,7 @@
       >
     </div>
     <div class="book-list">
-      <div
-        v-for="(orderBook, index) in order.books"
-        :key="orderBook.book.id"
-        class="book-item"
-      >
+      <div v-for="(orderBook, index) in order.books" :key="orderBook.book.id" class="book-item">
         <div class="book-info">
           <ShortBookCard :book="orderBook.book" :num="index" />
           <StyledButton
@@ -22,13 +18,10 @@
             Заказать
           </StyledButton>
         </div>
-
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
-      <StyledButton @click="onCancelOrderClick" v-if="canCancelOrder">
-        Отказаться
-      </StyledButton>
+      <StyledButton @click="onCancelOrderClick" v-if="canCancelOrder"> Отказаться </StyledButton>
     </div>
   </div>
 </template>
@@ -38,7 +31,7 @@ import { computed } from "vue";
 import { type OrderStatusEnum, type Order, orderStatuses } from "@/api/types";
 import type { Book } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
-import ShortBookCard from "@/components/ShortBookCard.vue";``
+import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];
@@ -90,7 +83,6 @@ const onAddToOrderClick = (bookToOrder: Book) => {
 </script>
 
 <style scoped lang="scss">
-
 .book-info {
   display: flex;
   flex-direction: row;
@@ -101,8 +93,8 @@ const onAddToOrderClick = (bookToOrder: Book) => {
   border-radius: 12px;
   box-shadow: 0 2px 4px var(--color-primary-600);
   transition:
-  transform 0.2s ease,
-  box-shadow 0.3s ease;
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
   background-color: var(--color-background-100);
   color: var(--color-text-900);
   margin: 1rem 0;
@@ -188,5 +180,4 @@ const onAddToOrderClick = (bookToOrder: Book) => {
   gap: 1rem;
   justify-content: flex-end;
 }
-
 </style>

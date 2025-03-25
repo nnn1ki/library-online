@@ -11,7 +11,7 @@
     </div>
     <div class="order-actions-footer">
       <RouterLink to="/order">
-        <StyledButton theme="primary" >Продолжить оформление</StyledButton>
+        <StyledButton theme="primary">Продолжить оформление</StyledButton>
       </RouterLink>
     </div>
   </div>
@@ -31,8 +31,8 @@ const { order } = defineProps<{
   border-radius: 12px;
   box-shadow: 0 4px 6px var(--color-primary-700);
   transition:
-  transform 0.2s ease,
-  box-shadow 0.3s ease;
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
   background-color: var(--color-background-200);
   color: var(--color-text-900);
   margin: 1rem 0;

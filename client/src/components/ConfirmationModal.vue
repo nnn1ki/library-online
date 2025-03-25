@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import StyledButton from '@/components/StyledButton.vue';
+import StyledButton from "@/components/StyledButton.vue";
 const props = defineProps<{
   title: string;
   text: string;
