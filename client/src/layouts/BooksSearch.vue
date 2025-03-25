@@ -413,6 +413,8 @@ onBeforeMount(async () => {
       flex-direction: row;
       align-items: center;
       column-gap: 0.5rem;
+
+      width: 100%;
     }
 
     .and-or {
