@@ -386,6 +386,8 @@ hr {
   }
 
   .options-card {
+    row-gap: 8px;
+
     h5 {
       margin: 0;
     }
