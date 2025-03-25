@@ -1,5 +1,5 @@
 <template>
-  <div class="card order-card">
+  <SurfaceCard class="order-card">
     <div class="order-header">
       <span class="order-number">📦 Заказ #{{ num }} oт {{ orderedDate }}</span>
       <span class="order-status" :class="statusClass"
@@ -15,15 +15,17 @@
             theme="secondary"
             v-if="canReorder"
           >
-            Заказать
+            Заказать еще раз
           </StyledButton>
         </div>
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
-      <StyledButton @click="onCancelOrderClick" v-if="canCancelOrder"> Отказаться </StyledButton>
+      <StyledButton theme="accent" @click="onCancelOrderClick" v-if="canCancelOrder"
+        >Отказаться
+      </StyledButton>
     </div>
-  </div>
+  </SurfaceCard>
 </template>
 
 <script setup lang="ts">
@@ -33,6 +35,7 @@ import type { Book } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
+import SurfaceCard from "@/components/SurfaceCard.vue";
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];
 const orderStore = useOrderStore();
@@ -83,27 +86,16 @@ const onAddToOrderClick = (bookToOrder: Book) => {
 </script>
 
 <style scoped lang="scss">
-.book-info {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
 .order-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 4px var(--color-primary-600);
   transition:
     transform 0.2s ease,
     box-shadow 0.3s ease;
-  background-color: var(--color-background-100);
-  color: var(--color-text-900);
   margin: 1rem 0;
-  padding: 1.5rem;
 }
 
 .order-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 12px var(--color-background-500);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .order-header {
@@ -167,6 +159,12 @@ const onAddToOrderClick = (bookToOrder: Book) => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.book-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .book-item {

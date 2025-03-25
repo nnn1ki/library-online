@@ -1,5 +1,5 @@
 <template>
-  <div class="card order-card">
+  <SurfaceCard class="order-card">
     <div class="order-header">
       <span class="order-status">● Еще не заказали </span>
     </div>
@@ -14,13 +14,14 @@
         <StyledButton theme="primary">Продолжить оформление</StyledButton>
       </RouterLink>
     </div>
-  </div>
+  </SurfaceCard>
 </template>
 
 <script setup lang="ts">
 import type { Book } from "@/api/types";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
+import SurfaceCard from "@/components/SurfaceCard.vue";
 const { order } = defineProps<{
   order: Book[];
 }>();
@@ -28,20 +29,16 @@ const { order } = defineProps<{
 
 <style scoped lang="scss">
 .order-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 6px var(--color-primary-700);
   transition:
     transform 0.2s ease,
     box-shadow 0.3s ease;
   background-color: var(--color-background-200);
-  color: var(--color-text-900);
   margin: 1rem 0;
-  padding: 1.5rem;
 }
 
 .order-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 12px var(--color-primary-700);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .order-header {
