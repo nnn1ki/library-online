@@ -41,7 +41,7 @@ onMounted(async () => {
   flex-basis: 20%;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 992px) {
   .announce-book {
     flex-basis: 90%;
   }

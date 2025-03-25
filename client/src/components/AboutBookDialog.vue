@@ -100,7 +100,7 @@ const visible = defineModel<boolean>({ required: true });
   height: 290px;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 992px) {
   .dialog {
     width: 90vw;
   }

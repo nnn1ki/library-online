@@ -398,7 +398,7 @@ onBeforeMount(async () => {
   }
 }
 
-@media (max-width: 991px) {
+@media (max-width: 992px) {
   .filter-condition {
     padding-top: 1rem;
 

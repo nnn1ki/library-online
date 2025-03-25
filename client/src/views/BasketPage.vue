@@ -361,7 +361,7 @@ hr {
   column-gap: 1rem;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 992px) {
   .sticky {
     position: sticky;
     bottom: 20px;

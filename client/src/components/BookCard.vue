@@ -225,7 +225,7 @@ const bookLink = computed(
   }
 }
 
-@media (max-width: 991px) {
+@media (max-width: 992px) {
   .card {
     word-break: break-word;
 
