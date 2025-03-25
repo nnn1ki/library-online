@@ -1,0 +1,79 @@
+@use "breakpoints.scss" as *;
+
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include media-sm {
+    max-width: $breakpoint-sm;
+  }
+
+  @include media-md {
+    max-width: $breakpoint-md;
+  }
+
+  @include media-lg {
+    max-width: $breakpoint-lg;
+  }
+
+  @include media-xl {
+    max-width: $breakpoint-xl;
+  }
+
+  @include media-2xl {
+    max-width: $breakpoint-2xl;
+  }
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.justify-around {
+  justify-content: space-around;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.w-fit {
+  width: fit-content;
+}

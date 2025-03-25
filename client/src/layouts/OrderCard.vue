@@ -38,7 +38,7 @@
 import { computed } from "vue";
 import type { OrderStatusEnum, Order, Book } from "@/api/types";
 import { orderStatuses } from "@/api/types";
-import ShortBook from "@/components/ShortBook.vue";
+import ShortBook from "@/components/ShortBookCard.vue";
 import { useOrderStore } from "@/stores/orderStore";
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];

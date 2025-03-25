@@ -1,11 +1,13 @@
 <template>
   <div class="modal-content">
-    <div class="loader"></div>
+    <LoadingSpinner />
     <p>Загрузка данных...</p>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+</script>
 
 <style scoped lang="scss">
 .modal {
@@ -30,25 +32,5 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.loader {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #ccc;
-  border-top: 4px solid #007bff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 10px;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>

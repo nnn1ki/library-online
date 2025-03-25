@@ -1,31 +1,35 @@
 <template>
-  <form @submit.prevent="login" class="w-50 mx-auto">
-    <h1 class="text-center">Вход</h1>
-    <div class="mb-3">
-      <label for="username" class="form-label">Имя пользователя:</label>
-      <input type="text" class="form-control" id="username" v-model="username" required />
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">Пароль:</label>
-      <input type="password" class="form-control" id="password" v-model="password" required />
-    </div>
-    <button type="submit" class="btn btn-primary w-100 mb-2">Войти</button>
-    <a
-      :href="`https://int.istu.edu/oauth/authorize?client_id=${OAUTH_CLIENT_ID}`"
-      class="btn btn-primary w-100 mb-2"
-    >
-      Войти через кампус
-    </a>
-    <a
-      href="https://library.istu.edu/for-students/zapis-v-biblioteku/"
-      class="btn btn-outline-primary w-100"
-    >
-      Запись в библиотеку
-    </a>
-  </form>
+  <SurfaceCard class="surface">
+    <form @submit.prevent="login">
+      <div class="login-form">
+        <h1 class="text-center">Вход</h1>
+        <label for="username">Имя пользователя:</label>
+        <TextField id="username" v-model="username" required class="field" />
+
+        <label for="password">Пароль:</label>
+        <PasswordTextField id="password" v-model="password" required class="field" />
+
+        <StyledButton type="submit" class="btn">Войти</StyledButton>
+        <a :href="`https://int.istu.edu/oauth/authorize?client_id=${OAUTH_CLIENT_ID}`" class="btn">
+          <StyledButton type="button" theme="secondary" class="w-full">
+            Войти через кампус
+          </StyledButton>
+        </a>
+        <a href="https://library.istu.edu/for-students/zapis-v-biblioteku/" class="btn">
+          <StyledButton type="button" theme="secondary" class="w-full">
+            Запись в библиотеку
+          </StyledButton>
+        </a>
+      </div>
+    </form>
+  </SurfaceCard>
 </template>
 
 <script setup lang="ts">
+import PasswordTextField from "@/components/PasswordTextField.vue";
+import StyledButton from "@/components/StyledButton.vue";
+import SurfaceCard from "@/components/SurfaceCard.vue";
+import TextField from "@/components/TextField.vue";
 import { useAuthStore } from "@/stores/auth";
 import { ref } from "vue";
 
@@ -42,4 +46,31 @@ async function login() {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+
+.surface {
+  margin-top: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+
+  margin: auto;
+  min-width: 24rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+.btn {
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+</style>

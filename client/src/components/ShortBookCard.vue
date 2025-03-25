@@ -3,18 +3,18 @@
     <span class="book-index">📖 {{ num + 1 }}</span>
     <div class="book-details">
       <h3 class="book-title">
-        {{ props.book.title[0] }}
-        <span class="book-year">{{ props.book.year }}</span>
+        {{ book.title[0] }}
+        <span class="book-year">{{ book.year }}</span>
       </h3>
 
       <div class="book-authors">
-        <template v-if="props.book.author.length > 0">
+        <template v-if="book.author.length > 0">
           <span class="author-icon">✍️</span>
-          {{ props.book.author.join(", ") }}
+          {{ book.author.join(", ") }}
         </template>
-        <template v-else-if="props.book.collective.length > 0">
+        <template v-else-if="book.collective.length > 0">
           <span class="collective-icon">👥</span>
-          {{ props.book.collective.join(", ") }}
+          {{ book.collective.join(", ") }}
         </template>
       </div>
     </div>
@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import type { Book } from "@/api/types";
-const props = defineProps<{
+const { book, num } = defineProps<{
   book: Book;
   num: number;
 }>();

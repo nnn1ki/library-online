@@ -4,24 +4,24 @@
       <span class="order-status">● Еще не заказали </span>
     </div>
     <div class="book-list">
-      <div v-for="(book, index) in props.order" :key="book.id" class="book-item">
-        <short-book :book="book" :num="index" />
+      <div v-for="(book, index) in order" :key="book.id" class="book-item">
+        <ShortBookCard :book="book" :num="index" />
         <hr class="divider" />
       </div>
     </div>
     <div class="order-actions-footer">
-      <router-link to="/order">
+      <RouterLink to="/order">
         <button class="btn btn-cancel">Продолжить оформление</button>
-      </router-link>
+      </RouterLink>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Book } from "@/api/types";
-import ShortBook from "@/components/ShortBook.vue";
+import ShortBookCard from "@/components/ShortBookCard.vue";
 
-const props = defineProps<{
+const { order } = defineProps<{
   order: Book[];
 }>();
 </script>
