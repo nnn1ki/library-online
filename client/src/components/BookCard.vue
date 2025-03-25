@@ -272,4 +272,16 @@ const bookLink = computed(
     padding-right: 16px;
   }
 }
+
+@media (max-width: 375px) {
+  .buttons {
+    button {
+      text-indent: -9999px;
+    }
+
+    svg {
+      margin: 0;
+    }
+  }
+}
 </style>
