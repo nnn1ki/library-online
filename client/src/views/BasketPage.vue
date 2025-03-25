@@ -384,5 +384,11 @@ hr {
     column-gap: 3rem;
     align-items: center;
   }
+
+  .options-card {
+    h5 {
+      margin: 0;
+    }
+  }
 }
 </style>
