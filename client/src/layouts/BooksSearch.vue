@@ -389,7 +389,7 @@ onBeforeMount(async () => {
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .filter-parameter {
     display: flex;
     flex-direction: row;
@@ -398,7 +398,7 @@ onBeforeMount(async () => {
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 991px) {
   .filter-condition {
     padding-top: 1rem;
 

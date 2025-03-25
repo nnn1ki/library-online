@@ -205,7 +205,7 @@ const bookLink = computed(
   margin-left: 0.5em;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .card {
     align-items: center;
   }
@@ -225,7 +225,7 @@ const bookLink = computed(
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 991px) {
   .card {
     word-break: break-word;
 
