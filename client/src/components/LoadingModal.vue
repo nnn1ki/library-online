@@ -1,5 +1,5 @@
 <template>
-  <ModalDialog v-model="loading">
+  <ModalDialog v-model="loading" :esc-closeable="false">
     <div class="flex flex-col items-center">
       <LoadingSpinner />
       <p>Загрузка данных...</p>
