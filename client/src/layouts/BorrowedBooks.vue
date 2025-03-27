@@ -3,8 +3,7 @@
     <div class="summary-header">
       <span class="alert-icon">⚠️</span>
       <h3 class="summary-title">
-        Книги, которые у вас на руках. <br />Отметьте те, которые принесете. <br />
-        Обязательно нужно принести те, что помеченны как "задолжность"
+        Книги, которые у вас на руках. <br />Подтвердите, что принесете их. <br />
       </h3>
     </div>
 
@@ -18,24 +17,7 @@
               v-model="orderStore.selectedBorrowedBooks"
               class="book-checkbox"
             />
-            <div class="book-details">
-              <div class="book-header">
-                <h4 class="book-title">
-                  📖 {{ item.book.title[0] }}
-                  <span class="book-year">({{ item.book.year }})</span>
-                </h4>
-              </div>
-              <div class="book-authors">
-                <template v-if="item.book.author.length > 0">
-                  <span class="author-icon">✍️</span>
-                  {{ item.book.author.join(", ") }}
-                </template>
-                <template v-else-if="item.book.collective.length > 0">
-                  <span class="collective-icon">👥</span>
-                  {{ item.book.collective.join(", ") }}
-                </template>
-              </div>
-            </div>
+            <ShortBookCard :book="item.book"/>
           </label>
           <div class="in-depth" v-if="inDebt(item.to_return_date)">
             <div class="in-depth-info">Задолжность</div>
@@ -48,7 +30,7 @@
 
 <script setup lang="ts">
 import { useOrderStore } from "@/stores/orderStore";
-
+import ShortBookCard from "@/components/ShortBookCard.vue";
 const orderStore = useOrderStore();
 
 const inDebt = (bookOnReturnDate: string): boolean => {
@@ -60,7 +42,7 @@ const inDebt = (bookOnReturnDate: string): boolean => {
 
 <style scoped lang="scss">
 .in-depth-info {
-  color: #ae3636;
+  color: var(--color-accent-600);
   padding: 0.5rem;
   border-radius: 1rem;
 }
@@ -83,7 +65,7 @@ const inDebt = (bookOnReturnDate: string): boolean => {
 }
 
 .borrow-summary {
-  background: #fff8f8;
+  background: var(--color-background-100);
   border-radius: 12px;
   padding: 1.5rem;
   margin: 2rem 0;
@@ -105,7 +87,7 @@ const inDebt = (bookOnReturnDate: string): boolean => {
 
 .summary-title {
   margin: 0;
-  color: #cc0000;
+  color:  var(--color-accent-500);
   font-size: 1.4rem;
 }
 
@@ -115,9 +97,6 @@ const inDebt = (bookOnReturnDate: string): boolean => {
 }
 
 .book-item {
-  background: white;
-  border: 1px solid #ffebeb;
-  border-radius: 8px;
   padding: 1rem;
   transition: all 0.2s ease;
 }
@@ -142,7 +121,7 @@ const inDebt = (bookOnReturnDate: string): boolean => {
   width: 20px;
   height: 20px;
   margin-top: 0.3rem;
-  accent-color: #42b983;
+  accent-color: var(--color-primary-700);
 }
 
 .book-details {

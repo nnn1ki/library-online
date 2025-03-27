@@ -8,12 +8,12 @@
     </div>
     <div class="book-list">
       <div
-        v-for="(orderBook, index) in order.books"
+        v-for="orderBook in order.books"
         :key="orderBook.book.id"
         class="book-item"
       >
         <div class="book-info">
-          <ShortBookCard :book="orderBook.book" :num="index" />
+          <ShortBookCard :book="orderBook.book" />
           <StyledButton
             @click="onAddToOrderClick(orderBook.book)"
             theme="secondary"

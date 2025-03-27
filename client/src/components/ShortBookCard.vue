@@ -1,31 +1,31 @@
 <template>
-  <div class="book-content">
-    <span class="book-index">📖 {{ num + 1 }}</span>
-    <div class="book-details">
-      <h3 class="book-title">
-        {{ book.title[0] }}
-        <span class="book-year">{{ book.year }}</span>
-      </h3>
-
-      <div class="book-authors">
-        <template v-if="book.author.length > 0">
-          <span class="author-icon">✍️</span>
-          {{ book.author.join(", ") }}
-        </template>
-        <template v-else-if="book.collective.length > 0">
-          <span class="collective-icon">👥</span>
-          {{ book.collective.join(", ") }}
-        </template>
+  <div class="book-details grid">
+    <h4 class="book-title grid-tr">
+      <div class="book-icon grid-td">
+        📖
       </div>
+      <div class="book-title-conten grid-td">
+        {{ book.title[0] }}
+      </div>
+      <span class="book-year">({{ book.year }})</span>
+    </h4>
+    <div class="book-authors grid-tr">
+      <template v-if="book.author.length > 0">
+        <span class="author-icon grid-td">✍️</span>
+        {{ book.author.join(", ") }}
+      </template>
+      <template v-else-if="book.collective.length > 0">
+        <span class="collective-icon grid-td">👥</span>
+        {{ book.collective.join(", ") }}
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Book } from "@/api/types";
-const { book, num } = defineProps<{
+const { book } = defineProps<{
   book: Book;
-  num: number;
 }>();
 </script>
 
@@ -52,13 +52,26 @@ const { book, num } = defineProps<{
   flex-grow: 1;
 }
 
+.grid {
+  display: table;
+  border-collapse: separate;
+}
+
+.grid-tr {
+  display: table-row;
+}
+
+.grid-td {
+  display: table-cell;
+  vertical-align: top;
+}
+
 .book-title {
   margin: 0;
   font-size: 1.1rem;
   color: var(--color-text-700);
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
 }
 
 .book-year {
@@ -72,7 +85,7 @@ const { book, num } = defineProps<{
   color: var(--color-text-700);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+
 }
 
 .author-icon,
