@@ -38,7 +38,7 @@ img {
 
   display: flex;
   flex-direction: column;
-  
+
   text-align: center;
   justify-content: center;
   align-items: center;
@@ -48,7 +48,7 @@ img {
   background-color: var(--color-background-200);
   text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
   font-size: var(--text-xs);
-  
+
   span {
     margin-bottom: 2em;
   }

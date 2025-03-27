@@ -12,7 +12,7 @@ import { watch } from "vue";
 const { escCloseable = true } = defineProps<{
   escCloseable?: boolean;
 }>();
-const open = defineModel<boolean>();
+const open = defineModel<boolean>({ required: true });
 
 function keydownClose(event: KeyboardEvent) {
   if (event.key === "Escape") {

@@ -6,7 +6,7 @@
     <div v-for="order in orders" :key="order.id" class="row">
       <OrderCard :order="order" :num="order.id" @cancel="openCancelModal" />
     </div>
-    <LoadingModal v-if="loading" />
+    <LoadingModal v-model="loading" />
   </div>
   <NotAllowedBanner v-model="notAllowedModalOpen" />
   <ConfirmationModal
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 
 import { ordersList } from "@/api/order";
 import { type Order } from "@/api/types";
@@ -29,6 +29,8 @@ import LoadingModal from "@/components/LoadingModal.vue";
 import CurrentOrderCard from "@/layouts/CurrentOrderCard.vue";
 import NotAllowedBanner from "@/layouts/NotAllowedBanner.vue";
 import ConfirmationModal from "@/components/ConfirmationModal.vue";
+import { useAuthentication } from "@/composables/auth";
+import { useRouter } from "vue-router";
 
 const orders = ref<Order[]>([]);
 const loading = ref(false);
@@ -37,6 +39,8 @@ const authStore = useAuthStore();
 const notAllowedModalOpen = ref(false);
 const confirmationModalOpen = ref(false);
 const cancelOrderId = ref<number | null>();
+
+const router = useRouter();
 
 onMounted(async () => {
   await fetchOrders();
@@ -57,19 +61,11 @@ const fetchOrders = async () => {
   }
 };
 
-// todo reactivity
-// windowOrders -> no auth -> no orders -> go login
-// windowLogin -> login
-// windowOrders -> fetchOrders
-
-watch(
-  () => authStore.isAuthenticated,
-  async (newVal) => {
-    if (newVal) {
-      window.location.reload();
-    }
+useAuthentication((isAuthenticated) => {
+  if (!isAuthenticated) {
+    router.push("/");
   }
-);
+});
 
 async function fetchOrderList() {
   orders.value = (await ordersList()).reverse();
