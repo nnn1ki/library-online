@@ -7,11 +7,7 @@
       >
     </div>
     <div class="book-list">
-      <div
-        v-for="orderBook in order.books"
-        :key="orderBook.book.id"
-        class="book-item"
-      >
+      <div v-for="orderBook in order.books" :key="orderBook.book.id" class="book-item">
         <div class="book-info">
           <ShortBookCard :book="orderBook.book" />
           <StyledButton

@@ -17,7 +17,7 @@
               v-model="orderStore.selectedBorrowedBooks"
               class="book-checkbox"
             />
-            <ShortBookCard :book="item.book"/>
+            <ShortBookCard :book="item.book" />
           </label>
           <div class="in-depth" v-if="inDebt(item.to_return_date)">
             <div class="in-depth-info">Задолжность</div>
@@ -76,9 +76,8 @@ const inDebt = (bookOnReturnDate: string): boolean => {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #ffe5e5;
 }
 
 .alert-icon {
@@ -87,7 +86,7 @@ const inDebt = (bookOnReturnDate: string): boolean => {
 
 .summary-title {
   margin: 0;
-  color:  var(--color-accent-500);
+  color: var(--color-accent-500);
   font-size: 1.4rem;
 }
 
@@ -106,10 +105,6 @@ const inDebt = (bookOnReturnDate: string): boolean => {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
-.book-item.not-returned {
-  border-left: 4px solid #ff4444;
-}
-
 .book-content {
   display: flex;
   align-items: flex-start;
@@ -121,67 +116,6 @@ const inDebt = (bookOnReturnDate: string): boolean => {
   width: 20px;
   height: 20px;
   margin-top: 0.3rem;
-  accent-color: var(--color-primary-700);
-}
-
-.book-details {
-  flex-grow: 1;
-}
-
-.book-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
-}
-
-.book-title {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #2c3e50;
-}
-
-.book-year {
-  font-size: 0.9rem;
-  color: #7f8c8d;
-}
-
-.return-status {
-  font-size: 0.8rem;
-  color: #ff4444;
-  background: #ffecec;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-}
-
-.book-authors {
-  margin-top: 0.5rem;
-  font-size: 0.95rem;
-  color: #7f8c8d;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.author-icon,
-.collective-icon {
-  font-size: 0.9em;
-  opacity: 0.8;
-}
-
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.5s ease;
-}
-
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.list-leave-active {
-  position: absolute;
+  accent-color: var(--color-primary-500);
 }
 </style>

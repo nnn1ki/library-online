@@ -30,8 +30,8 @@ const { order } = defineProps<{
 <style scoped lang="scss">
 .order-card {
   transition:
-  transform 0.2s ease,
-  box-shadow 0.3s ease;
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
   background-color: var(--color-background-200);
   margin: 1rem 0;
 }

@@ -38,8 +38,13 @@ export const useOrderStore = defineStore("orderStore", () => {
       return;
     }
 
+    if (selectedBooks.value.length > countOfBookInOrder) {
+      toast.error("В заказе максиум 5 книг");
+      return;
+    }
+
     if (selectedBorrowedBooks.value.length < borrowedBooks.value.length) {
-      toast.error("Отметьте книги, которае принесете");
+      toast.error("Отметьте книги, которые принесете");
       return;
     }
 
@@ -52,11 +57,6 @@ export const useOrderStore = defineStore("orderStore", () => {
     toast.info("Проверяем сколько у вас книг на руках и в заказах");
     const isValid = await validateOrder();
 
-    if (selectedBooks.value.length > countOfBookInOrder) {
-      toast.error("В заказе максиум 5 книг");
-      return;
-    }
-
     if (!isValid) {
       toast.error(
         "У вас много заказанных книг и книг на руках, больше заказывать нельзя. Нужно вернуть часть книг в библиотеку."
@@ -68,7 +68,6 @@ export const useOrderStore = defineStore("orderStore", () => {
 
     try {
       await createOrder(selectedBooks.value[0].library, bookIds, selectedBorrowedBooks.value);
-
       await clearBasket(bookIds);
       clearAll();
       await basketStore.updateBooks();
@@ -134,12 +133,19 @@ export const useOrderStore = defineStore("orderStore", () => {
   }
 
   function bookInOrders(targetBookId: string): boolean {
-    return userOrders.value.some((order) => {
+    const isInOrders = userOrders.value.some((order) => {
       const lastStatus = order.statuses.at(-1);
-      if (!lastStatus || !allowedStatusesToCountOrderedBooks.includes(lastStatus.status))
+      if (!lastStatus || !allowedStatusesToCountOrderedBooks.includes(lastStatus.status)) {
         return false;
+      }
       return order.books.some((bookItem) => bookItem.book.id === targetBookId);
     });
+
+    const isInBorrowed = borrowedBooks.value.some(
+      (borrowedBook) => borrowedBook.book.id === targetBookId
+    );
+
+    return isInOrders || isInBorrowed;
   }
 
   async function clearBasket(selectedIds: string[]) {

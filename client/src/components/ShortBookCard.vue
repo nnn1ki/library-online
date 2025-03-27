@@ -3,7 +3,9 @@
     <div class="book-row">
       <div class="icon-cell">📖</div>
       <div class="content-cell">
-        <span class="book-title book">{{ book.title[0] }} <span class="year"> ({{ book.year }}) </span></span>
+        <span class="book-title book"
+          >{{ book.title[0] }} <span class="year"> ({{ book.year }}) </span></span
+        >
       </div>
     </div>
     <div v-if="book.author.length > 0 || book.collective.length > 0" class="book-row">
@@ -12,13 +14,17 @@
         <span v-else-if="book.collective.length > 0">👥</span>
       </div>
       <div class="content-cell author">
-        {{ book.author.length > 0 ? book.author.join(", ") : book.collective.length > 0 ? book.collective.join(", ") :
-        "Автор не указан"}}
+        {{
+          book.author.length > 0
+            ? book.author.join(", ")
+            : book.collective.length > 0
+              ? book.collective.join(", ")
+              : "Автор не указан"
+        }}
       </div>
     </div>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import type { Book } from "@/api/types";
