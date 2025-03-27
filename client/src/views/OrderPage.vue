@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { ref, onBeforeMount, computed } from "vue";
-import { BookOpenIcon, CheckCircleIcon } from "@heroicons/vue/24/outline";
+import { BookOpenIcon } from "@heroicons/vue/24/outline";
 
 import BorrowedBooks from "@/layouts/BorrowedBooks.vue";
 import ShortBookCard from "@/components/ShortBookCard.vue";
