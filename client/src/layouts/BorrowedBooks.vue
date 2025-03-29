@@ -20,7 +20,7 @@
             <ShortBookCard :book="item.book" />
           </label>
           <div class="in-depth" v-if="inDebt(item.to_return_date)">
-            <div class="in-depth-info">Задолжность</div>
+            <div class="in-depth-info">Задолженность</div>
           </div>
         </div>
       </div>
@@ -98,11 +98,6 @@ const inDebt = (bookOnReturnDate: string): boolean => {
 .book-item {
   padding: 1rem;
   transition: all 0.2s ease;
-}
-
-.book-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .book-content {

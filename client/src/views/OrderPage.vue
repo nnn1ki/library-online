@@ -41,12 +41,12 @@
 
       <div class="email-input card">
         <label for="email" class="input-label">📧 Email (для уведомлений)</label>
-        <input
+        <TextField
           id="email"
           type="email"
           v-model="email"
           placeholder="example@mail.com"
-          class="styled-input"
+          class="email-input"
         />
         <div class="notifcation">
           <label for="email" class="input-label">📨 Уведомления в кампусе</label>
@@ -61,8 +61,8 @@
         :class="{ processing: loading }"
       >
         <span v-if="!loading">Оформить заказ</span>
-        <span v-else>
-          <span class="button-spinner"></span>
+        <span v-else class="button-spinner">
+          <LoadingSpinner />
           Обработка...
         </span>
       </StyledButton>
@@ -79,6 +79,8 @@ import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import { useOrderStore } from "@/stores/orderStore";
 import { borrowedList } from "@/api/order";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import TextField from "@/components/TextField.vue";
 
 const orderStore = useOrderStore();
 
@@ -195,66 +197,37 @@ const removeBook = (id: string) => {
 }
 
 .info-label {
-  color: var(--color-text-400);
+  color: var(--color-text-600);
   font-weight: 500;
 }
 
 .info-value {
-  color: var(--color-text-600);
+  color: var(--color-text-800);
   font-weight: 600;
 }
 
 .input-label {
   display: block;
   margin-bottom: 0.5rem;
-  color: var(--color-text-400);
+  color: var(--color-text-600);
   font-size: 0.9em;
 }
 
-.styled-input {
+.email-input {
   width: 100%;
   padding: 0.8rem;
-  border: 2px solid var(--color-background-300);
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  background: var(--color-background-100);
-  color: var(--color-text-600);
-}
-
-.styled-input:focus {
-  border-color: var(--color-primary-500);
-  outline: none;
-  box-shadow: 0 0 0 3px var(--color-primary-100);
 }
 
 .order-button {
   width: 100%;
   padding: 1rem;
-  color: var(--color-text-800);
-  cursor: pointer;
 }
 
 .button-spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-  box-sizing: border-box;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 0.5rem;
 }
 
 .list-move,
