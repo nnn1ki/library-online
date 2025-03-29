@@ -11,12 +11,7 @@
       <div v-for="item in orderStore.borrowedBooks" :key="item.book.id" class="book-item card">
         <div class="book-activities">
           <label class="book-content">
-            <input
-              type="checkbox"
-              :value="item.id"
-              v-model="orderStore.selectedBorrowedBooks"
-              class="book-checkbox"
-            />
+            <StyledCheckbox :value="item.id" v-model="orderStore.selectedBorrowedBooks" />
             <ShortBookCard :book="item.book" />
           </label>
           <div class="in-depth" v-if="inDebt(item.to_return_date)">
@@ -31,6 +26,7 @@
 <script setup lang="ts">
 import { useOrderStore } from "@/stores/orderStore";
 import ShortBookCard from "@/components/ShortBookCard.vue";
+import StyledCheckbox from "@/components/StyledCheckbox.vue";
 const orderStore = useOrderStore();
 
 const inDebt = (bookOnReturnDate: string): boolean => {
@@ -105,12 +101,5 @@ const inDebt = (bookOnReturnDate: string): boolean => {
   align-items: flex-start;
   gap: 1rem;
   cursor: pointer;
-}
-
-.book-checkbox {
-  width: 20px;
-  height: 20px;
-  margin-top: 0.3rem;
-  accent-color: var(--color-primary-500);
 }
 </style>

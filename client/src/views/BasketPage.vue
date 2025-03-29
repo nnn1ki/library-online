@@ -5,8 +5,7 @@
     <SurfaceCard v-if="books.length !== 0">
       <div class="books">
         <div class="select-all">
-          <input
-            type="checkbox"
+          <StyledCheckbox
             :checked="allSelected"
             @change="toggleSelectAll"
             aria-label="Выбрать все книги"
@@ -17,9 +16,7 @@
         </div>
 
         <div v-for="book in books" :key="book.description" class="book-card">
-          <input
-            type="checkbox"
-            :value="book"
+          <StyledCheckbox
             :checked="selectedBooks.includes(book.id)"
             @change="toggleBookSelection(book.id)"
             aria-label="Выбрать книгу"
@@ -110,6 +107,7 @@ import ModalDialog from "@/components/ModalDialog.vue";
 import SurfaceCard from "@/components/SurfaceCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import BookCard from "@/components/BookCard.vue";
+import StyledCheckbox from "@/components/StyledCheckbox.vue";
 
 const router = useRouter();
 const basketStore = useBasketStore();
@@ -327,12 +325,14 @@ async function onCreateOrderClick() {
 .select-all {
   display: flex;
   flex-direction: row;
+  align-items: center;
   column-gap: 1rem;
 }
 
 .book-card {
   display: flex;
   flex-direction: row;
+  align-items: center;
   column-gap: 1rem;
 }
 

@@ -50,7 +50,7 @@
         />
         <div class="notifcation">
           <label for="email" class="input-label">📨 Уведомления в кампусе</label>
-          <input type="checkbox" class="notifcation-checkbox" />
+          <StyledCheckbox v-model="notifcations" />
         </div>
       </div>
 
@@ -81,10 +81,12 @@ import { useOrderStore } from "@/stores/orderStore";
 import { borrowedList } from "@/api/order";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import TextField from "@/components/TextField.vue";
+import StyledCheckbox from "@/components/StyledCheckbox.vue";
 
 const orderStore = useOrderStore();
 
 const email = ref("");
+const notifcations = ref(false);
 
 const booksToreturn = computed(() => {
   return orderStore.borrowedBooks.filter((book) =>
@@ -112,14 +114,8 @@ const removeBook = (id: string) => {
 .notifcation {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 1rem;
-}
-
-.notifcation-checkbox {
-  width: 20px;
-  height: 20px;
-  margin-top: 0.3rem;
-  accent-color: var(--color-primary-500);
 }
 
 .book-activities {
