@@ -1,146 +1,120 @@
 <template>
-  <div class="search-filter p-3 border rounded bg-light">
-    <!-- Библиотеки -->
-    <span>Библиотека</span>
-    <select v-model="library" class="form-select form-select-sm" @change="updateSearchParams">
-      <option :value="undefined"></option>
-      <option v-for="lib in libraries" :key="lib.id" :value="lib.id">
-        {{ lib.description }} ({{ lib.address }})
-      </option>
-    </select>
+  <!-- TODO: адаптация под мобилки -->
 
-    <form @submit.prevent="search">
-      <!-- Сценарии -->
-      <div v-for="(condition, index) in conditions" :key="index" class="filter-condition mb-3 mt-3">
-        <div class="d-flex align-items-center gap-2">
-          <!-- Операторы И/ИЛИ -->
-          <select
-            v-if="index !== 0"
-            v-model="condition.operator"
-            class="form-select form-select-sm"
-            @change="updateSearchParams"
-          >
-            <option
-              v-for="[description, operator] in [
-                ['И', '*'],
-                ['ИЛИ', '+'],
-              ]"
-              :key="operator"
-              :value="operator"
-            >
-              {{ description }}
-            </option>
-          </select>
+  <SurfaceCard>
+    <form @submit.prevent="search" class="flex flex-col">
+      <SelectList
+        v-model="library"
+        :options="
+          libraries.map((x) => {
+            return { id: x.id, name: `${x.address} (${x.description})` };
+          })
+        "
+        blank-option="Все библиотеки"
+        @change="updateSearchParams"
+      />
 
-          <!-- Тип фильтра -->
-          <select
-            v-model="condition.scenarioPrefix"
-            class="form-select form-select-sm"
-            @change="updateSearchParams"
-          >
-            <option v-for="scenario in scenarios" :key="scenario.prefix" :value="scenario.prefix">
-              {{ scenario.description }}
-            </option>
-          </select>
+      <div v-for="(condition, index) in conditions" :key="index" class="filter-condition">
+        <SelectList
+          v-if="index !== 0"
+          v-model="condition.operator"
+          :options="[
+            { id: '*', name: 'И' },
+            { id: '+', name: 'ИЛИ' },
+          ]"
+          :default-option="'*'"
+          @change="updateSearchParams"
+        />
 
-          <!-- Значение фильтра -->
-          <input
-            v-model="condition.value"
-            type="text"
-            class="form-control form-control-sm"
-            placeholder="Введите значение"
-            @input="updateSearchParams"
-          />
+        <SelectList
+          v-model="condition.scenarioPrefix"
+          :options="
+            scenarios.map((x) => {
+              return {
+                id: x.prefix,
+                name: `${x.description}`,
+              };
+            })
+          "
+          :default-option="defaultScenario"
+          @change="updateSearchParams"
+        />
 
-          <button
-            v-if="index !== 0"
-            type="button"
-            class="btn btn-danger btn-sm"
-            @click="removeCondition(index)"
-          >
-            <i class="bi bi-x-square"></i>
-          </button>
-        </div>
+        <TextField
+          v-model="condition.value"
+          placeholder="Введите значение"
+          @input="updateSearchParams"
+        />
+
+        <StyledButton
+          v-if="index !== 0"
+          theme="accent"
+          class="remove-button"
+          @click="removeCondition(index)"
+        >
+          <XMarkIcon class="button-icon" />
+        </StyledButton>
       </div>
 
-      <div class="actions d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="addCondition">
-          Добавить условие <i class="bi bi-plus-square"></i>
-        </button>
-        <button type="submit" class="btn btn-success btn-sm">
-          Поиск <i class="bi bi-search"></i>
-        </button>
+      <div class="actions">
+        <StyledButton theme="secondary" @click="addCondition"
+          >Добавить условие <PlusIcon class="button-icon offset"
+        /></StyledButton>
+        <StyledButton theme="primary" type="submit"
+          >Поиск <MagnifyingGlassIcon class="button-icon offset"
+        /></StyledButton>
       </div>
     </form>
 
     <!-- Результаты поиска -->
-    <div v-if="loading" class="mt-3">
-      <span class="spinner-border spinner-border-sm" role="status"></span>
-      <strong>
-        Загрузка...
-      </strong>
+    <div v-if="loading" class="loading">
+      <strong> Загрузка... </strong>
+      <LoadingSpinner />
     </div>
-    <div v-else class="mt-3">
+    <div v-else class="flex flex-col">
       <h3>Результаты поиска</h3>
-      <ul v-if="paginatedResults.length" class="list-group">
-        <li v-for="book in paginatedResults" :key="book.id" class="list-group-item">
-          <BookCard :book="book" />
-        </li>
-      </ul>
-      <div v-else class="alert alert-warning mt-2">Книги не найдены</div>
+      <div v-if="paginatedResults.length > 0" class="books-list">
+        <BookCard v-for="book in paginatedResults" :key="book.id" :book="book" />
+      </div>
+      <div v-else class="not-found">Книги не найдены</div>
 
-      <!-- Пагинация -->
-      <nav v-if="paginatedResults.length" aria-label="Навигация по страницам">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" @click="prevPage" href="#" aria-label="Предыдущая">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" @click="goToPage(1)" href="#">1</a>
-          </li>
-          
-          <li v-if="showEllipsisLeft" class="page-item disabled">
-            <span class="page-link">...</span>
-          </li>
-
-          <template v-for="page in pagesToShow" :key="page">
-            <li 
-              v-if="page > 0 && page <= totalPages" 
-              class="page-item" 
-              :class="{ active: currentPage === page }"
+      <div v-if="pageEntries.length > 1" class="pagination">
+        <span>Отображено {{ paginatedResults.length }} из {{ results.length }} результатов</span>
+        <nav class="pagination-slider" aria-label="Навигация по страницам">
+          <template v-for="page in pageEntries" v-bind:key="page">
+            <button
+              v-if="page !== -1"
+              :class="{
+                left: page === 1,
+                right: page === totalPages,
+                active: page === currentPage,
+              }"
+              @click="currentPage = page"
             >
-              <a class="page-link" @click="goToPage(page)" href="#">{{ page }}</a>
-            </li>
+              {{ page }}
+            </button>
+            <span v-else>...</span>
           </template>
-
-          <li v-if="showEllipsisRight" class="page-item disabled">
-            <span class="page-link">...</span>
-          </li>
-          
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <a class="page-link" @click="goToPage(totalPages)" href="#">{{ totalPages }}</a>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <a class="page-link" @click="nextPage" href="#" aria-label="Следующая">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+        </nav>
+      </div>
     </div>
-  </div>
+  </SurfaceCard>
 </template>
 
 <script setup lang="ts">
 import { nextTick, onBeforeMount, ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { PlusIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { searchBooks } from "@/api/books";
 import { scenariosList } from "@/api/scenarios";
 import type { Book, Library, Scenario } from "@/api/types";
 import { librariesList } from "@/api/libraries";
+import SurfaceCard from "@/components/SurfaceCard.vue";
 import BookCard from "@/components/BookCard.vue";
+import SelectList from "@/components/SelectList.vue";
+import StyledButton from "@/components/StyledButton.vue";
+import TextField from "@/components/TextField.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 // Состояния
 const router = useRouter();
@@ -206,6 +180,7 @@ async function search() {
   try {
     const query = buildQuery();
     results.value = await searchBooks(query, library.value);
+    currentPage.value = 1;
   } catch (error) {
     console.error("Ошибка поиска:", error);
     results.value = [];
@@ -214,7 +189,45 @@ async function search() {
   }
 }
 
+// Пагинация найденных книг
+const currentPage = ref(1);
+const itemsPerPage = 10;
+
+const totalPages = computed(() => {
+  return Math.ceil(results.value.length / itemsPerPage);
+});
+
+const paginatedResults = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return results.value.slice(start, start + itemsPerPage);
+});
+
+const pageEntries = computed(() => {
+  const current = currentPage.value;
+  const total = totalPages.value;
+
+  if (current === undefined || total === undefined) {
+    return [];
+  }
+
+  const pages = new Set(
+    [1, 2, current - 1, current, current + 1, total - 1, total].filter((x) => x >= 1 && x <= total)
+  );
+  const result = [...pages];
+
+  for (let i = 0; i < result.length - 1; i++) {
+    if (result[i] + 1 !== result[i + 1]) {
+      result.splice(i + 1, 0, -1);
+      i += 1;
+    }
+  }
+
+  return result;
+});
+
 onBeforeMount(async () => {
+  [scenarios.value, libraries.value] = await Promise.all([scenariosList(), librariesList()]);
+
   const queryParam = router.currentRoute.value.query["query"];
   const libraryParam = router.currentRoute.value.query["library"];
 
@@ -225,7 +238,7 @@ onBeforeMount(async () => {
     }
   }
 
-  if (typeof queryParam === "string") {
+  if (typeof queryParam === "string" && queryParam.length !== 0) {
     conditions.value = queryParam
       .split(")")
       .map((item) => item.replace("(", "").replace("$", ""))
@@ -249,79 +262,123 @@ onBeforeMount(async () => {
 
     search();
   }
-
-  [scenarios.value, libraries.value] = await Promise.all([scenariosList(), librariesList()]);
 });
-
-// Пагинация найденных книг
-const currentPage = ref(1);
-const itemsPerPage = 10;
-
-const totalPages = computed(() => {
-  return Math.ceil(results.value.length / itemsPerPage);
-});
-
-const paginatedResults = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return results.value.slice(start, start + itemsPerPage);
-});
-
-const pagesToShow = computed(() => {
-  const pages = [];
-  const startPage = Math.max(2, currentPage.value - 1);
-  const endPage = Math.min(totalPages.value - 1, currentPage.value + 1);
-
-  if (currentPage.value === 5) {
-    pages.push(startPage - 2);
-  }
-
-  if (startPage > 2) {
-    pages.push(startPage - 1);
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i);
-  }
-
-  if (endPage < totalPages.value - 1) {
-    pages.push(endPage + 1);
-  }
-
-  if (totalPages.value - currentPage.value === 4) {
-    pages.push(endPage + 2);
-  }
-
-  return pages;
-});
-
-const showEllipsisLeft = computed(() => {
-  return currentPage.value > 5;
-});
-
-const showEllipsisRight = computed(() => {
-  return currentPage.value < totalPages.value - 4;
-});
-
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-  }
-}
-
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
-}
-
-function goToPage(page) {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-}
 </script>
+
 <style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+@use "@/styles/colors.scss" as *;
+
+.filter-condition {
+  padding-top: 1rem;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 0.5rem;
+}
+
+.actions {
+  padding-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.remove-button {
+  padding: 0.75rem;
+}
+
+.button-icon {
+  width: 1.2em;
+  height: 1.2em;
+  &.offset {
+    margin-left: 0.5em;
+  }
+}
+
+.loading {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 1rem;
+}
+
+.books-list {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+.not-found {
+  background-color: var(--color-accent-200);
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .pagination {
-  margin: 1rem 0 0 0;
+  align-self: end;
+  margin-top: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  row-gap: 0.25rem;
+}
+
+.pagination-slider {
+  width: fit-content;
+
+  background-color: var(--color-background-50);
+  color: var(--color-text-950);
+
+  border-style: solid;
+  border-radius: 2rem;
+  border-width: 1px;
+  border-color: var(--color-text-300);
+
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  button {
+    border: 0;
+    background-color: var(--color-background-50);
+    color: var(--color-text-950);
+
+    cursor: pointer;
+
+    padding: 0.25rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &.left {
+      border-top-left-radius: 2rem;
+      border-bottom-left-radius: 2rem;
+    }
+
+    &.right {
+      border-top-right-radius: 2rem;
+      border-bottom-right-radius: 2rem;
+    }
+
+    transition: 0.05s;
+    @include light-theme {
+      &:hover,
+      &.active {
+        background-color: var(--color-background-100);
+      }
+    }
+    @include dark-theme {
+      &:hover,
+      &.active {
+        background-color: var(--color-background-200);
+      }
+    }
+  }
 }
 </style>

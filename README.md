@@ -22,7 +22,7 @@ graph TD
     subgraph django сервер
     handler <--> cacher(Прослойка над opac)
     end
-    
+
     cacher <--> opac(Внутренняя система opac)
     cacher <--> psql
 ```
@@ -43,15 +43,15 @@ erDiagram
     Order }o--|| Library : references
 
     LibraryDatabase }|--|| Library : includes
-    
-    User { 
-      int id PK 
+
+    User {
+      int id PK
     }
 
     UserProfile {
-      int id PK 
+      int id PK
       varchar library_card
-      varchar campus_id 
+      varchar campus_id
       varchar mira_id
       int user_id FK
       int role_id FK
@@ -59,12 +59,12 @@ erDiagram
 
     UserRole {
         int id PK
-        varchar user_role 
+        varchar user_role
     }
-    
+
     Basket {
-        int id PK 
-        DATETIME basket_created_at 
+        int id PK
+        DATETIME basket_created_at
         int user_id FK
     }
 
@@ -75,7 +75,7 @@ erDiagram
     }
 
     Order {
-        int id PK  
+        int id PK
         int user_id FK
         int libary_id FK
     }
@@ -85,7 +85,7 @@ erDiagram
         varchar description
         varchar status
         DATETIME date
-        int order_id FK 
+        int order_id FK
     }
 
     OrderItem {
@@ -130,9 +130,15 @@ erDiagram
 ## Структура директорий проекта
 
 В корне проекта находятся файлы, связанные с проектом в целом. В том числе к ним относится конфигурация для запуска на проде и описание Docker-контейнеров.  
-В директории `docs` находится OpenAPI документация проекта.  
-В директории `backend` находится код для бэкенда на Django.  
-В директории `client` находится код для веб-клиента на Vue.
+Структура проекта:
+
+- `docs` - OpenAPI документация проекта.
+- `backend` - код для бэкенда на Django.
+- `client` - для веб-клиента на Vue.
+  - `cleint/src/api` - описание типов и функций для общения с бэкендом
+  - `client/src/views` - компоненты для страниц. Каждый из данных компонентов относится к какому-то url
+  - `client/src/layouts` - компоненты, используемые внутри небольшого количества страниц
+  - `client/src/components` - стандартные часто используемые компоненты, такие как кнопки, текстовые поля и т.д. В отличие от компонентов в `layouts`, данные компоненты могут использоваться в большом количестве страниц и являются более низко уровневыми и неделимыми.
 
 ## Разработка проекта
 
@@ -142,14 +148,16 @@ erDiagram
 
 #### Бэкенд
 
-На бэкенде используется инструмент pylint. Чтобы запустить его локально, используется команда:  
+На бэкенде используется инструмент pylint. Чтобы запустить его локально, используется команда:
+
 ```bash
 pylint ./
 ```
 
 #### Фронт
 
-На фронте используется инструмент eslint. Чтобы запустить его локально, используется команда:  
+На фронте используется инструмент eslint. Чтобы запустить его локально, используется команда:
+
 ```bash
 npm run lint
 ```
@@ -160,14 +168,16 @@ npm run lint
 
 #### Бэкенд
 
-На бэкенде используется форматирование с использованием Black (расширение в vs code: ms-python.black-formatter). Автоматически отформатировать весь проект можно командой:  
+На бэкенде используется форматирование с использованием Black (расширение в vs code: ms-python.black-formatter). Автоматически отформатировать весь проект можно командой:
+
 ```bash
 black ./
 ```
 
 #### Фронт
 
-На фронте используется форматирование с использованием Prettier (расширение в vs code: esbenp.prettier-vscode). Для автоматического форматирования всего проекта используется:  
+На фронте используется форматирование с использованием Prettier (расширение в vs code: esbenp.prettier-vscode). Для автоматического форматирования всего проекта используется:
+
 ```bash
 npm run format
 ```
@@ -177,6 +187,7 @@ npm run format
 ### Локальный запуск
 
 Для запуска фронтенда используется nodejs:
+
 ```sh
 cd client
 npm install # Установка зависимостей
@@ -184,47 +195,54 @@ npm run dev
 ```
 
 Для запуска бэкенда рекомендуется создать виртуальное окружение python, из которого сервис запускается следующим образом:
+
 ```sh
 cd backend
 pip install -r requirements.txt # Установка зависимостей
 python manage.py runserver
-```  
+```
 
 Так же можно в директории `backend` создать файл `local_settings.py` с настройками, специфичными для вашего окружения и запускать сервер через:
+
 ```sh
 python manage.py runserver --settings local_settings
 ```
-Это, в частности, необходимо сделать, если нужно протестировать работу oauth. Тогда в файле `local_settings.py` нужно заполнить поля `OAUTH_CLIENT_ID` и `OAUTH_CLIENT_SECRET`.  
+
+Это, в частности, необходимо сделать, если нужно протестировать работу oauth. Тогда в файле `local_settings.py` нужно заполнить поля `OAUTH_CLIENT_ID` и `OAUTH_CLIENT_SECRET`.
 
 ### Запуск на проде
 
-В корне необходимо создать два файла: `prod_settings.py` и `.env`, скопировав в них текст из соответствующих .example файлов: `prod_settings.py.example` и `.env.example`.  
+В корне необходимо создать два файла: `prod_settings.py` и `.env`, скопировав в них текст из соответствующих .example файлов: `prod_settings.py.example` и `.env.example`.
 
 После этого требуется дополнительное заполнение созданных файлов. Файл `prod_settings.py` можно оставить как есть, однако в некоторых случаях все же могут потребоваться дополнительные специфические для django настройки. Обязательным является заполнение в файле `.env` следующих полей:
- - `POSTGRES_PASSWORD` (пароль СУБД)
- - `LIBRARY_PORT` (на каком порте будет хоститься сервис)
- - `DJANGO_SECRET_KEY` (секретный ключ для Django).  
- - `SERVICE_HOSTNAME` (адрес сервиса, например: http://localhost:8000)  
- - `OAUTH_CLIENT_ID` (публичная часть oauth ключа для int.istu.edu)
- - `OAUTH_CLIENT_SECRET` (приватная часть oauth ключа для int.istu.edu)
+
+- `POSTGRES_PASSWORD` (пароль СУБД)
+- `LIBRARY_PORT` (на каком порте будет хоститься сервис)
+- `DJANGO_SECRET_KEY` (секретный ключ для Django).
+- `SERVICE_HOSTNAME` (адрес сервиса, например: http://localhost:8000)
+- `OAUTH_CLIENT_ID` (публичная часть oauth ключа для int.istu.edu)
+- `OAUTH_CLIENT_SECRET` (приватная часть oauth ключа для int.istu.edu)
 
 Пароль для БД рекомендуется генерировать случайно:
+
 ```sh
 openssl rand -hex 32 | tr -d '\n'
-```  
+```
 
 Для генерации ключа в Django используется следующий код на Python:
+
 ```python
 from django.core.management.utils import get_random_secret_key
 print(get_random_secret_key())
-```  
+```
 
-При получении пары ключей oauth, для redirect_uri нужно указать значение, равное `${SERVICE_HOSTNAME}/bitrix-auth`, соотввественно, подставив ранее указанное значение вместо `${SERVICE_HOSTNAME}`.  
+При получении пары ключей oauth, для redirect_uri нужно указать значение, равное `${SERVICE_HOSTNAME}/bitrix-auth`, соотввественно, подставив ранее указанное значение вместо `${SERVICE_HOSTNAME}`.
 
 После того, как данные файлы были заполнены, можно приступать к запуску сервиса с использованием docker compose или podman compose:
+
 ```sh
 sudo docker compose build
 sudo docker compose up -d
-```  
+```
 
 Сервис будет запущен на порту, указанном в `LIBRARY_PORT`
