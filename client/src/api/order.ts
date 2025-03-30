@@ -16,7 +16,7 @@ export async function updateOrderStatus(orderId: number, newStatus: OrderStatusE
     const updatedStatuses = [...currentOrder.statuses, statusUpdate];
     console.log(updatedStatuses);
 
-    await axios.patch(`/api/order/${orderId}/`, { statuses: updatedStatuses });
+    await axios.patch(`/api/staff/order/${orderId}/`, { statuses: updatedStatuses });
     console.log(`Статус заказа ${orderId} добавлен: "${newStatus}"`);
   } catch (error) {
     console.error("Ошибка при обновлении статуса заказа", error);
@@ -68,15 +68,12 @@ export async function fetchReadyOrders(): Promise<UserOrder[]> {
   }
 }
 
-export async function fetchDoneOrders(page: number = 1): Promise<PaginatedOrders> {
+export async function fetchArchiveOrders(): Promise<UserOrder[]> {
   try {
-    const { data } = await axios.get(`/api/staff/order/done/`, {
-      params: { page },
-    });
-    console.log(`/api/staff/order/done/?page=${page}`, data);
-    return data;
+    const response = await axios.get("/api/staff/order/?status=done");
+    return response.data;
   } catch (error) {
-    console.error(`Ошибка при получении заказов со статусом ${status}`, error);
+    console.error("Ошибка при получении готовых заказов:", error);
     throw error;
   }
 }

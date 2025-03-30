@@ -16,35 +16,30 @@
               <i :class="sortOrder === 1 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
             </span>
           </th>
-          <th scope="col">Информация</th>
         </tr>
       </thead>
       <tbody>
         <tr
           v-for="order in sortedOrders"
           :key="order.id"
-          :class="[selectedOrderId === order.id ? 'table-primary' : getRowClass(order)]"
-          @click="selectOrder(order.id)"
           @dblclick="handleUpdateOrderStatus(order.id, 'processing')"
         >
           <th scope="row">{{ order.id }}</th>
           <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
           <td>{{ formatDate(order.statuses[0].date) }}</td>
-          <td>{{ order }}</td>
+          <td>
+            <button
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#orderDetailsModal"
+              @click="showOrderDetails(order.id)"
+            >
+              <EllipsisHorizontalIcon/>
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
-    <div>
-      <button
-        class="btn btn-primary"
-        :disabled="selectedOrderId === null"
-        data-bs-toggle="modal"
-        data-bs-target="#orderDetailsModal"
-        @click="showOrderDetails(selectedOrderId)"
-      >
-        Подробнее
-      </button>
-    </div>
     <div
       class="modal fade"
       id="orderDetailsModal"
@@ -79,19 +74,15 @@
 import { defineProps, ref, computed } from "vue";
 import type { UserOrder, OrderStatusEnum, Order } from "@/api/types";
 import { updateOrderStatus } from "@/api/order";
+import { EllipsisHorizontalCircleIcon, EllipsisHorizontalIcon } from "@heroicons/vue/24/outline";
 
 const props = defineProps<{
   orders: UserOrder[];
 }>();
 
-const selectedOrderId = ref<number | null>(null);
 const selectedOrderBooks = ref<any[]>([]);
 const sortKey = ref<string>("id");
 const sortOrder = ref<number>(1);
-
-function selectOrder(orderId: number) {
-  selectedOrderId.value = selectedOrderId.value === orderId ? null : orderId;
-}
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);

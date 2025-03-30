@@ -39,7 +39,7 @@ class StaffOrderViewset(
     SessionUpdateModelMixin,
     AsyncGenericViewSet,
 ):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
     
     def get_serializer_class(self):
@@ -67,11 +67,13 @@ class StaffOrderViewset(
         status = self.request.query_params.get('status')
         target_status = OrderHistory.Status.NEW
 
-        if (status == 'processing'):
+        if (status == 'new'):
+            target_status = OrderHistory.Status.NEW
+        elif (status == 'processing'):
             target_status = OrderHistory.Status.PROCESSING
         elif (status == 'ready'):
             target_status = OrderHistory.Status.READY
-        elif (status == 'done'):
+        else:
             target_status = OrderHistory.Status.DONE
 
         data = await self.get_data(target_status)

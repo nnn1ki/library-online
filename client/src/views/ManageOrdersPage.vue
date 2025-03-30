@@ -31,6 +31,16 @@
           Готовые к выдаче <span class="badge bg-danger">{{ readyOrdersCount }}</span>
         </a>
       </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentTab === tabsNumbers.archive }"
+          @click="currentTab = tabsNumbers.archive"
+          href="#"
+        >
+          Архив <span class="badge bg-danger">{{ readyOrdersCount }}</span>
+        </a>
+      </li>
     </ul>
     <OrderList :orders="currentData" />
   </div>
@@ -41,7 +51,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import OrderList from "@/components/OrderList.vue";
 import { useToast } from "vue-toastification";
 import { useNotificationStore } from "@/stores/notificationStore";
-import { fetchNewOrders, fetchProcessingOrders, fetchReadyOrders } from "@/api/order";
+import { fetchNewOrders, fetchProcessingOrders, fetchReadyOrders, fetchArchiveOrders } from "@/api/order";
 import type { UserOrder } from "@/api/types";
 
 const toast = useToast();
@@ -59,6 +69,7 @@ const tabsNumbers = {
   new: 0,
   processing: 1,
   ready: 2,
+  archive: 3,
 };
 
 const currentTab = ref(tabsNumbers.new);
@@ -76,8 +87,14 @@ const tabs = ref<TabConfig[]>([
     data: [],
   },
   {
-    label: "Готовы",
+    label: "Готовые",
     fetchFn: fetchReadyOrders,
+    interval: 10000,
+    data: [],
+  },
+  {
+    label: "Архив",
+    fetchFn: fetchArchiveOrders,
     interval: 10000,
     data: [],
   },
@@ -86,6 +103,7 @@ const tabs = ref<TabConfig[]>([
 const newOrdersCount = computed(() => tabs.value[tabsNumbers.new].data.length);
 const processingOrdersCount = computed(() => tabs.value[tabsNumbers.processing].data.length);
 const readyOrdersCount = computed(() => tabs.value[tabsNumbers.ready].data.length);
+const archiveOrdersCount = computed(() => tabs.value[tabsNumbers.archive].data.length);
 
 const startAllIntervals = () => {
   tabs.value.forEach((tab, index) => {
