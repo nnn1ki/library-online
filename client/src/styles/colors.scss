@@ -1,0 +1,214 @@
+// Палитра: https://www.realtimecolors.com/?colors=09080c-f6f5f9-6f50be-ceb1c9-b4889a&fonts=Inter-Inter
+// TODO: стоит уменьшить количество оттенков - 11 на каждый цвет это многовато
+// TODO: режим высокой контрастности
+
+@mixin -light-theme-variables {
+  --color-text-50: #f1f0f5;
+  --color-text-100: #e3e0eb;
+  --color-text-200: #c7c2d6;
+  --color-text-300: #aba3c2;
+  --color-text-400: #8f85ad;
+  --color-text-500: #736699;
+  --color-text-600: #5c527a;
+  --color-text-700: #453d5c;
+  --color-text-800: #2e293d;
+  --color-text-900: #17141f;
+  --color-text-950: #0b0a0f;
+
+  --color-background-50: #f1eff5;
+  --color-background-100: #e2dfec;
+  --color-background-200: #c6bfd9;
+  --color-background-300: #a99fc6;
+  --color-background-400: #8c80b3;
+  --color-background-500: #70609f;
+  --color-background-600: #594d80;
+  --color-background-700: #433960;
+  --color-background-800: #2d2640;
+  --color-background-900: #161320;
+  --color-background-950: #0b0a10;
+
+  --color-primary-50: #f0ecf8;
+  --color-primary-100: #e0daf1;
+  --color-primary-200: #c2b5e3;
+  --color-primary-300: #a38fd6;
+  --color-primary-400: #856ac8;
+  --color-primary-500: #6645ba;
+  --color-primary-600: #523795;
+  --color-primary-700: #3d2970;
+  --color-primary-800: #291c4a;
+  --color-primary-900: #140e25;
+  --color-primary-950: #0a0713;
+
+  --color-secondary-50: #f5eff4;
+  --color-secondary-100: #ebe0e9;
+  --color-secondary-200: #d8c0d4;
+  --color-secondary-300: #c4a1be;
+  --color-secondary-400: #b082a9;
+  --color-secondary-500: #9d6293;
+  --color-secondary-600: #7d4f76;
+  --color-secondary-700: #5e3b58;
+  --color-secondary-800: #3f273b;
+  --color-secondary-900: #1f141d;
+  --color-secondary-950: #100a0f;
+
+  --color-accent-50: #f5eff2;
+  --color-accent-100: #ebe0e5;
+  --color-accent-200: #d8c0ca;
+  --color-accent-300: #c4a1b0;
+  --color-accent-400: #b08295;
+  --color-accent-500: #9d627b;
+  --color-accent-600: #7d4f62;
+  --color-accent-700: #5e3b4a;
+  --color-accent-800: #3f2731;
+  --color-accent-900: #1f1419;
+  --color-accent-950: #100a0c;
+
+  --color-status-new: var(--color-primary-500);
+  --background-status-new: var(--color-primary-50);
+
+  --color-status-processing: var(--color-secondary-500);
+  --background-status-processing: var(--color-secondary-50);
+
+  --color-status-ready: var(--color-accent-500);
+  --background-status-ready: var(--color-accent-50);
+
+  --color-status-done: var(--color-primary-600);
+  --background-status-done: var(--color-primary-100);
+
+  --color-status-cancelled: var(--color-text-700);
+  --background-status-cancelled: var(--color-background-200);
+
+  --color-status-error: var(--color-accent-700);
+  --background-status-error: var(--color-accent-100);
+
+  --color-status-archived: var(--color-text-600);
+  --background-status-archived: var(--color-background-300);
+}
+
+@mixin -dark-theme-variables {
+  --color-text-50: #0b0a0f;
+  --color-text-100: #17141f;
+  --color-text-200: #2e293d;
+  --color-text-300: #453d5c;
+  --color-text-400: #5c527a;
+  --color-text-500: #736699;
+  --color-text-600: #8f85ad;
+  --color-text-700: #aba3c2;
+  --color-text-800: #c7c2d6;
+  --color-text-900: #e3e0eb;
+  --color-text-950: #f1f0f5;
+
+  --color-background-50: #0b0a10;
+  --color-background-100: #161320;
+  --color-background-200: #2d2640;
+  --color-background-300: #433960;
+  --color-background-400: #594d80;
+  --color-background-500: #70609f;
+  --color-background-600: #8c80b3;
+  --color-background-700: #a99fc6;
+  --color-background-800: #c6bfd9;
+  --color-background-900: #e2dfec;
+  --color-background-950: #f1eff5;
+
+  --color-primary-50: #0a0713;
+  --color-primary-100: #140e25;
+  --color-primary-200: #291c4a;
+  --color-primary-300: #3d2970;
+  --color-primary-400: #523795;
+  --color-primary-500: #6645ba;
+  --color-primary-600: #856ac8;
+  --color-primary-700: #a38fd6;
+  --color-primary-800: #c2b5e3;
+  --color-primary-900: #e0daf1;
+  --color-primary-950: #f0ecf8;
+
+  --color-secondary-50: #100a0f;
+  --color-secondary-100: #1f141e;
+  --color-secondary-200: #3f273c;
+  --color-secondary-300: #5e3b59;
+  --color-secondary-400: #7d4f77;
+  --color-secondary-500: #9d6295;
+  --color-secondary-600: #b082aa;
+  --color-secondary-700: #c4a1bf;
+  --color-secondary-800: #d8c0d5;
+  --color-secondary-900: #ebe0ea;
+  --color-secondary-950: #f5eff4;
+
+  --color-accent-50: #100a0c;
+  --color-accent-100: #1f1419;
+  --color-accent-200: #3f2731;
+  --color-accent-300: #5e3b4a;
+  --color-accent-400: #7d4f62;
+  --color-accent-500: #9d627b;
+  --color-accent-600: #b08295;
+  --color-accent-700: #c4a1b0;
+  --color-accent-800: #d8c0ca;
+  --color-accent-900: #ebe0e5;
+  --color-accent-950: #f5eff2;
+
+  --color-status-new: var(--color-primary-400);
+  --background-status-new: var(--color-primary-900);
+
+  --color-status-processing: var(--color-secondary-400);
+  --background-status-processing: var(--color-secondary-900);
+
+  --color-status-ready: var(--color-accent-400);
+  --background-status-ready: var(--color-accent-900);
+
+  --color-status-done: var(--color-primary-300);
+  --background-status-done: var(--color-primary-800);
+
+  --color-status-cancelled: var(--color-text-300);
+  --background-status-cancelled: var(--color-background-700);
+
+  --color-status-error: var(--color-accent-300);
+  --background-status-error: var(--color-accent-800);
+
+  --color-status-archived: var(--color-text-400);
+  --background-status-archived: var(--color-background-600);
+}
+
+@mixin light-theme {
+  @each $selector in & {
+    // Fallback to the light theme
+    @at-root #{$selector} {
+      @content;
+    }
+
+    @at-root :root[data-theme="light"] #{if(#{$selector} == ":root", "", #{$selector})} {
+      @content;
+    }
+
+    @media screen and (prefers-color-scheme: light) {
+      @at-root :root:not([data-theme]) #{if(#{$selector} == ":root", "", #{$selector})} {
+        @content;
+      }
+    }
+  }
+}
+
+@mixin dark-theme {
+  @each $selector in & {
+    @at-root :root[data-theme="dark"] #{if(#{$selector} == ":root", "", #{$selector})} {
+      @content;
+    }
+
+    @media screen and (prefers-color-scheme: dark) {
+      @at-root :root:not([data-theme]) #{if(#{$selector} == ":root", "", #{$selector})} {
+        @content;
+      }
+    }
+  }
+}
+
+:root {
+  @include light-theme {
+    @include -light-theme-variables;
+  }
+}
+
+:root {
+  @include dark-theme {
+    @include -dark-theme-variables;
+  }
+}

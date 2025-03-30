@@ -1,10 +1,10 @@
 <template>
-  <div class="container mt-4">
-    <SearchFilter />
+  <div class="container">
+    <BooksSearch />
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
-      <div v-for="book in announces" :key="book.id" class="col">
-        <AnnouncementBookCard :book="book" />
+    <div class="announces">
+      <div v-for="book in announces" :key="book.id" class="announce-book">
+        <BookCard :book="book" :announcement="true" />
       </div>
     </div>
   </div>
@@ -12,8 +12,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import SearchFilter from "@/layouts/BooksSearch.vue";
-import AnnouncementBookCard from "@/components/AnnouncementBookCard.vue";
+import BookCard from "@/components/BookCard.vue";
+import BooksSearch from "@/layouts/BooksSearch.vue";
 import type { Book } from "@/api/types";
 import { announcesList } from "@/api/announces";
 const announces = ref<Book[]>([]);
@@ -24,10 +24,20 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-/* Убираем паддинг у контейнера */
 .container {
-  padding: 20px;
+  padding-top: 20px;
 }
 
-/* Можно добавить любые дополнительные стили для карточек, если нужно */
+.announces {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.announce-book {
+  flex-basis: 20%;
+}
 </style>

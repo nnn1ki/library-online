@@ -27,14 +27,19 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = computed(() => refresh.value !== undefined);
   const currentUser = ref<ProfileInfo>();
 
-  async function refreshTokens() {
-    const simpleAxios = axios.create();
-    const { data } = await simpleAxios.post<Tokens>("/api/auth/refresh/", {
-      refresh: refresh.value,
-    });
+  async function refreshTokens(): Promise<boolean> {
+    try {
+      const simpleAxios = axios.create();
+      const { data } = await simpleAxios.post<Tokens>("/api/auth/refresh/", {
+        refresh: refresh.value,
+      });
 
-    access.value = data.access;
-    refresh.value = data.refresh;
+      access.value = data.access;
+      refresh.value = data.refresh;
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async function updateTokens(): Promise<boolean> {
@@ -44,7 +49,7 @@ export const useAuthStore = defineStore("auth", () => {
       currentUser.value = undefined;
       return false;
     } else if (!isTokenValid(access.value)) {
-      await refreshTokens();
+      return await refreshTokens();
     }
     return true;
   }
