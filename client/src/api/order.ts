@@ -1,7 +1,11 @@
 import axios from "axios";
 import type { BorrowedBook, Order, PaginatedOrders, UserOrder, OrderStatusEnum } from "@/api/types";
 
-export async function updateOrderStatus(orderId: number, newStatus: OrderStatusEnum, description?: string) {
+export async function updateOrderStatus(
+  orderId: number,
+  newStatus: OrderStatusEnum,
+  description?: string
+) {
   const statusUpdate = {
     status: newStatus,
     date: new Date().toISOString(),
@@ -41,12 +45,13 @@ export async function fetchNewOrders(): Promise<UserOrder[]> {
     console.log("Ответ сервера:", response);
     return response.data;
   } catch (error: unknown) {
-    console.error("Ошибка при получении новых заказов:", 
-      error instanceof Error ? error.message : String(error));
+    console.error(
+      "Ошибка при получении новых заказов:",
+      error instanceof Error ? error.message : String(error)
+    );
     throw error;
   }
 }
-
 
 export async function fetchProcessingOrders(): Promise<UserOrder[]> {
   try {

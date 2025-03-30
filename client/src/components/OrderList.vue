@@ -32,41 +32,13 @@
               class="btn btn-primary"
               data-bs-toggle="modal"
               data-bs-target="#orderDetailsModal"
-              @click="showOrderDetails(order.id)"
             >
-              <EllipsisHorizontalIcon/>
+              <EllipsisHorizontalIcon />
             </button>
           </td>
         </tr>
       </tbody>
     </table>
-    <div
-      class="modal fade"
-      id="orderDetailsModal"
-      tabindex="-1"
-      aria-labelledby="orderDetailsModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="orderDetailsModalLabel">Детали заказа</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-          </div>
-          <div class="modal-body">
-            <h6>Книги в заказе:</h6>
-            <ul>
-              <li v-for="book in selectedOrderBooks" :key="book.id">
-                {{ book.title }} ({{ book.year }}) - {{ book.author.join(", ") }}
-              </li>
-            </ul>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -74,7 +46,7 @@
 import { defineProps, ref, computed } from "vue";
 import type { UserOrder, OrderStatusEnum, Order } from "@/api/types";
 import { updateOrderStatus } from "@/api/order";
-import { EllipsisHorizontalCircleIcon, EllipsisHorizontalIcon } from "@heroicons/vue/24/outline";
+import { EllipsisHorizontalIcon } from "@heroicons/vue/24/outline";
 
 const props = defineProps<{
   orders: UserOrder[];
@@ -129,18 +101,25 @@ function sortOrders(key: string) {
 // Вычисляемый массив для отсортированных заказов
 const sortedOrders = computed(() => {
   return [...props.orders].sort((a, b) => {
-    let aValue: any;
-    let bValue: any;
+    let aValue: string | number;
+    let bValue: string | number;
 
-    if (sortKey.value === "user") {
-      aValue = `${a.user.first_name} ${a.user.last_name}`;
-      bValue = `${b.user.first_name} ${b.user.last_name}`;
-    } else if (sortKey.value === "date") {
-      aValue = new Date(a.statuses[0].date).getTime();
-      bValue = new Date(b.statuses[0].date).getTime();
-    } else {
-      aValue = a[sortKey.value];
-      bValue = b[sortKey.value];
+    switch (sortKey.value) {
+      case "user":
+        aValue = `${a.user.first_name} ${a.user.last_name}`;
+        bValue = `${b.user.first_name} ${b.user.last_name}`;
+        break;
+      case "date":
+        aValue = new Date(a.statuses[0].date).getTime();
+        bValue = new Date(b.statuses[0].date).getTime();
+        break;
+      case "id":
+        aValue = a.id;
+        bValue = b.id;
+        break;
+      default:
+        aValue = a.id;
+        bValue = b.id;
     }
 
     if (aValue < bValue) return -1 * sortOrder.value;
@@ -159,13 +138,13 @@ async function handleUpdateOrderStatus(orderId: number, newStatus: OrderStatusEn
   }
 }
 
-// Функция для отображения деталей заказа
-function showOrderDetails(orderId: number | null) {
-  if (orderId !== null) {
-    const order = props.orders.find(o => o.id === orderId);
-    selectedOrderBooks.value = order ? order.books : [];
-  }
-}
+// // Функция для отображения деталей заказа
+// function showOrderDetails(orderId: number | null) {
+//   if (orderId !== null) {
+//     const order = props.orders.find((o) => o.id === orderId);
+//     selectedOrderBooks.value = order ? order.books : [];
+//   }
+// }
 </script>
 
 <style scoped>

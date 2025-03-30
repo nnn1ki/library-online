@@ -51,7 +51,12 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import OrderList from "@/components/OrderList.vue";
 import { useToast } from "vue-toastification";
 import { useNotificationStore } from "@/stores/notificationStore";
-import { fetchNewOrders, fetchProcessingOrders, fetchReadyOrders, fetchArchiveOrders } from "@/api/order";
+import {
+  fetchNewOrders,
+  fetchProcessingOrders,
+  fetchReadyOrders,
+  fetchArchiveOrders,
+} from "@/api/order";
 import type { UserOrder } from "@/api/types";
 
 const toast = useToast();
