@@ -19,10 +19,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="order in sortedOrders"
-          :key="order.id"
-        >
+        <tr v-for="order in sortedOrders" :key="order.id">
           <th scope="row">{{ order.id }}</th>
           <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
           <td>{{ formatDate(order.statuses[0].date) }}</td>
@@ -40,8 +37,6 @@
       </tbody>
     </table>
   </div>
-
-
 </template>
 
 <script setup lang="ts">
@@ -55,7 +50,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'getOrder', id: number): void;
+  (e: "getOrder", id: number): void;
 }>();
 
 const sortKey = ref<string>("id");
@@ -135,7 +130,7 @@ const sortedOrders = computed(() => {
 
 const handleOpenOrderDetails = (orderId: number) => {
   emit("getOrder", orderId);
-}
+};
 </script>
 
 <style scoped>

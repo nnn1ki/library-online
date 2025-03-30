@@ -11,7 +11,7 @@
           Новые <span class="badge bg-danger">{{ newOrdersCount }}</span>
         </a>
       </li>
-      <li class="nav-item"> 
+      <li class="nav-item">
         <a
           class="nav-link"
           :class="{ active: currentTab === tabsNumbers.processing }"
@@ -42,14 +42,14 @@
         </a>
       </li>
     </ul>
-    <OrderList @get-order="fetchOrder" :orders="currentData"/>
-    <ModalOrderDetails 
-    v-if="selectedOrder"
-    :order="selectedOrder"
-    @close="selectedOrder = null"
-    @next-order-status="handleUpdateOrderStatus"
-  />
-  <LoadingModal v-model="isLoading" />
+    <OrderList @get-order="fetchOrder" :orders="currentData" />
+    <ModalOrderDetails
+      v-if="selectedOrder"
+      :order="selectedOrder"
+      @close="selectedOrder = null"
+      @next-order-status="handleUpdateOrderStatus"
+    />
+    <LoadingModal v-model="isLoading" />
   </div>
 </template>
 
@@ -71,7 +71,7 @@ import { getOrder, updateOrderStatus } from "@/api/order";
 import { RefSymbol } from "@vue/reactivity";
 const toast = useToast();
 const notifStore = useNotificationStore();
-const isLoading = ref(false)
+const isLoading = ref(false);
 interface TabConfig {
   label: string;
   fetchFn: () => Promise<UserOrder[]>;
@@ -93,25 +93,25 @@ const tabs = ref<TabConfig[]>([
   {
     label: "Новые",
     fetchFn: fetchNewOrders,
-    interval: 5000,
+    interval: 500000,
     data: [],
   },
   {
     label: "В работе",
     fetchFn: fetchProcessingOrders,
-    interval: 10000,
+    interval: 1000000,
     data: [],
   },
   {
     label: "Готовые",
     fetchFn: fetchReadyOrders,
-    interval: 10000,
+    interval: 1000000,
     data: [],
   },
   {
     label: "Архив",
     fetchFn: fetchArchiveOrders,
-    interval: 10000,
+    interval: 1000000,
     data: [],
   },
 ]);
@@ -184,23 +184,19 @@ const currentData = computed<UserOrder[]>((): UserOrder[] => {
   }
 });
 
-
 const fetchOrder = async (orderId: number) => {
   isLoading.value = true;
   selectedOrder.value = await getOrder(orderId);
   isLoading.value = false;
-}
-
+};
 
 async function handleUpdateOrderStatus(orderId: number, newStatus: OrderStatusEnum) {
   const description = "Временное описание";
   try {
     await updateOrderStatus(orderId, newStatus, description);
-
   } catch (error) {
     console.error("Ошибка при обновлении статуса заказа", error);
   }
-
 }
 
 onMounted(async () => {

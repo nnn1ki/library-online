@@ -7,13 +7,13 @@ export async function updateOrderStatus(
   description?: string
 ) {
   const statusUpdate = {
+    description: description,
     status: newStatus,
     date: new Date().toISOString(),
-    description: description,
   };
 
   try {
-    const orderData = await getOrder(orderId)
+    const orderData = await getOrder(orderId);
     const currentOrder: Order = orderData;
     console.log(currentOrder);
 
