@@ -21,6 +21,7 @@ from library_service.models.order import Order, OrderHistory, OrderItem
 
 from library_service.serializers.staff_order import (
     UserOrderSerializer,
+    OrderSerializer,
 )
 
 ACCEPTABLE_STATUSES = [
@@ -38,11 +39,17 @@ class StaffOrderViewset(
     SessionUpdateModelMixin,
     AsyncGenericViewSet,
 ):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
     
     def get_serializer_class(self):
-        return UserOrderSerializer
+        if self.action in ["get_orders", "new_orders"]:
+            return UserOrderSerializer
+        else: 
+            return OrderSerializer
+    
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("library")
     
     @sync_to_async
     def get_data(self, target_status):
@@ -55,25 +62,17 @@ class StaffOrderViewset(
         serializer = self.get_serializer(queryset, many=True)
         return serializer.data
 
-    @action(detail=False, methods=["get"], url_path="new")
-    async def new_orders(self, request):
-        data = await self.get_data(OrderHistory.Status.NEW)
-        return Response(data)
+    @action(detail=False, methods=["get"], url_path="order")
+    async def get_orders(self, request):
+        status = self.request.query_params.get('status')
+        target_status = OrderHistory.Status.NEW
 
-    @action(detail=False, methods=["get"], url_path="processing")
-    async def processing_orders(self, request):
-        data = await self.get_data(OrderHistory.Status.PROCESSING)
-        return Response(data)
+        if (status == 'processing'):
+            target_status = OrderHistory.Status.PROCESSING
+        elif (status == 'ready'):
+            target_status = OrderHistory.Status.READY
+        elif (status == 'done'):
+            target_status = OrderHistory.Status.DONE
 
-    @action(detail=False, methods=["get"], url_path="ready")
-    async def ready_orders(self, request):
-        data = await self.get_data(OrderHistory.Status.READY)
+        data = await self.get_data(target_status)
         return Response(data)
-
-    @action(detail=False, methods=["get"], url_path="done")
-    async def done_orders(self, request):
-        data = await self.get_data(OrderHistory.Status.DONE)
-        paginator = PageNumberPagination()
-        paginator.page_size = 5
-        paginated_queryset = paginator.paginate_queryset(data, request)
-        return paginator.get_paginated_response(paginated_queryset)

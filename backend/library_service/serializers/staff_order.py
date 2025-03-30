@@ -17,7 +17,6 @@ from library_service.serializers.parallel_list import ParallelListSerializer
 
 User = get_user_model()
 
-#class GetOrderSerializer(serializers.Serializer):
 class OrderStatusSerializer(aserializers.ModelSerializer):
     class Meta:
         model = OrderHistory
