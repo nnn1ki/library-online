@@ -22,7 +22,6 @@
         <tr
           v-for="order in sortedOrders"
           :key="order.id"
-          @dblclick="handleUpdateOrderStatus(order.id, 'processing')"
         >
           <th scope="row">{{ order.id }}</th>
           <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
@@ -32,6 +31,7 @@
               class="btn btn-primary"
               data-bs-toggle="modal"
               data-bs-target="#orderDetailsModal"
+              @click="handleOpenOrderDetails(order.id)"
             >
               <EllipsisHorizontalIcon />
             </button>
@@ -40,11 +40,13 @@
       </tbody>
     </table>
   </div>
+
+
 </template>
 
 <script setup lang="ts">
 import { defineProps, ref, computed } from "vue";
-import type { UserOrder, OrderStatusEnum, Order } from "@/api/types";
+import type { UserOrder, OrderStatusEnum } from "@/api/types";
 import { updateOrderStatus } from "@/api/order";
 import { EllipsisHorizontalIcon } from "@heroicons/vue/24/outline";
 
@@ -52,7 +54,10 @@ const props = defineProps<{
   orders: UserOrder[];
 }>();
 
-const selectedOrderBooks = ref<any[]>([]);
+const emit = defineEmits<{
+    (e: 'getOrder', id: number): void;
+}>();
+
 const sortKey = ref<string>("id");
 const sortOrder = ref<number>(1);
 
@@ -128,23 +133,9 @@ const sortedOrders = computed(() => {
   });
 });
 
-// Функция для обновления статуса заказа
-async function handleUpdateOrderStatus(orderId: number, newStatus: OrderStatusEnum) {
-  const description = "Статус заказа обновлен";
-  try {
-    await updateOrderStatus(orderId, newStatus, description); // Или передайте описание, если нужно
-  } catch (error) {
-    console.error("Ошибка при обновлении статуса заказа", error);
-  }
+const handleOpenOrderDetails = (orderId: number) => {
+  emit("getOrder", orderId);
 }
-
-// // Функция для отображения деталей заказа
-// function showOrderDetails(orderId: number | null) {
-//   if (orderId !== null) {
-//     const order = props.orders.find((o) => o.id === orderId);
-//     selectedOrderBooks.value = order ? order.books : [];
-//   }
-// }
 </script>
 
 <style scoped>

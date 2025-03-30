@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { BorrowedBook, Order, PaginatedOrders, UserOrder, OrderStatusEnum } from "@/api/types";
+import type { BorrowedBook, Order, UserOrder, OrderStatusEnum } from "@/api/types";
 
 export async function updateOrderStatus(
   orderId: number,
@@ -13,8 +13,8 @@ export async function updateOrderStatus(
   };
 
   try {
-    const response = await axios.get(`/api/order/${orderId}/`);
-    const currentOrder: Order = response.data;
+    const orderData = await getOrder(orderId)
+    const currentOrder: Order = orderData;
     console.log(currentOrder);
 
     const updatedStatuses = [...currentOrder.statuses, statusUpdate];

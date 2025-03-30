@@ -11,7 +11,7 @@
           Новые <span class="badge bg-danger">{{ newOrdersCount }}</span>
         </a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item"> 
         <a
           class="nav-link"
           :class="{ active: currentTab === tabsNumbers.processing }"
@@ -42,13 +42,22 @@
         </a>
       </li>
     </ul>
-    <OrderList :orders="currentData" />
+    <OrderList @get-order="fetchOrder" :orders="currentData"/>
+    <ModalOrderDetails 
+    v-if="selectedOrder"
+    :order="selectedOrder"
+    @close="selectedOrder = null"
+    @next-order-status="handleUpdateOrderStatus"
+  />
+  <LoadingModal v-model="isLoading" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import OrderList from "@/components/OrderList.vue";
+import ModalOrderDetails from "@/components/ModalOrderDetails.vue";
+import LoadingModal from "@/components/LoadingModal.vue";
 import { useToast } from "vue-toastification";
 import { useNotificationStore } from "@/stores/notificationStore";
 import {
@@ -57,11 +66,12 @@ import {
   fetchReadyOrders,
   fetchArchiveOrders,
 } from "@/api/order";
-import type { UserOrder } from "@/api/types";
-
+import type { UserOrder, Order, OrderStatusEnum } from "@/api/types";
+import { getOrder, updateOrderStatus } from "@/api/order";
+import { RefSymbol } from "@vue/reactivity";
 const toast = useToast();
 const notifStore = useNotificationStore();
-
+const isLoading = ref(false)
 interface TabConfig {
   label: string;
   fetchFn: () => Promise<UserOrder[]>;
@@ -78,6 +88,7 @@ const tabsNumbers = {
 };
 
 const currentTab = ref(tabsNumbers.new);
+
 const tabs = ref<TabConfig[]>([
   {
     label: "Новые",
@@ -109,6 +120,7 @@ const newOrdersCount = computed(() => tabs.value[tabsNumbers.new].data.length);
 const processingOrdersCount = computed(() => tabs.value[tabsNumbers.processing].data.length);
 const readyOrdersCount = computed(() => tabs.value[tabsNumbers.ready].data.length);
 const archiveOrdersCount = computed(() => tabs.value[tabsNumbers.archive].data.length);
+const selectedOrder = ref<Order | null>(null);
 
 const startAllIntervals = () => {
   tabs.value.forEach((tab, index) => {
@@ -171,6 +183,25 @@ const currentData = computed<UserOrder[]>((): UserOrder[] => {
       return [];
   }
 });
+
+
+const fetchOrder = async (orderId: number) => {
+  isLoading.value = true;
+  selectedOrder.value = await getOrder(orderId);
+  isLoading.value = false;
+}
+
+
+async function handleUpdateOrderStatus(orderId: number, newStatus: OrderStatusEnum) {
+  const description = "Временное описание";
+  try {
+    await updateOrderStatus(orderId, newStatus, description);
+
+  } catch (error) {
+    console.error("Ошибка при обновлении статуса заказа", error);
+  }
+
+}
 
 onMounted(async () => {
   startAllIntervals();
