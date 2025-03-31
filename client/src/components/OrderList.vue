@@ -16,9 +16,6 @@
               <i :class="sortOrder === 1 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
             </span>
           </th>
-          <th scope="col">
-            Сотрудник
-          </th>
         </tr>
       </thead>
       <tbody>
@@ -26,7 +23,6 @@
           <th scope="row">{{ order.id }}</th>
           <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
           <td>{{ formatDate(order.statuses[0].date) }}</td>
-          <td>{{ order.statuses[order.statuses.length - 1].staff.last_name + " " + order.statuses[order.statuses.length - 1].staff.first_name }}</td>
           <td>
             <button
               class="btn btn-primary"
