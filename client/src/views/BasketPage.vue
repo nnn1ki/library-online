@@ -76,7 +76,7 @@
         </label>
 
         <label>
-          <input disabled="true" type="radio" value="pdf" v-model="fileFormat" />
+          <input type="radio" value="pdf" v-model="fileFormat" />
           PDF файл (.pdf)
         </label>
 
@@ -261,9 +261,12 @@ async function saveAsDocx(defaultFileName) {
           new Paragraph({
             children: [new TextRun("Список литературы:")],
           }),
-          ...content.map(item => new Paragraph({
-            children: [new TextRun(item)],
-          })),
+          ...content.map(
+            (item) =>
+              new Paragraph({
+                children: [new TextRun(item)],
+              })
+          ),
         ],
       },
     ],
@@ -282,10 +285,13 @@ async function saveAsPdf(defaultFileName) {
     return;
   }
   // Формируем содержимое для PDF документа
-  const content = bookList.value.split("<hr>").map(item => item.trim()).filter(item => item !== "");
+  const content = bookList.value
+    .split("<hr>")
+    .map((item) => item.trim())
+    .filter((item) => item !== "");
 
   pdf.text("Список литературы:", 10, 10);
-  
+
   // Устанавливаем начальную позицию для текста
   let yOffset = 20;
 
@@ -306,9 +312,9 @@ async function loadFont(pdf) {
     const response = await fetch(`src/views/${fontName}.ttf`);
     const fontData = await response.arrayBuffer();
     const uint8Array = new Uint8Array(fontData);
-    
+
     // Преобразование Uint8Array в строку
-    let binaryString = '';
+    let binaryString = "";
     for (let i = 0; i < uint8Array.length; i++) {
       binaryString += String.fromCharCode(uint8Array[i]);
     }
@@ -318,7 +324,7 @@ async function loadFont(pdf) {
     pdf.setFont(fontName);
     pdf.setFontSize(14);
   } catch (error) {
-    console.error('Ошибка загрузки шрифта:', error);
+    console.error("Ошибка загрузки шрифта:", error);
   }
 }
 
