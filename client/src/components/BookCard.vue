@@ -1,5 +1,5 @@
 <template>
-  <div class="card" :class="{ announcement: announcement }">
+  <div class="card" :class="{ announcement: announcement }" :title="bookHint">
     <div class="book-image" :class="{ announcement: announcement }">
       <BookImage
         :class="{ 'rounded-left': !announcement, 'rounded-top': announcement }"
