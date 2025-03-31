@@ -22,6 +22,7 @@ from library_service.models.order import Order, OrderHistory, OrderItem
 from library_service.serializers.staff_order import (
     UserOrderSerializer,
     OrderSerializer,
+    UpdateOrderSerializer,
 )
 
 ACCEPTABLE_STATUSES = [
@@ -43,8 +44,10 @@ class StaffOrderViewset(
     queryset = Order.objects.all()
     
     def get_serializer_class(self):
-        if self.action in ["get_orders", "new_orders"]:
+        if self.action in ["get_orders"]:
             return UserOrderSerializer
+        elif self.action in ["update_order"]:
+            return UpdateOrderSerializer
         else: 
             return OrderSerializer
     
@@ -78,3 +81,22 @@ class StaffOrderViewset(
 
         data = await self.get_data(target_status)
         return Response(data)
+    
+class StaffOrderUpdateViewset(
+    LockUserMixin,
+    SessionListModelMixin,
+    SessionRetrieveModelMixin,
+    SessionCreateModelMixin,
+    SessionUpdateModelMixin,
+    AsyncGenericViewSet,
+):
+    permission_classes = [IsAuthenticated]
+    queryset = Order.objects.all()
+    
+    def get_serializer_class(self):
+        if self.action in ["get_orders"]:
+            return UserOrderSerializer
+        elif self.action in ["aupdate"]:
+            return UpdateOrderSerializer
+        else: 
+            return OrderSerializer

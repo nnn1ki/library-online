@@ -20,7 +20,7 @@ export async function updateOrderStatus(
     const updatedStatuses = [...currentOrder.statuses, statusUpdate];
     console.log(updatedStatuses);
 
-    await axios.patch(`/api/staff/order/${orderId}/`, { statuses: updatedStatuses });
+    await axios.put(`/api/staff/order/${orderId}/`, { status: statusUpdate, books: [] });
     console.log(`Статус заказа ${orderId} добавлен: "${newStatus}"`);
   } catch (error) {
     console.error("Ошибка при обновлении статуса заказа", error);
