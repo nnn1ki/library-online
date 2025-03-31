@@ -1,0 +1,25 @@
+[MAIN]
+load-plugins=
+    pylint_django,
+
+django-settings-module=app.settings
+
+ignore=
+    local_settings.py,
+    manage.py,
+    library_service/migrations,
+
+[MESSAGES CONTROL]
+disable=
+    fixme,
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-many-ancestors,
+    too-many-instance-attributes,
+    abstract-method,
+    no-else-return,
+    no-else-raise,
+
+[FORMAT]
+max-line-length=120

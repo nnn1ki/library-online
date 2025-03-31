@@ -4,7 +4,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { ref, nextTick } from "vue";
 import { useToast } from "vue-toastification";
 
-import { ordersList, getOrder, editOrder, createOrder, deleteOrder } from "@/api/order";
+import { ordersList, createOrder, deleteOrder } from "@/api/order";
 import { getBook } from "@/api/books";
 import { deleteBasketBook } from "@/api/basket";
 import type { Book, Order, BorrowedBook, OrderStatusEnum } from "@/api/types";
@@ -23,6 +23,8 @@ export const useOrderStore = defineStore("orderStore", () => {
   const selectedBorrowedBooks = ref<number[]>([]);
   const borrowedBooks = ref<BorrowedBook[]>([]);
   const userOrders = ref<Order[]>([]);
+  const countOfBookInOrder = 5;
+  const countOfBookPerPerson = 15;
   const allowedStatusesToCountOrderedBooks: OrderStatusEnum[] = [
     "new",
     "processing",
@@ -36,8 +38,19 @@ export const useOrderStore = defineStore("orderStore", () => {
       return;
     }
 
+    if (selectedBooks.value.length > countOfBookInOrder) {
+      toast.error("В заказе максиум 5 книг");
+      return;
+    }
+
+    if (selectedBorrowedBooks.value.length < borrowedBooks.value.length) {
+      toast.error("Отметьте книги, которые принесете");
+      return;
+    }
+
     toast.info("Проверяем все ли книги, можно заказать");
     userOrders.value = await ordersList();
+    console.log("userOrders.value", userOrders.value);
     const canBeOrdered = await checkCanBeOrdered();
     if (!canBeOrdered) return;
 
@@ -55,13 +68,12 @@ export const useOrderStore = defineStore("orderStore", () => {
 
     try {
       await createOrder(selectedBooks.value[0].library, bookIds, selectedBorrowedBooks.value);
-
       await clearBasket(bookIds);
-      selectedBooks.value = [];
+      clearAll();
       await basketStore.updateBooks();
       toast.success("Заказ принят");
       await nextTick();
-    } catch (error) {
+    } catch {
       toast.error("Что то не так");
     }
     router.push({ name: "Home" });
@@ -71,7 +83,7 @@ export const useOrderStore = defineStore("orderStore", () => {
     try {
       await deleteOrder(orderId);
       toast.info("Ваш заказ отменен");
-    } catch (error) {
+    } catch {
       toast.error("Что то пошло не так...");
     }
   }
@@ -84,7 +96,7 @@ export const useOrderStore = defineStore("orderStore", () => {
       selectedBorrowedBooks.value.length +
       selectedBooks.value.length +
       orderedBooksCount;
-    return totalItems > 0 && totalItems <= 7 && librarySet.size === 1;
+    return totalItems > 0 && totalItems <= countOfBookPerPerson && librarySet.size === 1;
   }
 
   // проверка сколько книг в заказах
@@ -111,8 +123,9 @@ export const useOrderStore = defineStore("orderStore", () => {
           toast.error(`Нельзя заказать книгу "${book.title}",\nона будет удалена из заказа`);
           selectedBooks.value = selectedBooks.value.filter((b) => b.id !== book.id);
         }
-      } catch (error) {
+      } catch {
         toast.error(`Ошибка при проверке книги "${book.title}"`);
+
         allCanBeOrdered = false;
       }
     }
@@ -120,12 +133,19 @@ export const useOrderStore = defineStore("orderStore", () => {
   }
 
   function bookInOrders(targetBookId: string): boolean {
-    return userOrders.value.some((order) => {
-      const lastStatus = order.statuses[order.statuses.length - 1];
-      if (lastStatus && allowedStatusesToCountOrderedBooks.includes(lastStatus.status)) {
-        order.books.some((orderBook) => orderBook.book.id === targetBookId);
+    const isInOrders = userOrders.value.some((order) => {
+      const lastStatus = order.statuses.at(-1);
+      if (!lastStatus || !allowedStatusesToCountOrderedBooks.includes(lastStatus.status)) {
+        return false;
       }
+      return order.books.some((bookItem) => bookItem.book.id === targetBookId);
     });
+
+    const isInBorrowed = borrowedBooks.value.some(
+      (borrowedBook) => borrowedBook.book.id === targetBookId
+    );
+
+    return isInOrders || isInBorrowed;
   }
 
   async function clearBasket(selectedIds: string[]) {
@@ -135,11 +155,22 @@ export const useOrderStore = defineStore("orderStore", () => {
     }
   }
 
+  function addBook(newBook: Book) {
+    selectedBooks.value.push(newBook);
+  }
+
+  function clearAll() {
+    selectedBooks.value = [];
+    selectedBorrowedBooks.value = [];
+    borrowedBooks.value = [];
+    userOrders.value = [];
+  }
   return {
     handleCreateOrder,
     selectedBooks,
     selectedBorrowedBooks,
     borrowedBooks,
     handleDeleteOrder,
+    addBook,
   };
 });

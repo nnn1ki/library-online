@@ -20,15 +20,20 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenBlacklistView,
+)
 
 from adrf.routers import DefaultRouter as AsyncDefaultRouter
 
-from library_service.views.catalog import *
-from library_service.views.basket import *
-from library_service.views.profile import *
-from library_service.views.order import *
+from library_service.views.basket import BasketViewset
 from library_service.views.bitrix import BitrixAuthView
+from library_service.views.catalog import BookViewset, LibraryViewset, ScenarioViewset
+from library_service.views.library_settings import LibrarySettingsViewSet
+from library_service.views.order import BorrowedViewset, OrderViewset
+from library_service.views.profile import ProfileViewset
 
 router = AsyncDefaultRouter()
 router.register("book", BookViewset, basename="book")
@@ -38,13 +43,14 @@ router.register("basket", BasketViewset, basename="basket")
 router.register("profile", ProfileViewset, basename="profile")
 router.register("order", OrderViewset, basename="order")
 router.register("borrowed", BorrowedViewset, basename="borrowed")
+router.register("library-settings", LibrarySettingsViewSet, basename="library-settings")
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/auth/login/', TokenObtainPairView.as_view()),
-    path('api/auth/bitrix-login/', BitrixAuthView.as_view()),
-    path('api/auth/refresh/', TokenRefreshView.as_view()),
-    path('api/auth/logout/', TokenBlacklistView.as_view()),
+    path("admin/", admin.site.urls),
+    path("api/auth/login/", TokenObtainPairView.as_view()),
+    path("api/auth/bitrix-login/", BitrixAuthView.as_view()),
+    path("api/auth/refresh/", TokenRefreshView.as_view()),
+    path("api/auth/logout/", TokenBlacklistView.as_view()),
     path("api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 
 from library_service.models.user import UserProfile
-from library_service.serializers.profile import *
+from library_service.serializers.profile import ProfileSerializer
+
 
 class ProfileViewset(AsyncGenericViewSet):
     serializer_class = ProfileSerializer

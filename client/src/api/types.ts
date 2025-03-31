@@ -79,6 +79,9 @@ export type OrderBook = {
   id: number;
   book: Book;
   status: OrderBookStatus;
+  handed_date: string | null;
+  to_return_date: string | null;
+  returned_date: string | null;
 };
 
 export type Order = {
@@ -92,4 +95,30 @@ export type BorrowedBook = {
   id: number;
   book: Book;
   order: number;
+  handed_date: string;
+  to_return_date: string;
+};
+
+export type UserOrder = {
+  id: number;
+  statuses: OrderStatus[];
+  library: Library;
+  user: UserInfo;
+};
+
+export type UserInfo = {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  library_card: string | null;
+  campus_id: string | null;
+  mira_id: string | null;
+};
+
+export type PaginatedOrders = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: UserOrder[];
 };
