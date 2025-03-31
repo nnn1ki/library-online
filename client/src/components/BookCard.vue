@@ -1,5 +1,5 @@
 <template>
-  <div class="card" :class="{ announcement: announcement }">
+  <div class="card" :class="{ announcement: announcement }" :title="bookHint">
     <div class="book-image" :class="{ announcement: announcement }">
       <BookImage
         :class="{ 'rounded-left': !announcement, 'rounded-top': announcement }"
@@ -96,6 +96,22 @@ async function addBook() {
 const bookLink = computed(
   () => book.links.filter((link) => link.description === "Электронная библиотека ИРНИТУ")[0]?.url
 );
+
+const bookHint = computed(() => {
+  if (book.can_be_ordered) {
+    if (book.copies > 0) {
+      return `Книга доступна для заказа \nКниг, доступных для заказа: ${book.copies}`;
+    } else {
+      return "Доступных книг для заказа пока нет, закажите позже или возьмите в читальном зале";
+    }
+  } else {
+    if (book.links.length > 0) {
+      return "Можете только прочитать книгу онлайн";
+    } else {
+      return "Книга доступна только в зале";
+    }
+  }
+});
 </script>
 
 <style scoped lang="scss">
