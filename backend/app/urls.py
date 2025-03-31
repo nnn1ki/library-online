@@ -31,6 +31,7 @@ from adrf.routers import DefaultRouter as AsyncDefaultRouter
 from library_service.views.basket import BasketViewset
 from library_service.views.bitrix import BitrixAuthView
 from library_service.views.catalog import BookViewset, LibraryViewset, ScenarioViewset
+from library_service.views.library_settings import LibrarySettingsViewSet
 from library_service.views.order import BorrowedViewset, OrderViewset
 from library_service.views.profile import ProfileViewset
 
@@ -42,6 +43,7 @@ router.register("basket", BasketViewset, basename="basket")
 router.register("profile", ProfileViewset, basename="profile")
 router.register("order", OrderViewset, basename="order")
 router.register("borrowed", BorrowedViewset, basename="borrowed")
+router.register("library-settings", LibrarySettingsViewSet, basename="library-settings")
 
 
 urlpatterns = [

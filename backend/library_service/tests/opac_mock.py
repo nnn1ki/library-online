@@ -1,3 +1,4 @@
+from enum import Enum
 from aiohttp import web
 
 from library_service.opac.api.announces import OpacAnnounce
@@ -7,15 +8,27 @@ from library_service.opac.api.scenarios import OpacScenario
 
 PORT = 3740
 
-DATABASES: list[OpacDatabase] = [OpacDatabase("ISTU", True), OpacDatabase("NTD", True)]
+DATABASES: list[OpacDatabase] = [OpacDatabase("ISTU", True), OpacDatabase("NTD", True), OpacDatabase("ZIMA", True)]
 SCENARIOS: list[OpacScenario] = [
     OpacScenario("A=", "author"),
     OpacScenario("T=", "title"),
     OpacScenario("IN=", "exemplar id"),
 ]
+
+
+class BookId(Enum):
+    ISTU_AAAA_XXXX = "ISTU_1"
+    ISTU_BBBB_YYYY = "ISTU_2"
+    ISTU_CCCC_ZZZZ = "ISTU_3"
+    NTD_AAAA_XXXX = "NTD_1"
+    NTD_BBBB_AAA_YYYY = "NTD_2"
+    ZIMA_AAAA_XXXX = "ZIMA_1"
+    ZIMA_BBBB_XXXX = "ZIMA_2"
+
+
 BOOKS: list[OpacBook] = [
     OpacBook(
-        "ISTU_1",
+        BookId.ISTU_AAAA_XXXX.value,
         "",
         OpacBookInfo(["AAAA"], [], ["XXXX"], [], ["eng"], [], [], [], [], []),
         True,
@@ -23,7 +36,7 @@ BOOKS: list[OpacBook] = [
         [OpacBookExemplar("1234", 1, "ok")],
     ),
     OpacBook(
-        "ISTU_2",
+        BookId.ISTU_BBBB_YYYY.value,
         "",
         OpacBookInfo(["BBBB"], [], ["YYYY"], [], ["eng"], [], [], [], [], []),
         True,
@@ -31,7 +44,7 @@ BOOKS: list[OpacBook] = [
         [OpacBookExemplar("1235", 1, "ok")],
     ),
     OpacBook(
-        "ISTU_3",
+        BookId.ISTU_CCCC_ZZZZ.value,
         "",
         OpacBookInfo(["CCCC"], [], ["ZZZZ"], [], ["eng"], [], [], [], [], []),
         True,
@@ -39,7 +52,7 @@ BOOKS: list[OpacBook] = [
         [OpacBookExemplar("1236", 1, "ok")],
     ),
     OpacBook(
-        "NTD_1",
+        BookId.NTD_AAAA_XXXX.value,
         "",
         OpacBookInfo(["AAAA"], [], ["XXXX"], [], ["eng"], [], [], [], [], []),
         True,
@@ -47,18 +60,39 @@ BOOKS: list[OpacBook] = [
         [OpacBookExemplar("1234", 1, "ok")],
     ),
     OpacBook(
-        "NTD_2",
+        BookId.NTD_BBBB_AAA_YYYY.value,
         "",
         OpacBookInfo(["BBBB", "AAA"], [], ["YYYY"], [], ["eng"], [], [], [], [], []),
         True,
         2025,
         [OpacBookExemplar("1235", 1, "ok")],
     ),
+    OpacBook(
+        BookId.ZIMA_AAAA_XXXX.value,
+        "",
+        OpacBookInfo(["AAAA"], [], ["XXXX"], [], ["eng"], [], [], [], [], []),
+        True,
+        2025,
+        [OpacBookExemplar("1234", 1, "ok")],
+    ),
+    OpacBook(
+        BookId.ZIMA_BBBB_XXXX.value,
+        "",
+        OpacBookInfo(["BBBB"], [], ["XXXX"], [], ["eng"], [], [], [], [], []),
+        True,
+        2025,
+        [OpacBookExemplar("1235", 1, "ok")],
+    ),
 ]
-ANNOUNCES: list[OpacAnnounce] = [
-    OpacAnnounce("/opac/index.html?expression=IN=1235"),
-    OpacAnnounce("/opac/index.html?expression=IN=1236"),
+
+ANNOUNCES = [
+    OpacAnnounce("/opac/index.html?db=ISTU&expression=IN=1235"),
+    OpacAnnounce("/opac/index.html?db=ISTU&expression=IN=1236"),
 ]
+
+
+def books_by_id(*ids: BookId) -> list[OpacBook]:
+    return [book for book in BOOKS if book.id in [id.value for id in ids]]
 
 
 def databases(request: web.Request):
@@ -76,7 +110,8 @@ def announces(request: web.Request):
 def book_retrieve(request: web.Request):
     database = request.match_info["database"]
     mfn = request.match_info["mfn"]
-    book = [book for book in BOOKS if book.id.split("_")[0] == database and book.id.split("_")[1] == mfn][0]
+    book_id = f"{database}_{mfn}"
+    book = [book for book in BOOKS if book.id == book_id][0]
     return web.json_response(book.to_dict())
 
 

@@ -1,31 +1,19 @@
 <template>
-  <div class="instructions-page container py-5">
-    <h1 class="text-center mb-4">Как использовать наш сервис</h1>
+  <div class="container instructions-page">
+    <h1>Как использовать наш сервис</h1>
 
-    <!-- Шаги инструкции -->
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-      <div class="col" v-for="(step, index) in steps" :key="index">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
-            <h2 class="card-title text-primary">{{ step.title }}</h2>
-            <p class="card-text">{{ step.description }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Важная информация -->
-    <div class="important-info bg-light p-4 mt-5 rounded border">
-      <h3 class="text-center">Свяжитесь с нами</h3>
-      <p class="text-center">
-        Если у вас возникли вопросы, пожалуйста, свяжитесь с нашей службой поддержки через email:
-        <a href="mailto:support@yourservice.com">domrachev@conferoom.site</a>.
-      </p>
+    <div class="instructions">
+      <SurfaceCard v-for="(step, index) in steps" v-bind:key="index" class="card">
+        <h2 class="text-3xl">{{ step.title }}</h2>
+        <p class="card-text">{{ step.description }}</p>
+      </SurfaceCard>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import SurfaceCard from "@/components/SurfaceCard.vue";
+
 const steps = [
   {
     title: "Шаг 1: Регистрация",
@@ -56,38 +44,36 @@ const steps = [
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+
 .instructions-page {
   padding: 20px;
 }
 
 h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #333;
+  text-align: center;
 }
 
-.card-title {
-  font-size: 1.5rem;
+.instructions {
+  display: flex;
+  flex: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.card {
+  flex-basis: 100%;
+  @include media-md {
+    flex-basis: 45%;
+  }
+  @include media-lg {
+    flex-basis: 25%;
+  }
 }
 
 .card-text {
-  font-size: 1rem;
-  color: #555;
-}
-
-.important-info {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #e7e7e7;
-}
-
-.important-info a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.important-info a:hover {
-  text-decoration: underline;
+  font-size: var(--text-base);
+  color: var(--color-text-700);
 }
 </style>

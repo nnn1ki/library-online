@@ -1,36 +1,47 @@
 <template>
-  <div class="card shadow-sm border-0" v-b-tooltip.hover.focus.bottom :title="bookHint">
-    <!-- Картинка -->
-    <div v-if="book.cover !== null" class="book-image">
-      <img :src="book.cover" />
+  <div class="card" :class="{ announcement: announcement }">
+    <div class="book-image" :class="{ announcement: announcement }">
+      <BookImage
+        :class="{ 'rounded-left': !announcement, 'rounded-top': announcement }"
+        :book="book"
+      />
     </div>
-    <i v-else class="book-image bi bi-image"></i>
 
     <div class="card-body">
-      <!-- Заголовок книги и автор -->
       <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
-      <h6 v-if="book.author.length > 0" class="card-subtitle text-muted">
+      <h6 v-if="book.author.length > 0" class="card-subtitle">
         {{ book.author.join(", ") }}
       </h6>
-      <h6 v-else-if="book.collective.length > 0" class="card-subtitle text-muted">
+      <h6 v-else-if="book.collective.length > 0" class="card-subtitle">
         {{ book.collective.join(", ") }}
       </h6>
+      <h6 class="card-subtitle">
+        {{ book.brief }}
+      </h6>
 
-      <div class="d-flex justify-content-between align-items-center">
-        <!-- Кнопка добавления в корзину -->
-        <button
-          class="btn btn-info btn-sm"
-          type="button"
-          @click="addBook(book)"
+      <div class="buttons">
+        <StyledButton
+          v-if="showCart"
+          theme="primary"
+          @click="addBook"
           :disabled="isAdding || isInBasket"
         >
-          <i class="bi bi-cart3"></i> В Корзину
-        </button>
+          В Корзину <ShoppingCartIcon class="button-icon" />
+        </StyledButton>
 
-        <!-- Кнопка для подробного описания -->
-        <button class="btn btn-primary btn-sm mt-2" type="button" @click="isModalVisible = true">
-          Подробнее
-        </button>
+        <StyledButton theme="secondary" type="button" @click="isModalVisible = true">
+          Подробнее <Bars3Icon class="button-icon" />
+        </StyledButton>
+
+        <a v-if="bookLink !== undefined" :href="bookLink">
+          <StyledButton theme="accent">
+            Читать онлайн <BookOpenIcon class="button-icon" />
+          </StyledButton>
+        </a>
+
+        <StyledButton v-if="basketCart" theme="accent" @click="basketStore.removeBook(book)">
+          Удалить <TrashIcon class="button-icon" />
+        </StyledButton>
       </div>
     </div>
   </div>
@@ -39,27 +50,36 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs } from "vue";
+import { computed, ref } from "vue";
 import type { Book } from "@/api/types";
+import { ShoppingCartIcon, Bars3Icon, BookOpenIcon, TrashIcon } from "@heroicons/vue/24/outline";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
-import AboutBookDialog from "./AboutBookDialog.vue";
+import AboutBookDialog from "@/components/AboutBookDialog.vue";
+import StyledButton from "@/components/StyledButton.vue";
+import BookImage from "@/components/BookImage.vue";
 
-const props = defineProps<{
+const {
+  book,
+  announcement = false,
+  showCart = true,
+  basketCart = false,
+} = defineProps<{
   book: Book;
+  announcement?: boolean;
+  showCart?: boolean;
+  basketCart?: boolean;
 }>();
-const { book } = toRefs(props);
 
 const basketStore = useBasketStore();
 
 const { books: basketBooks } = storeToRefs(basketStore);
-const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.value.id));
+const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.id));
 
 const isModalVisible = ref(false);
-
 const isAdding = ref(false);
 
-async function addBook(book: Book) {
+async function addBook() {
   if (isInBasket.value || isAdding.value) return;
   isAdding.value = true;
 
@@ -72,6 +92,10 @@ async function addBook(book: Book) {
       if (!isInBasket.value) isAdding.value = false;
     });
 }
+
+const bookLink = computed(
+  () => book.links.filter((link) => link.description === "Электронная библиотека ИРНИТУ")[0]?.url
+);
 
 const bookHint = computed(() => {
   const bookInfo = book.value;
@@ -95,44 +119,68 @@ const bookHint = computed(() => {
 <style scoped lang="scss">
 .card {
   width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-}
 
-.card:hover {
-  transform: scale(1.05);
-}
+  background-color: var(--color-background-50);
+  border-style: solid;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--color-text-300);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 
-.card-img-top {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
+  display: flex;
+  flex-direction: row;
+
+  &.announcement {
+    flex-direction: column;
+  }
 }
 
 .card-body {
-  padding: 16px;
+  padding: 1rem;
 }
 
 .card-title {
-  font-size: 1.2rem;
+  font-size: var(--text-lg);
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .card-subtitle {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 16px;
-}
-
-.card-text {
-  font-size: 1rem;
-  color: #888;
+  color: var(--color-text-700);
+  margin-bottom: 1rem;
 }
 
 .book-image {
-  font-size: 50px;
-  text-align: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 190px;
+  height: 290px;
+
+  &.announcement {
+    flex-basis: 490px;
+    height: 490px;
+  }
+
+  .rounded-left {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  .rounded-top {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  column-gap: 1rem;
+}
+
+.button-icon {
+  width: 1.2em;
+  height: 1.2em;
+  margin-left: 0.5em;
 }
 </style>
