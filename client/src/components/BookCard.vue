@@ -98,16 +98,14 @@ const bookLink = computed(
 );
 
 const bookHint = computed(() => {
-  const bookInfo = book.value;
-
-  if (bookInfo.can_be_ordered) {
-    if (bookInfo.copies > 0) {
-      return `Книга доступна для заказа \nКниг, доступных для заказа: ${bookInfo.copies}`;
+  if (book.can_be_ordered) {
+    if (book.copies > 0) {
+      return `Книга доступна для заказа \nКниг, доступных для заказа: ${book.copies}`;
     } else {
       return "Доступных книг для заказа пока нет, закажите позже или возьмите в читальном зале";
     }
   } else {
-    if (bookInfo.links.length > 0) {
+    if (book.links.length > 0) {
       return "Можете только прочитать книгу онлайн";
     } else {
       return "Книга доступна только в зале";
