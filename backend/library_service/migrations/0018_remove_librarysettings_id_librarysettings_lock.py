@@ -6,6 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
+
         ("library_service", "0017_merge_20250323_1143"),
     ]
 
