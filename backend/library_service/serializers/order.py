@@ -15,6 +15,8 @@ from library_service.models.catalog import Library
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
 from library_service.serializers.parallel_list import ParallelListSerializer
 
+from django.contrib.auth.hashers import make_password
+
 User = get_user_model()
 
 
@@ -38,13 +40,13 @@ class OrderUserSerializer(aserializers.ModelSerializer):
 
 
 class OrderItemSerializer(aserializers.ModelSerializer):
-    book = afields.SerializerMethodField()
+    
 
     class Meta:
         model = OrderItem
         fields = [
             "id",
-            "book",
+            "book_id",
             "status",
             "handed_date",
             "to_return_date",
@@ -70,20 +72,30 @@ class OrderSerializer(aserializers.ModelSerializer):
 class UserOrderSerializer(aserializers.ModelSerializer):
     library = LibrarySerializer()
     statuses = OrderStatusSerializer(many=True)
-    user = OrderUserSerializer()
+    books = OrderItemSerializer(many=True)
 
     class Meta:
         model = Order
-        fields = ["id", "user", "library", "statuses"]
+        fields = ["id", "library", "statuses", "books"]
         list_serializer_class = ParallelListSerializer
 
 
 class CreateUpdateOrderSerializer(aserializers.Serializer):
+    user = serializers.CharField()
     library = serializers.IntegerField()
     books = serializers.ListField(child=serializers.CharField())
     borrowed = serializers.ListField(child=serializers.IntegerField())
 
     async def validate_order(self, validated_data, order: Order | None = None):
+        if await User.objects.filter(username = validated_data["user"]).aexists():
+            user = await User.objects.aget(username = validated_data["user"])
+        else:
+            user = await User.objects.acreate(
+                username = validated_data["user"],
+                password = make_password('1234'),
+                is_active = True
+            )
+
         library = await Library.objects.aget(pk=validated_data["library"])
         books: list[str] = validated_data["books"]
         borrowed_books: list[str] = validated_data["borrowed"]
@@ -93,7 +105,7 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
 
         queryset = (
             OrderItem.objects.all()
-            .filter(order__user=self.context["request"].user)
+            .filter(order__user=user)
             .filter(Q(status=OrderItem.Status.ORDERED) | Q(status=OrderItem.Status.HANDED))
         )
         if order is not None:
@@ -126,7 +138,7 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
             order_item = await OrderItem.objects.filter(pk=book).prefetch_related("order__user").afirst()
             if (
                 order_item is None
-                or order_item.order.user != self.context["request"].user
+                or order_item.order.user != user
                 or order_item.status != OrderItem.Status.HANDED
             ):
                 raise ValidationError(f"Invalid borrowed book id {book}", code="invalid_borrowed_book_id")
@@ -144,7 +156,16 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
             await order_item.asave()
 
     async def acreate(self, validated_data):
-        user = self.context["request"].user
+        #user = self.context["request"].user
+
+        if await User.objects.filter(username = validated_data["user"]).aexists():
+            user = await User.objects.aget(username = validated_data["user"])
+        else:
+            user = await User.objects.acreate(
+                username = validated_data["user"],
+                password = make_password('1234'),
+                is_active = True
+            )
 
         await self.validate_order(validated_data)  # Проводим валидацию перед тем, как что-то добавлять в БД
         order = await Order.objects.acreate(user=user, library=await Library.objects.aget(pk=validated_data["library"]))

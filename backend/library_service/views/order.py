@@ -7,6 +7,12 @@ from rest_framework.pagination import PageNumberPagination
 from asgiref.sync import sync_to_async
 from django.db.models import OuterRef, Subquery
 
+from django.contrib.auth.hashers import make_password
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 
 from library_service.mixins import (
@@ -41,65 +47,51 @@ class OrderViewset(
     SessionUpdateModelMixin,
     AsyncGenericViewSet,
 ):
-    permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
 
     def get_serializer_class(self):
         if self.action in ["acreate", "aupdate"]:
             return CreateUpdateOrderSerializer
-        elif self.action in ["new_orders", "processing_orders", "ready_orders", "done_orders"]:
-            return UserOrderSerializer
         else:
             return OrderSerializer
 
     def get_queryset(self):
-        if self.action in ["new_orders"]:
-            return super().get_queryset().prefetch_related("library")
-        return super().get_queryset().filter(user=self.request.user).prefetch_related("library")
-
+        return super().get_queryset().prefetch_related("library")
+    
     @sync_to_async
-    def get_data(self, target_status):
+    def get_data(self, user):
         queryset = self.get_queryset()
 
-        last_status_subquery = OrderHistory.objects.filter(order=OuterRef("pk")).order_by("-date").values("status")[:1]
-
-        queryset = queryset.annotate(last_status=Subquery(last_status_subquery)).filter(last_status=target_status)
+        queryset = queryset.filter(user = user)
 
         serializer = self.get_serializer(queryset, many=True)
         return serializer.data
 
-    @action(detail=False, methods=["get"], url_path="new")
-    async def new_orders(self, request):
-        data = await self.get_data(OrderHistory.Status.NEW)
+    @action(detail=False, methods=["get"], url_path="current")
+    async def get_orders(self, request):
+        username = self.request.query_params.get('user')
+        
+        if await User.objects.filter(username = username).aexists():
+            user = await User.objects.aget(username = username)
+        else:
+            user = await User.objects.acreate(
+                username = username,
+                password = make_password('1234'),
+                is_active = True
+            )
+
+        data = await self.get_data(user)
+        print(data)
         return Response(data)
 
-    @action(detail=False, methods=["get"], url_path="processing")
-    async def processing_orders(self, request):
-        data = await self.get_data(OrderHistory.Status.PROCESSING)
-        return Response(data)
-
-    @action(detail=False, methods=["get"], url_path="ready")
-    async def ready_orders(self, request):
-        data = await self.get_data(OrderHistory.Status.READY)
-        return Response(data)
-
-    @action(detail=False, methods=["get"], url_path="done")
-    async def done_orders(self, request):
-        data = await self.get_data("cancelled")
-        paginator = PageNumberPagination()
-        paginator.page_size = 5
-        paginated_queryset = paginator.paginate_queryset(data, request)
-        return paginator.get_paginated_response(paginated_queryset)
-
-    @LockUserMixin.lock_request
     async def acreate(self, *args, **kwargs):
         return await super().acreate(*args, **kwargs)
 
-    @LockUserMixin.lock_request
+#    @LockUserMixin.lock_request
     async def aupdate(self, *args, **kwargs):
         return await super().aupdate(*args, **kwargs)
 
-    @LockUserMixin.lock_request
+#    @LockUserMixin.lock_request
     async def adestroy(self, request, *args, **kwargs):
         order = await self.aget_object()
 
