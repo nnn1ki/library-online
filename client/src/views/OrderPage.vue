@@ -66,12 +66,23 @@
           Обработка...
         </span>
       </StyledButton>
-    </div>
+
+
+      <OrderProgressModal      
+      v-model="orderStore.modalState.isOpen"
+    :currentStep="orderStore.modalState.currentStep"
+    :steps="orderStore.modalState.steps"
+    :isSuccess="orderStore.modalState.isSuccess"
+    :isError="orderStore.modalState.isError"
+    :orderId="orderStore.modalState.orderId"
+    :errorMessage="orderStore.modalState.errorMessage"
+  />
+  </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, computed } from "vue";
+import { ref, onBeforeMount, computed, watch } from "vue";
 import { BookOpenIcon } from "@heroicons/vue/24/outline";
 
 import BorrowedBooks from "@/layouts/BorrowedBooks.vue";
@@ -82,11 +93,13 @@ import { borrowedList } from "@/api/order";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import TextField from "@/components/TextField.vue";
 import StyledCheckbox from "@/components/StyledCheckbox.vue";
+import OrderProgressModal from '@/components/OrderProgressModal.vue';
 
 const orderStore = useOrderStore();
 
 const email = ref("");
 const notifcations = ref(false);
+const processingStep = ref(-1);
 
 const booksToreturn = computed(() => {
   return orderStore.borrowedBooks.filter((book) =>
@@ -99,6 +112,10 @@ const placeOrder = async () => {
   loading.value = true;
   await orderStore.handleCreateOrder();
   loading.value = false;
+};
+
+const retryOrder = async () => {
+  orderStore.closeModal();
 };
 
 onBeforeMount(async () => {

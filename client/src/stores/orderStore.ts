@@ -12,6 +12,21 @@ import type { Book, Order, BorrowedBook, OrderStatusEnum } from "@/api/types";
 import { useAuthStore } from "./auth";
 import { useBasketStore } from "@/stores/basket";
 
+interface ModalStep {
+  title: string;
+  error: string | null;
+}
+
+interface ModalState {
+  isOpen: boolean;
+  currentStep: number;
+  steps: ModalStep[];
+  isSuccess: boolean;
+  isError: boolean;
+  orderId: string | null;
+  errorMessage: string | null;
+}
+
 export const useOrderStore = defineStore("orderStore", () => {
   const toast = useToast();
   const authStore = useAuthStore();
@@ -32,51 +47,101 @@ export const useOrderStore = defineStore("orderStore", () => {
     "done",
   ];
 
+  const modalState = ref<ModalState>({
+    isOpen: false,
+    currentStep: 0,
+    steps: [
+      { title: "Проверка авторизации", error: null },
+      { title: "Проверка количества книг", error: null },
+      { title: "Проверка возвращаемых книг", error: null },
+      { title: "Проверка доступности книг", error: null },
+      { title: "Проверка лимитов", error: null },
+      { title: "Создание заказа", error: null },
+    ],
+    isSuccess: false,
+    isError: false,
+    orderId: null,
+    errorMessage: null,
+  });
+
+
   async function handleCreateOrder() {
-    if (!isAuthenticated.value) {
-      toast.error("Необходимо зарегистрироваться");
-      return;
-    }
-
-    if (selectedBooks.value.length > countOfBookInOrder) {
-      toast.error("В заказе максиум 5 книг");
-      return;
-    }
-
-    if (selectedBorrowedBooks.value.length < borrowedBooks.value.length) {
-      toast.error("Отметьте книги, которые принесете");
-      return;
-    }
-
-    toast.info("Проверяем все ли книги, можно заказать");
-    userOrders.value = await ordersList();
-    console.log("userOrders.value", userOrders.value);
-    const canBeOrdered = await checkCanBeOrdered();
-    if (!canBeOrdered) return;
-
-    toast.info("Проверяем сколько у вас книг на руках и в заказах");
-    const isValid = await validateOrder();
-
-    if (!isValid) {
-      toast.error(
-        "У вас много заказанных книг и книг на руках, больше заказывать нельзя. Нужно вернуть часть книг в библиотеку."
-      );
-      return;
-    }
-
-    const bookIds = selectedBooks.value.map((book) => book.id);
+    resetModalState();
+    modalState.value.isOpen = true;
 
     try {
-      await createOrder(selectedBooks.value[0].library, bookIds, selectedBorrowedBooks.value);
+      modalState.value.currentStep = 0;
+      if (!isAuthenticated.value) {
+        modalState.value.steps[0].error = "Требуется авторизация";
+        modalState.value.isError = true;
+        modalState.value.errorMessage = "Необходимо зарегистрироваться";
+        toast.error("Необходимо зарегистрироваться");
+        return;
+      }
+
+      modalState.value.currentStep = 1;
+      if (selectedBooks.value.length > countOfBookInOrder) {
+        modalState.value.steps[1].error = `Максимум ${countOfBookInOrder} книг`;
+        modalState.value.isError = true;
+        modalState.value.errorMessage = "В заказе максимум 5 книг";
+        toast.error("В заказе максимум 5 книг");
+        return;
+      }
+
+      modalState.value.currentStep = 2;
+      if (selectedBorrowedBooks.value.length < borrowedBooks.value.length) {
+        modalState.value.steps[2].error = "Не все книги отмечены";
+        modalState.value.isError = true;
+        modalState.value.errorMessage = "Отметьте книги, которые принесете";
+        toast.error("Отметьте книги, которые принесете");
+        return;
+      }
+
+      modalState.value.currentStep = 3;
+      userOrders.value = await ordersList();
+      const canBeOrdered = await checkCanBeOrdered();
+      if (!canBeOrdered) {
+        modalState.value.isError = true;
+        return;
+      }
+
+      modalState.value.currentStep = 4;
+      const isValid = await validateOrder();
+      if (!isValid) {
+        modalState.value.steps[4].error = "Превышены лимиты";
+        modalState.value.isError = true;
+        modalState.value.errorMessage = 
+          "У вас много заказанных книг и книг на руках. Нужно вернуть часть книг.";
+        toast.error("У вас много заказанных книг и книг на руках");
+        return;
+      }
+
+      modalState.value.currentStep = 5;
+      const bookIds = selectedBooks.value.map((book) => book.id);
+      const order = await createOrder(
+        selectedBooks.value[0].library, 
+        bookIds, 
+        selectedBorrowedBooks.value
+      );
+
       await clearBasket(bookIds);
       clearAll();
       await basketStore.updateBooks();
+
+      modalState.value.isSuccess = true;
       toast.success("Заказ принят");
-      await nextTick();
-    } catch {
-      toast.error("Что то не так");
+      
+      setTimeout(() => {
+        modalState.value.isOpen = false;
+        router.push({ name: "Home" });
+      }, 3000);
+
+    } catch (error) {
+      modalState.value.steps[modalState.value.currentStep].error = "Ошибка сервера";
+      modalState.value.isError = true;
+      modalState.value.errorMessage = "Что-то пошло не так";
+      toast.error("Что-то пошло не так");
     }
-    router.push({ name: "Home" });
   }
 
   async function handleDeleteOrder(orderId: number) {
@@ -165,6 +230,26 @@ export const useOrderStore = defineStore("orderStore", () => {
     borrowedBooks.value = [];
     userOrders.value = [];
   }
+
+  function resetModalState() {
+    modalState.value = {
+      isOpen: false,
+      currentStep: 0,
+      steps: [
+        { title: "Проверка авторизации", error: null },
+        { title: "Проверка количества книг", error: null },
+        { title: "Проверка возвращаемых книг", error: null },
+        { title: "Проверка доступности книг", error: null },
+        { title: "Проверка лимитов", error: null },
+        { title: "Создание заказа", error: null },
+      ],
+      isSuccess: false,
+      isError: false,
+      orderId: null,
+      errorMessage: null,
+    };
+  }
+
   return {
     handleCreateOrder,
     selectedBooks,
@@ -172,5 +257,6 @@ export const useOrderStore = defineStore("orderStore", () => {
     borrowedBooks,
     handleDeleteOrder,
     addBook,
+    modalState,
   };
 });
