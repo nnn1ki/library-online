@@ -103,10 +103,19 @@ class UpdateOrderSerializer(aserializers.Serializer):
         new_status = validated_data["status"]
 
         if (new_status["status"] == OrderHistory.Status.PROCESSING):
-            await OrderHistory.objects.acreate(order=instance, 
+            await OrderHistory.objects.acreate(
+                order=instance, 
                 status=OrderHistory.Status.PROCESSING,
                 description=new_status["description"],
-                staff=user)
+                staff=user
+            )
+            
+        elif (new_status["status"] == OrderHistory.Status.NEW):
+            await OrderHistory.objects.filter(
+                order = instance,
+                staff = user,
+                status=OrderHistory.Status.PROCESSING
+            ).adelete()
             
         elif (new_status["status"] == OrderHistory.Status.READY):
             order_books = validated_data["books"]
@@ -127,10 +136,46 @@ class UpdateOrderSerializer(aserializers.Serializer):
                 
                 await order_item.asave()
 
-            await OrderHistory.objects.acreate(order=instance, 
+            await OrderHistory.objects.acreate(
+                order=instance, 
                 status=OrderHistory.Status.READY,
                 description=new_status["description"],
-                staff=user)
+                staff=user
+            )
+            
+        elif (new_status["status"] == OrderHistory.Status.DONE):
+
+            #TODO: нужно проверять какие книги сотрудник пропи кал по итогу, и уже с ними работать
+
+            await OrderHistory.objects.acreate(
+                order=instance, 
+                status=OrderHistory.Status.DONE,
+                description=new_status["description"],
+                staff=user
+            )
+
+        elif (new_status["status"] == OrderHistory.Status.CANCELLED):
+            order_items_list: list[OrderItem] = OrderItem.objects.filter(order = instance).all()
+
+            async for order_item in order_items_list:
+                order_item.status = OrderItem.Status.CANCELLED
+                await order_item.asave()
+
+                if (order_item.analogous_order_item is not None):
+                    await OrderItem.objects.filter(id = order_item.aanlogous_order_item.id).adelete()
+                
+            items_to_return: list[OrderItem] = OrderItem.objects.filter(order_to_return = instance).all()
+
+            async for order_item in items_to_return:
+                order_item.order_to_return = None
+                await order_item.asave()
+
+            await OrderHistory.objects.acreate(
+                order=instance, 
+                status=OrderHistory.Status.CANCELLED,
+                description=new_status["description"],
+                staff=user
+            )
 
         return validated_data
     
