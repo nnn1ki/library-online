@@ -120,21 +120,21 @@ class UpdateOrderSerializer(aserializers.Serializer):
         elif (new_status["status"] == OrderHistory.Status.READY):
             order_books = validated_data["books"]
 
-            async for order_item in order_books:
-                if validated_data["exemplar_id"] is not None:
-                    order_item.exemplar_id = validated_data["exemplar_id"]
+            # async for order_item in order_books:
+            #     if validated_data["exemplar_id"] is not None:
+            #         order_item.exemplar_id = validated_data["exemplar_id"]
                 
-                if validated_data["analogous_order_item"] is not None:
-                    analogous_order_item = await OrderItem.objects.acreate(
-                        order = instance,
-                        book_id = validated_data["analogous_order_item"]["book_id"],
-                        exemplar_id = validated_data["analogous_order_item"]["exemplar_id"],
-                        status = OrderItem.Status.ORDERED
-                    )
+            #     if validated_data["analogous_order_item"] is not None:
+            #         analogous_order_item = await OrderItem.objects.acreate(
+            #             order = instance,
+            #             book_id = validated_data["analogous_order_item"]["book_id"],
+            #             exemplar_id = validated_data["analogous_order_item"]["exemplar_id"],
+            #             status = OrderItem.Status.ORDERED
+            #         )
 
-                    order_item.analogous_order_item = analogous_order_item
+            #         order_item.analogous_order_item = analogous_order_item
                 
-                await order_item.asave()
+            #     await order_item.asave()
 
             await OrderHistory.objects.acreate(
                 order=instance, 

@@ -38,7 +38,7 @@
           @click="currentTab = tabsNumbers.archive"
           href="#"
         >
-          Архив <span class="badge bg-danger">{{ readyOrdersCount }}</span>
+          Архив <span class="badge bg-danger">{{ archiveOrdersCount }}</span>
         </a>
       </li>
     </ul>
@@ -179,6 +179,8 @@ const currentData = computed<UserOrder[]>((): UserOrder[] => {
       return tabs.value[tabsNumbers.processing].data;
     case tabsNumbers.ready:
       return tabs.value[tabsNumbers.ready].data;
+    case tabsNumbers.archive:
+      return tabs.value[tabsNumbers.archive].data;
     default:
       return [];
   }
