@@ -65,6 +65,7 @@ export type OrderStatus = {
   status: OrderStatusEnum;
   date: string;
   description: string;
+  staff: ProfileInfo;
 };
 
 export const orderBookStatuses = {

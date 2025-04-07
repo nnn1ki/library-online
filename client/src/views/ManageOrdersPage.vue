@@ -67,7 +67,7 @@ import {
   fetchArchiveOrders,
 } from "@/api/order";
 import type { UserOrder, Order, OrderStatusEnum } from "@/api/types";
-import { getOrder, updateOrderStatus } from "@/api/order";
+import { getOrderStaff, updateOrderStatus } from "@/api/order";
 import { RefSymbol } from "@vue/reactivity";
 const toast = useToast();
 const notifStore = useNotificationStore();
@@ -186,7 +186,7 @@ const currentData = computed<UserOrder[]>((): UserOrder[] => {
 
 const fetchOrder = async (orderId: number) => {
   isLoading.value = true;
-  selectedOrder.value = await getOrder(orderId);
+  selectedOrder.value = await getOrderStaff(orderId);
   isLoading.value = false;
 };
 

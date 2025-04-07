@@ -47,7 +47,7 @@ router.register("borrowed", BorrowedViewset, basename="borrowed")
 router.register("library-settings", LibrarySettingsViewSet, basename="library-settings")
 router.register("staff", StaffOrderViewset, basename="staff")
 router.register("staff/order", StaffOrderGetUpdateViewset, basename="staff/order")
-router.register("staff/order/borrowed/", StaffBorrowedViewset, basename="staff/order/borrowed/")
+router.register("staff/order/borrowed", StaffBorrowedViewset, basename="staff/order/borrowed")
 
 
 urlpatterns = [

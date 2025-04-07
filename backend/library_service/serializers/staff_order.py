@@ -29,7 +29,7 @@ class StaffOrderSerializer(aserializers.ModelSerializer):
         fields = ["id", "username", "first_name", "last_name", "campus_id", "mira_id"]
 
 class OrderStatusSerializer(aserializers.ModelSerializer):
-    staff = StaffOrderSerializer()
+    #staff = StaffOrderSerializer(required = False)
 
     class Meta:
         model = OrderHistory
@@ -75,7 +75,6 @@ class OrderSerializer(aserializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ["id", "library", "statuses", "books"]
-        list_serializer_class = ParallelListSerializer
 
 
 class UserOrderSerializer(aserializers.ModelSerializer):

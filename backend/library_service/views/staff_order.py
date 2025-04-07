@@ -34,7 +34,6 @@ ACCEPTABLE_STATUSES = [
 ]
 
 class StaffOrderViewset(
-    LockUserMixin,
     SessionListModelMixin,
     AsyncGenericViewSet,
 ):
@@ -81,7 +80,7 @@ class StaffOrderViewset(
         return Response(data)
     
 class StaffOrderGetUpdateViewset(
-    LockUserMixin,
+    SessionListModelMixin,
     SessionRetrieveModelMixin,
     SessionUpdateModelMixin,
     AsyncGenericViewSet,
@@ -95,6 +94,9 @@ class StaffOrderGetUpdateViewset(
         else: 
             return OrderSerializer
         
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("library")
+        
 class StaffBorrowedViewset(
     SessionRetrieveModelMixin,
     SessionListModelMixin,
@@ -104,11 +106,12 @@ class StaffBorrowedViewset(
     queryset = OrderItem.objects.all()
     serializer_class = BorrowedBookSerializer
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("library")
+
     #Получаем спсиок задолжностей, которые обещали принести с заказом
     async def aget_object(self):
         pk = self.kwargs["pk"]
         order: Order = await self.get_queryset().filter(id=pk).afirst()
 
         return await self.get_queryset().filter(order_to_return = order)
-
-        return super().aget_object()

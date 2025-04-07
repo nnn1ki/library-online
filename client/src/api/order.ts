@@ -94,6 +94,17 @@ export async function getOrder(orderId: number): Promise<Order> {
   }
 }
 
+export async function getOrderStaff(orderId: number): Promise<Order> {
+  try {
+    const { data } = await axios.get(`/api/staff/order/${orderId}/`);
+    console.log(`/api/staff/order/${orderId}`, data);
+    return data;
+  } catch (error) {
+    console.error("Ошибка при получении заказа", error);
+    throw error;
+  }
+}
+
 export async function createOrder(libraryId: number, bookIds: string[], borrowedBookIds: number[]) {
   try {
     await axios.post("/api/order/", {
