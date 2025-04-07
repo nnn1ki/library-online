@@ -89,11 +89,10 @@ class UserOrderSerializer(aserializers.ModelSerializer):
         list_serializer_class = ParallelListSerializer
 
 class OrderBookSerializer(serializers.ModelSerializer): 
-    book_id = serializers.CharField()
 
     class Meta:
         model = OrderItem
-        fields = ["book_id", "status", "description", "analogous_order_item_id"]
+        fields = ["id", "exemplar_id" "status", "description", "analogous_order_item_id"]
         list_serializer_class = ParallelListSerializer
 
 class UpdateOrderSerializer(aserializers.Serializer):
@@ -105,15 +104,45 @@ class UpdateOrderSerializer(aserializers.Serializer):
         new_status = validated_data["status"]
 
         if (new_status["status"] == OrderHistory.Status.PROCESSING):
-            await OrderHistory.objects.acreate(order=instance, status=OrderHistory.Status.PROCESSING, description=new_status["description"], staff=user)
+            await OrderHistory.objects.acreate(order=instance, 
+                status=OrderHistory.Status.PROCESSING,
+                description=new_status["description"],
+                staff=user)
+            
         elif (new_status["status"] == OrderHistory.Status.READY):
             order_books = validated_data["books"]
 
-            # async for order_item in :
-            #     order_item.order_to_return = None
-            #     await order_item.asave()
+            async for order_item in order_books:
+                if validated_data["exemplar_id"] is not None:
+                    order_item.exemplar_id = validated_data["exemplar_id"]
+                
+                if validated_data["analogous_order_item"] is not None:
+                    analogous_order_item = await OrderItem.objects.acreate(
+                        order = instance,
+                        book_id = validated_data["analogous_order_item"]["book_id"],
+                        exemplar_id = validated_data["analogous_order_item"]["exemplar_id"],
+                        status = OrderItem.Status.ORDERED
+                    )
 
-            # instance.library = await Library.objects.aget(pk=validated_data["library"])
-            # await instance.asave()
+                    order_item.analogous_order_item = analogous_order_item
+                
+                await order_item.asave()
+
+            await OrderHistory.objects.acreate(order=instance, 
+                status=OrderHistory.Status.READY,
+                description=new_status["description"],
+                staff=user)
 
         return validated_data
+    
+
+class BorrowedBookSerializer(aserializers.ModelSerializer):
+    book = afields.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = ["id", "book", "order", "handed_date", "to_return_date"]
+        list_serializer_class = ParallelListSerializer
+
+    async def get_book(self, obj: OrderItem):
+        return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data

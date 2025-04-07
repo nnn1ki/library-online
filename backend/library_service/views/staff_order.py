@@ -23,6 +23,7 @@ from library_service.serializers.staff_order import (
     UserOrderSerializer,
     OrderSerializer,
     UpdateOrderSerializer,
+    BorrowedBookSerializer,
 )
 
 ACCEPTABLE_STATUSES = [
@@ -35,9 +36,6 @@ ACCEPTABLE_STATUSES = [
 class StaffOrderViewset(
     LockUserMixin,
     SessionListModelMixin,
-    SessionRetrieveModelMixin,
-    SessionCreateModelMixin,
-    SessionUpdateModelMixin,
     AsyncGenericViewSet,
 ):
     permission_classes = [IsAuthenticated]
@@ -82,11 +80,9 @@ class StaffOrderViewset(
         data = await self.get_data(target_status)
         return Response(data)
     
-class StaffOrderUpdateViewset(
+class StaffOrderGetUpdateViewset(
     LockUserMixin,
-    SessionListModelMixin,
     SessionRetrieveModelMixin,
-    SessionCreateModelMixin,
     SessionUpdateModelMixin,
     AsyncGenericViewSet,
 ):
@@ -94,9 +90,25 @@ class StaffOrderUpdateViewset(
     queryset = Order.objects.all()
     
     def get_serializer_class(self):
-        if self.action in ["get_orders"]:
-            return UserOrderSerializer
-        elif self.action in ["aupdate"]:
+        if self.action in ["aupdate"]:
             return UpdateOrderSerializer
         else: 
             return OrderSerializer
+        
+class StaffBorrowedViewset(
+    SessionRetrieveModelMixin,
+    SessionListModelMixin,
+    AsyncGenericViewSet,
+):
+    permission_classes = [IsAuthenticated]
+    queryset = OrderItem.objects.all()
+    serializer_class = BorrowedBookSerializer
+
+    #Получаем спсиок задолжностей, которые обещали принести с заказом
+    async def aget_object(self):
+        pk = self.kwargs["pk"]
+        order: Order = await self.get_queryset().filter(id=pk).afirst()
+
+        return await self.get_queryset().filter(order_to_return = order)
+
+        return super().aget_object()

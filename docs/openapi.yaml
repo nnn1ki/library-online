@@ -597,8 +597,10 @@ paths:
                   items:
                     type: object
                     properties:
-                      book_id:
+                      id:
                         $ref: "#/components/schemas/OrderBookId"
+                      exemplar_id:
+                        $ref: "#/components/schemas/ExemplarId"
                       status:
                         type: string
                         description: Статус книги
@@ -610,10 +612,8 @@ paths:
                       description:
                         type: string
                         description: Комментарий по ненайденной книге
-                      analogous_order_item_id:
-                        type: number
-                        nullable: true
-                        description: ID элемента заказа, на который заменена книга
+                      analogous_order_item:
+                        $ref: "#/components/schemas/AnalogousOrderItem"
       responses:
         '200':
           description: OK
@@ -662,8 +662,35 @@ paths:
         '403':
           description: Forbidden
         '404':
-          description: Not Found                  
-  
+          description: Not Found         
+
+  /api/staff/order/borrowed/{id}/:
+    get:
+      tags:
+        - staff
+      security:
+        - bearer: []         
+      summary: Получение списка долгов, которые обещали принести при получении заказа с текущем id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/OrderId"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BorrowedBook"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+
   /api/admin/settings/:
     get:
       tags:
@@ -1134,6 +1161,14 @@ components:
         last_name:
           description: Фамилия
           type: string
+
+    AnalogousOrderItem:
+      type: object
+      properties:
+        book_id:
+          $ref: "#/components/schemas/BookId"
+        exemplar_id:
+          $ref: "#/components/schemas/ExemplarId"
 
     LibraryParams:
       type: object
