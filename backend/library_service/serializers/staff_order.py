@@ -1,19 +1,18 @@
-import asyncio
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from adrf import serializers as aserializers
 from adrf import fields as afields
 
 from library_service.models.order import Order, OrderHistory, OrderItem
-from library_service.opac.book import book_retrieve, book_retrieve_safe
-from library_service.models.catalog import Library
+from library_service.opac.book import book_retrieve
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
 from library_service.serializers.parallel_list import ParallelListSerializer
+
+from library_service.opac.api.ticket import OpacLoan
 
 User = get_user_model()
 
@@ -192,7 +191,36 @@ class BorrowedBookSerializer(aserializers.ModelSerializer):
         return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
     
 class CheckOrderSerializer(aserializers.Serializer):
+    found_books = serializers.SerializerMethodField()
+    notfound_books = serializers.SerializerMethodField()
+    additional_books = serializers.SerializerMethodField()
 
-    async def check_order(self):
-        #TODO
-        pass
+    async def get_found_books(self, order: Order, loans):
+        books = OrderItem.objects.filter(order = order).all()
+        found_books = []
+        
+        for book in books:
+            if book.book_id in loans:
+                found_books.append(book)
+                
+        return found_books
+
+    async def get_notfound_books(self, order: Order, loans):
+        books = OrderItem.objects.filter(order = order).all()
+        notfound_books = []
+        
+        for book in books:
+            if book.book_id not in loans:
+                notfound_books.append(book)
+                
+        return notfound_books
+
+    async def get_additional_books(self, order: Order, loans):
+        books = OrderItem.objects.filter(order = order).values("book_id").all()
+        additional_books = []
+        
+        for loan in loans:
+            if loan not in books:
+                additional_books.append(loan)
+                
+        return additional_books

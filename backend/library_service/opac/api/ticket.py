@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses_json import DataClassJsonMixin, config, Undefined
 from aiohttp import ClientSession
-from django.conf import settings
+from app import local_settings as settings
 
 headers={"X-ISTU-Request": settings.OPAC_INTERNAL_TOKEN}
 
@@ -13,11 +13,11 @@ class OpacReader(DataClassJsonMixin):
     category: str | None = None
     departemnt: str | None = None
     mail: str | None = None
-    allowed: bool
-    debtor : bool
-    gone: bool
-    academ: bool
-    everlasting: bool
+    allowed: bool = False
+    debtor : bool = False
+    gone: bool = False
+    academ: bool = False
+    everlasting: bool = False
 
 @dataclass
 class OpacLoan(DataClassJsonMixin):
@@ -29,10 +29,10 @@ class OpacLoan(DataClassJsonMixin):
     book: str | None = None
     number: str | None = None
     description: str | None = None
-    date: str
-    deadline: str
-    prolongation: int
-
+    date: str | None = None
+    deadline: str | None = None
+    prolongation: int = 0
+#Тут проблема, добавил лишние None из-за постоянной ошибки "non-default argument 'prolongation' follows default argument"
 
 async def opac_reader_info_by_mira(client: ClientSession, mira_id) -> OpacReader:
     r = await client.get(f"{settings.OPAC_HOSTNAME}/api/readers/mira/internal/{mira_id}", headers=headers)

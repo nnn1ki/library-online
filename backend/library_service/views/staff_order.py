@@ -1,13 +1,19 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from asgiref.sync import sync_to_async
 from django.db.models import OuterRef, Subquery
 
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
+
+from library_service.models.user import UserProfile
+
+from library_service.opac.api.ticket import opac_reader_loans
+from library_service.opac.book import book_retrieve_by_id
+
+from aiohttp import ClientSession
 
 from library_service.mixins import (
     LockUserMixin,
@@ -100,8 +106,20 @@ class StaffOrderGetUpdateViewset(
     def get_queryset(self):
         return super().get_queryset().prefetch_related("library")
     
-    async def check_order(self):
-        return self.get_serializer().check_order(self)
+    @action(detail=False, methods=["GET"], url_path="check/(?P<order_id>\w+)")
+    async def check_order(self, request, order_id = None):
+        order: Order = await Order.objects.aget(id = order_id)
+        profile: UserProfile = await UserProfile.objects.aget(user = order.user)
+
+        async with ClientSession() as client:
+            loans = await opac_reader_loans(client, profile.library_card)
+
+        loans_id_list = []
+        for loan in loans:
+            book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
+            loans_id_list.append(book.id)
+        
+        return await self.get_serializer(self, order, loans_id_list)
         
 class StaffBorrowedViewset(
     SessionRetrieveModelMixin,

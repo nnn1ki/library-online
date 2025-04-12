@@ -67,3 +67,10 @@ async def opac_book_retrieve(client: ClientSession, database: str, mfn: int) -> 
     r = await client.get(f"{settings.OPAC_HOSTNAME}/api/books/by/mfn/{database}/{mfn}", params=params)
     r.raise_for_status()
     return OpacBook.schema().load(await r.json())
+
+async def opac_book_retrieve_by_id(client: ClientSession, database: str, id: int) -> OpacBook:
+    params = {"format": "@opac_plain", "extended": "true"}
+
+    r = await client.get(f"{settings.OPAC_HOSTNAME}/api/books/?db={database}&id={id}", params=params)
+    r.raise_for_status()
+    return OpacBook.schema().load(await r.json())
