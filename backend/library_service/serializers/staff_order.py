@@ -190,3 +190,9 @@ class BorrowedBookSerializer(aserializers.ModelSerializer):
 
     async def get_book(self, obj: OrderItem):
         return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
+    
+class CheckOrderSerializer(aserializers.Serializer):
+
+    async def check_order(self):
+        #TODO
+        pass

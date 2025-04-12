@@ -24,6 +24,7 @@ from library_service.serializers.staff_order import (
     OrderSerializer,
     UpdateOrderSerializer,
     BorrowedBookSerializer,
+    CheckOrderSerializer,
 )
 
 ACCEPTABLE_STATUSES = [
@@ -91,11 +92,16 @@ class StaffOrderGetUpdateViewset(
     def get_serializer_class(self):
         if self.action in ["aupdate"]:
             return UpdateOrderSerializer
+        elif self.action in ["check_order"]:
+            return CheckOrderSerializer
         else: 
             return OrderSerializer
         
     def get_queryset(self):
         return super().get_queryset().prefetch_related("library")
+    
+    async def check_order(self):
+        return self.get_serializer().check_order(self)
         
 class StaffBorrowedViewset(
     SessionRetrieveModelMixin,
