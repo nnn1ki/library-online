@@ -9,14 +9,16 @@
     <div class="book-list">
       <div v-for="orderBook in order.books" :key="orderBook.book.id" class="book-item">
         <div class="book-info">
-          <ShortBookCard :book="orderBook.book" />
-          <StyledButton
-            @click="onAddToOrderClick(orderBook.book)"
-            theme="secondary"
-            v-if="canReorder"
-          >
-            Заказать еще раз
-          </StyledButton>
+          <div class="col">
+            <ShortBookCard :book="orderBook.book" />
+          </div>
+            <StyledButton
+              @click="onAddToOrderClick(orderBook.book)"
+              theme="secondary"
+              v-if="canReorder"
+            >
+              Заказать еще раз
+            </StyledButton>
         </div>
       </div>
     </div>
@@ -175,6 +177,7 @@ const onAddToOrderClick = (bookToOrder: Book) => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 }
 
 .book-item {

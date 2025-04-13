@@ -1,4 +1,6 @@
 <template>
+  <!-- TODO: адаптация под мобилки -->
+
   <div class="card" :class="{ announcement: announcement }">
     <div class="book-image" :class="{ announcement: announcement }">
       <BookImage
@@ -118,7 +120,7 @@ const bookLink = computed(
 }
 
 .card-body {
-  padding: 1rem;
+  padding: 1rem 0.5rem 1rem 0.5rem;
 }
 
 .card-title {
