@@ -36,6 +36,7 @@ import { useOrderStore } from "@/stores/orderStore";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import SurfaceCard from "@/components/SurfaceCard.vue";
+import { log } from "console";
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];
 const orderStore = useOrderStore();
@@ -54,8 +55,17 @@ const canCancelOrder = computed(() => allowedCancelStatuses.includes(currentStat
 const canReorder = computed(() => !notAllowedToReOrderBoookStatuses.includes(currentStatus.value));
 const showOrderActions = computed(() => canCancelOrder.value);
 
-const orderedDate = order.statuses.at(0)?.date.slice(0, 10);
-const lastStatusDate = order.statuses.at(-1)?.date.slice(0, 10);
+const orderedDate = formatDate(order.statuses[0].date);
+const lastStatusDate = formatDate(order.statuses[1].date);
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const year = date.getFullYear().toString().padStart(4, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+
+  return `${day}.${month}.${year}`;
+}
 
 const currentStatus = computed(() => {
   const lastStatus = order.statuses[order.statuses.length - 1]?.status;

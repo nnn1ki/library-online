@@ -11,7 +11,7 @@
             </span>
           </th>
           <th scope="col" @click="sortOrders('date')">
-            Дата
+            Дата и время
             <span v-if="sortKey === 'date'">
               <i :class="sortOrder === 1 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
             </span>
@@ -65,7 +65,8 @@ function formatDate(dateString: string): string {
   const minutes = date.getMinutes().toString().padStart(2, "0");
   const seconds = date.getSeconds().toString().padStart(2, "0");
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  // return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return `${day}.${month}.${year} | ${hours}:${minutes}:${seconds}`;
 }
 
 // Функция для раскраски таблицы
