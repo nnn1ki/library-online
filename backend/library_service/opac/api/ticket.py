@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses_json import DataClassJsonMixin, config, Undefined
 from aiohttp import ClientSession
-from app import local_settings as settings
+import local_settings as settings
 
 headers={"X-ISTU-Request": settings.OPAC_INTERNAL_TOKEN}
 
