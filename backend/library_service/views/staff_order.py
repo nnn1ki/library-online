@@ -92,7 +92,7 @@ class StaffOrderGetUpdateViewset(
     SessionUpdateModelMixin,
     AsyncGenericViewSet,
 ):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
     
     def get_serializer_class(self):
@@ -107,19 +107,14 @@ class StaffOrderGetUpdateViewset(
         return super().get_queryset().prefetch_related("library")
     
     @action(detail=False, methods=["GET"], url_path="check/(?P<order_id>\w+)")
-    async def check_order(self, request, order_id = None):
-        order: Order = await Order.objects.aget(id = order_id)
-        profile: UserProfile = await UserProfile.objects.aget(user = order.user)
+    async def check_order(self, request, order_id = None):        
+        serializer = self.get_serializer(self, order_id)
+        print(serializer.is_valid())
+        print(serializer)
+        if (serializer.is_valid()):
+            print(serializer.data)
+        return Response(await serializer.adata)
 
-        async with ClientSession() as client:
-            loans = await opac_reader_loans(client, profile.library_card)
-
-        loans_id_list = []
-        for loan in loans:
-            book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
-            loans_id_list.append(book.id)
-        
-        return await self.get_serializer(self, order, loans_id_list)
         
 class StaffBorrowedViewset(
     SessionRetrieveModelMixin,

@@ -7,12 +7,17 @@ from adrf import serializers as aserializers
 from adrf import fields as afields
 
 from library_service.models.order import Order, OrderHistory, OrderItem
+from library_service.models.user import UserProfile
 from library_service.opac.book import book_retrieve
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
 from library_service.serializers.parallel_list import ParallelListSerializer
 
 from library_service.opac.api.ticket import OpacLoan
+from library_service.opac.api.ticket import opac_reader_loans
+from library_service.opac.book import book_retrieve_by_id
+
+from aiohttp import ClientSession
 
 User = get_user_model()
 
@@ -191,35 +196,73 @@ class BorrowedBookSerializer(aserializers.ModelSerializer):
         return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
     
 class CheckOrderSerializer(aserializers.Serializer):
-    found_books = serializers.SerializerMethodField()
-    notfound_books = serializers.SerializerMethodField()
-    additional_books = serializers.SerializerMethodField()
+    found_books = afields.SerializerMethodField()
+    notfound_books = afields.SerializerMethodField()
+    additional_books = afields.SerializerMethodField()
 
-    async def get_found_books(self, order: Order, loans):
+    async def get_found_books(self, order_id):
+        order: Order = Order.objects.get(id = order_id)
+        profile: UserProfile = await UserProfile.objects.aget(user = order.user)
+
+        loans_id_list = []
+
+        async with ClientSession() as client:
+            loans = await opac_reader_loans(client, profile.library_card)
+
+            for loan in loans:
+                book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
+                loans_id_list.append(book.id)
+
         books = OrderItem.objects.filter(order = order).all()
         found_books = []
         
         for book in books:
-            if book.book_id in loans:
+            if book.book_id in loans_id_list:
                 found_books.append(book)
                 
         return found_books
 
-    async def get_notfound_books(self, order: Order, loans):
+    async def get_notfound_books(self, order_id):
+        order: Order = Order.objects.get(id = order_id)
+        profile: UserProfile = await UserProfile.objects.aget(user = order.user)
+
+        print(order)
+
+        loans_id_list = []
+
+        async with ClientSession() as client:
+            loans = await opac_reader_loans(client, profile.library_card)
+
+            for loan in loans:
+                book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
+                loans_id_list.append(book.id)
+
         books = OrderItem.objects.filter(order = order).all()
         notfound_books = []
         
         for book in books:
-            if book.book_id not in loans:
+            if book.book_id not in loans_id_list:
                 notfound_books.append(book)
                 
         return notfound_books
 
-    async def get_additional_books(self, order: Order, loans):
+    async def get_additional_books(self, order_id):
+        order: Order = Order.objects.get(id = order_id)
+        profile: UserProfile = await UserProfile.objects.aget(user = order.user)
+
+        loans_id_list = []
+
+        async with ClientSession() as client:
+            loans = await opac_reader_loans(client, profile.library_card)
+
+            for loan in loans:
+                book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
+                loans_id_list.append(book.id)
+
         books = OrderItem.objects.filter(order = order).values("book_id").all()
         additional_books = []
         
-        for loan in loans:
+        for loan in loans_id_list:
             if loan not in books:
                 additional_books.append(loan)
                 
