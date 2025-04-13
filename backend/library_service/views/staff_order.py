@@ -92,7 +92,7 @@ class StaffOrderGetUpdateViewset(
     SessionUpdateModelMixin,
     AsyncGenericViewSet,
 ):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
     
     def get_serializer_class(self):

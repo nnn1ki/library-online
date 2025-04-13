@@ -206,12 +206,11 @@ class CheckOrderSerializer(aserializers.Serializer):
 
         loans_id_list = []
 
-        async with ClientSession() as client:
-            loans = await opac_reader_loans(client, profile.library_card)
+        loans = await opac_reader_loans(self.context["client_session"], profile.library_card)
 
-            for loan in loans:
-                book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
-                loans_id_list.append(book.id)
+        for loan in loans:
+            book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
+            loans_id_list.append(book.id)
 
         books = OrderItem.objects.filter(order = order).all()
         found_books = []
@@ -230,12 +229,11 @@ class CheckOrderSerializer(aserializers.Serializer):
 
         loans_id_list = []
 
-        async with ClientSession() as client:
-            loans = await opac_reader_loans(client, profile.library_card)
+        loans = await opac_reader_loans(self.context["client_session"], profile.library_card)
 
-            for loan in loans:
-                book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
-                loans_id_list.append(book.id)
+        for loan in loans:
+            book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
+            loans_id_list.append(book.id)
 
         books = OrderItem.objects.filter(order = order).all()
         notfound_books = []
@@ -252,12 +250,11 @@ class CheckOrderSerializer(aserializers.Serializer):
 
         loans_id_list = []
 
-        async with ClientSession() as client:
-            loans = await opac_reader_loans(client, profile.library_card)
+        loans = await opac_reader_loans(self.context["client_session"], profile.library_card)
 
-            for loan in loans:
-                book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
-                loans_id_list.append(book.id)
+        for loan in loans:
+            book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
+            loans_id_list.append(book.id)
 
         books = OrderItem.objects.filter(order = order).values("book_id").all()
         additional_books = []
