@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses_json import DataClassJsonMixin, config, Undefined
 from aiohttp import ClientSession
-import app.local_settings as settings
+from django.conf import settings
 
 headers={"X-ISTU-Request": settings.OPAC_INTERNAL_TOKEN}
 

@@ -5,6 +5,7 @@ SERVICE_HOSTNAME = "http://localhost:5173"
 
 OAUTH_CLIENT_ID = ""
 OAUTH_CLIENT_SECRET = ""
+OPAC_INTERNAL_TOKEN=""
 
 # for SQLite
 DATABASES = {
