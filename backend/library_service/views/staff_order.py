@@ -31,6 +31,7 @@ from library_service.serializers.staff_order import (
     UpdateOrderSerializer,
     BorrowedBookSerializer,
     CheckOrderSerializer,
+    OrderItemSerializer,
 )
 
 ACCEPTABLE_STATUSES = [
@@ -106,28 +107,48 @@ class StaffOrderGetUpdateViewset(
     def get_queryset(self):
         return super().get_queryset().prefetch_related("library")
     
-    @sync_to_async
-    def get_order_and_profile(self, order_id):
-        order: Order = self.get_queryset().filter(id=order_id).first()
-        profile: UserProfile = UserProfile.objects.get(user = order.user)
-        return order, profile
-    
     @action(detail=False, methods=["GET"], url_path="check/(?P<order_id>\w+)")
     async def check_order(self, request, order_id = None):      
-        order, profile = await self.get_order_and_profile(order_id)
+        order: Order = await self.get_queryset().prefetch_related("user").filter(id=order_id).afirst()
+        profile: UserProfile = await UserProfile.objects.prefetch_related("user").aget(user = order.user)
 
         loans_id_list = []
 
         async with ClientSession() as client:
+            self.client_session = client
             loans = await opac_reader_loans(client, profile.library_card)
 
             for loan in loans:
                 book = await book_retrieve_by_id(client, loan.db, loan.book)
                 loans_id_list.append(book.id)  
 
-        serializer = self.get_serializer(order, loans_id_list)
-        print(serializer.is_valid())
-        return Response(await serializer.adata)
+            books = OrderItem.objects.prefetch_related("order").filter(order = order).all()
+            found_books = []
+            
+            async for book in books:
+                if book.book_id in loans_id_list:
+                    found_books.append(book)
+
+            notfound_books = []
+            
+            async for book in books:
+                if book.book_id not in loans_id_list:
+                    notfound_books.append(book)
+
+            additional_books = []
+            
+            for loan in loans_id_list:
+                if loan not in books:
+                    additional_books.append(loan)
+            
+            response = {
+                "found_books": await OrderItemSerializer(found_books, many=True, context = self.get_serializer_context()).adata,
+                "notfound_books": await OrderItemSerializer(notfound_books, many=True, context = self.get_serializer_context()).adata,
+                "additional_books": additional_books,
+            }
+
+        print(response)
+        return Response(response)
 
         
 class StaffBorrowedViewset(

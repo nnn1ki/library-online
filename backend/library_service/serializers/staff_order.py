@@ -166,7 +166,7 @@ class UpdateOrderSerializer(aserializers.Serializer):
                 await order_item.asave()
 
                 if (order_item.analogous_order_item is not None):
-                    await OrderItem.objects.filter(id = order_item.aanlogous_order_item.id).adelete()
+                    await OrderItem.objects.filter(id = order_item.analogous_order_item.id).adelete()
                 
             items_to_return: list[OrderItem] = OrderItem.objects.filter(order_to_return = instance).all()
 
@@ -196,38 +196,6 @@ class BorrowedBookSerializer(aserializers.ModelSerializer):
         return BookSerializer(await book_retrieve(self.context["client_session"], obj.book_id)).data
     
 class CheckOrderSerializer(aserializers.Serializer):
-    found_books = afields.SerializerMethodField()
-    notfound_books = afields.SerializerMethodField()
-    additional_books = afields.SerializerMethodField()
-
-    async def get_found_books(self, order, loans):
-        books = OrderItem.objects.filter(order = order).all()
-        found_books = []
-        
-        for book in books:
-            if book.book_id in loans:
-                found_books.append(book)
-                
-        return found_books
-
-    async def get_notfound_books(self, order, loans):
-        books = OrderItem.objects.filter(order = order).all()
-        notfound_books = []
-        
-        for book in books:
-            if book.book_id not in loans:
-                notfound_books.append(book)
-
-        print(notfound_books)
-                
-        return notfound_books
-
-    async def get_additional_books(self, order, loans):
-        books = OrderItem.objects.filter(order = order).values("book_id").all()
-        additional_books = []
-        
-        for loan in loans:
-            if loan not in books:
-                additional_books.append(loan)
-                
-        return additional_books
+    found_books = OrderItemSerializer(many = True)
+    notfound_books = OrderItemSerializer(many = True)
+    additional_books = serializers.ListField(child=serializers.CharField())

@@ -10,14 +10,14 @@ class OpacReader(DataClassJsonMixin):
     dataclass_json_config = config(undefined=Undefined.EXCLUDE)["dataclasses_json"]
     ticket: str
     name: str
+    allowed: bool
+    debtor : bool
+    gone: bool
+    academ: bool
+    everlasting: bool
     category: str | None = None
     departemnt: str | None = None
     mail: str | None = None
-    allowed: bool = False
-    debtor : bool = False
-    gone: bool = False
-    academ: bool = False
-    everlasting: bool = False
 
 @dataclass
 class OpacLoan(DataClassJsonMixin):
@@ -25,13 +25,13 @@ class OpacLoan(DataClassJsonMixin):
     type: str
     overdue: bool
     can: bool
-    db: str | None = None
-    book: str | None = None
-    number: str | None = None
+    db: str
+    book: str
+    number: str
+    date: str
+    deadline: str
+    prolongation: int
     description: str | None = None
-    date: str | None = None
-    deadline: str | None = None
-    prolongation: int = 0
 #Тут проблема, добавил лишние None из-за постоянной ошибки "non-default argument 'prolongation' follows default argument"
 
 async def opac_reader_info_by_mira(client: ClientSession, mira_id) -> OpacReader:
