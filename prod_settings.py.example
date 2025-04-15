@@ -11,6 +11,8 @@ OPAC_HOSTNAME = os.environ.get("OPAC_HOSTNAME")
 OAUTH_CLIENT_ID = os.environ.get("OAUTH_CLIENT_ID")
 OAUTH_CLIENT_SECRET = os.environ.get("OAUTH_CLIENT_SECRET")
 
+OPAC_INTERNAL_TOKEN = os.environ.get("OPAC_INTERNAL_TOKEN") 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
