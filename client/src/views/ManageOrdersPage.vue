@@ -48,6 +48,7 @@
       :order="selectedOrder"
       @close="selectedOrder = null"
       @next-order-status="handleUpdateOrderStatus"
+      @check-order="handleCheckOrder"
     />
     <LoadingModal v-model="isLoading" />
   </div>
@@ -66,8 +67,8 @@ import {
   fetchReadyOrders,
   fetchArchiveOrders,
 } from "@/api/order";
-import type { UserOrder, Order, OrderStatusEnum } from "@/api/types";
-import { getOrderStaff, updateOrderStatus } from "@/api/order";
+import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@/api/types";
+import { getOrderStaff, updateOrderStatus, checkOrder } from "@/api/order";
 import { RefSymbol } from "@vue/reactivity";
 const toast = useToast();
 const notifStore = useNotificationStore();
@@ -198,6 +199,14 @@ async function handleUpdateOrderStatus(orderId: number, newStatus: OrderStatusEn
     await updateOrderStatus(orderId, newStatus, description);
   } catch (error) {
     console.error("Ошибка при обновлении статуса заказа", error);
+  }
+}
+
+async function handleCheckOrder(orderId: number): Promise<OrderCheckingInfo | undefined> {
+  try {
+    return await checkOrder(orderId);
+  } catch (error) {
+    console.error("Ошибка при проверке готовности заказа", error);
   }
 }
 

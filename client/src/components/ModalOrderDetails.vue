@@ -85,7 +85,7 @@
 import { ref, computed } from "vue";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "./StyledButton.vue";
-import type { Order } from "@/api/types";
+import type { Order, OrderCheckingInfo } from "@/api/types";
 import type { OrderStatusEnum } from "@/api/types";
 import { orderStatuses, orderBookStatuses } from "@/api/types";
 
@@ -103,7 +103,7 @@ const statusTransitions = {
   processing: {
     next: "ready",
     prev: "new",
-    nextButtonText: "Завершить сборку",
+    nextButtonText: "Проверить готовность",
     prevButtonText: "Вернуть в новые",
   },
   ready: {
@@ -141,6 +141,7 @@ const statusTransitions = {
 const emit = defineEmits<{
   (e: "close"): void;
   (e: "nextOrderStatus", orderId: number, nextStatus: OrderStatusEnum): void;
+  (e: "checkOrder", orderId: number): OrderCheckingInfo;
 }>();
 
 const selectedOrder = ref<Order>(props.order);
@@ -194,6 +195,10 @@ const changeToNextStatus = () => {
     emit("nextOrderStatus", selectedOrder.value.id, nextStatus.value);
     emit("close");
   }
+};
+
+const checkOrder = () => {
+  emit("checkOrder", selectedOrder.value.id);
 };
 </script>
 

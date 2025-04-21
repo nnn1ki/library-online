@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { BorrowedBook, Order, UserOrder, OrderStatusEnum } from "@/api/types";
+import type { BorrowedBook, Order, UserOrder, OrderStatusEnum, OrderCheckingInfo } from "@/api/types";
 
 export async function updateOrderStatus(
   orderId: number,
@@ -86,6 +86,17 @@ export async function fetchArchiveOrders(): Promise<UserOrder[]> {
 export async function getOrder(orderId: number): Promise<Order> {
   try {
     const { data } = await axios.get(`/api/order/${orderId}/`);
+    console.log(`/api/order/${orderId}`, data);
+    return data;
+  } catch (error) {
+    console.error("Ошибка при получении заказа", error);
+    throw error;
+  }
+}
+
+export async function checkOrder(orderId: number): Promise<OrderCheckingInfo> {
+  try {
+    const { data } = await axios.get(`/api/staff/order/check/${orderId}/`);
     console.log(`/api/order/${orderId}`, data);
     return data;
   } catch (error) {

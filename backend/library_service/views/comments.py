@@ -4,7 +4,6 @@ from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 from library_service.serializers.comments import (
     OrderCommentSerrializer,
     OrderItemCommentSerializer,
-    OrderItemCommentTypeSerializer
 )
 
 from library_service.models.comments import OrderComment, OrderItemComment

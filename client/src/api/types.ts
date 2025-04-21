@@ -123,3 +123,9 @@ export type PaginatedOrders = {
   previous: string | null;
   results: UserOrder[];
 };
+
+export type OrderCheckingInfo = {
+  found_books: OrderBook[];
+  notfound_books: OrderBook[];
+  additional_books: string[];
+};

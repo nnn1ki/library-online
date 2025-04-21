@@ -30,7 +30,7 @@
               data-bs-target="#orderDetailsModal"
               @click="handleOpenOrderDetails(order.id)"
             >
-              <EllipsisHorizontalIcon />
+              Инфо
             </button>
           </td>
         </tr>
