@@ -33,7 +33,7 @@
           Подробнее <Bars3Icon class="button-icon" />
         </StyledButton>
 
-        <a v-if="bookLink !== undefined" :href="bookLink">
+        <a v-if="!announcement && bookLink !== undefined" :href="bookLink">
           <StyledButton theme="accent">
             Читать онлайн <BookOpenIcon class="button-icon" />
           </StyledButton>
@@ -42,6 +42,14 @@
         <StyledButton v-if="basketCart" theme="accent" @click="basketStore.removeBook(book)">
           Удалить <TrashIcon class="button-icon" />
         </StyledButton>
+      </div>
+
+      <div v-if="announcement && bookLink !== undefined" class="read-online-announcement">
+        <a :href="bookLink">
+          <StyledButton theme="accent" class="w-full">
+            Читать онлайн <BookOpenIcon class="button-icon" />
+          </StyledButton>
+        </a>
       </div>
     </div>
   </div>
@@ -168,6 +176,11 @@ const bookHint = computed(() => {
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
   }
+}
+
+.read-online-announcement {
+  padding-top: 1rem;
+  width: 100%;
 }
 
 .buttons {
