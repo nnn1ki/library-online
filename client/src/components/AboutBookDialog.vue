@@ -64,6 +64,7 @@ const basketStore = useBasketStore();
 
 const { books: basketBooks } = storeToRefs(basketStore);
 const isInBasket = computed(() => basketBooks.value.some((item) => item.id == book.id));
+
 const visible = defineModel<boolean>({ required: true });
 </script>
 

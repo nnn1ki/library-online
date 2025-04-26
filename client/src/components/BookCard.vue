@@ -1,5 +1,5 @@
 <template>
-  <div class="card" :class="{ announcement: announcement }">
+  <div class="card" :class="{ announcement: announcement }" :title="bookHint">
     <div class="book-image" :class="{ announcement: announcement }">
       <BookImage
         :class="{ 'rounded-left': !announcement, 'rounded-top': announcement }"
@@ -34,7 +34,7 @@
           Подробнее <Bars3Icon class="button-icon" />
         </StyledButton>
 
-        <a v-if="bookLink !== undefined" :href="bookLink">
+        <a v-if="!announcement && bookLink !== undefined" :href="bookLink">
           <StyledButton theme="accent">
             Читать онлайн <BookOpenIcon class="button-icon" />
           </StyledButton>
@@ -43,6 +43,14 @@
         <StyledButton v-if="basketCart" theme="accent" @click="basketStore.removeBook(book)">
           Удалить <TrashIcon class="button-icon" />
         </StyledButton>
+      </div>
+
+      <div v-if="announcement && bookLink !== undefined" class="read-online-announcement">
+        <a :href="bookLink">
+          <StyledButton theme="accent" class="w-full">
+            Читать онлайн <BookOpenIcon class="button-icon" />
+          </StyledButton>
+        </a>
       </div>
     </div>
   </div>
@@ -97,6 +105,22 @@ async function addBook() {
 const bookLink = computed(
   () => book.links.filter((link) => link.description === "Электронная библиотека ИРНИТУ")[0]?.url
 );
+
+const bookHint = computed(() => {
+  if (book.can_be_ordered) {
+    if (book.copies > 0) {
+      return `Книга доступна для заказа \nКниг, доступных для заказа: ${book.copies}`;
+    } else {
+      return "Доступных книг для заказа пока нет, закажите позже или возьмите в читальном зале";
+    }
+  } else {
+    if (book.links.length > 0) {
+      return "Можете только прочитать книгу онлайн";
+    } else {
+      return "Книга доступна только в зале";
+    }
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -191,6 +215,11 @@ const bookLink = computed(
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
   }
+}
+
+.read-online-announcement {
+  padding-top: 1rem;
+  width: 100%;
 }
 
 .buttons {

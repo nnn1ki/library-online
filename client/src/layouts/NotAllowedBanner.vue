@@ -22,7 +22,7 @@ import StyledButton from "@/components/StyledButton.vue";
 import ModalDialog from "@/components/ModalDialog.vue";
 
 const router = useRouter();
-const open = defineModel<boolean>();
+const open = defineModel<boolean>({ required: true });
 
 // Переход на страницу профиля
 const goToProfile = () => {

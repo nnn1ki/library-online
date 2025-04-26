@@ -1,21 +1,26 @@
 <template>
-  <div class="book-content">
-    <span class="book-index">📖 {{ num + 1 }}</span>
-    <div class="book-details">
-      <h3 class="book-title">
-        {{ book.title[0] }}
-        <span class="book-year">{{ book.year }}</span>
-      </h3>
-
-      <div class="book-authors">
-        <template v-if="book.author.length > 0">
-          <span class="author-icon">✍️</span>
-          {{ book.author.join(", ") }}
-        </template>
-        <template v-else-if="book.collective.length > 0">
-          <span class="collective-icon">👥</span>
-          {{ book.collective.join(", ") }}
-        </template>
+  <div class="book-details">
+    <div class="book-row">
+      <div class="icon-cell">📖</div>
+      <div class="content-cell">
+        <span class="book-title book"
+          >{{ book.title[0] }} <span class="year"> ({{ book.year }}) </span></span
+        >
+      </div>
+    </div>
+    <div v-if="book.author.length > 0 || book.collective.length > 0" class="book-row">
+      <div class="icon-cell">
+        <span v-if="book.author.length > 0">✍️</span>
+        <span v-else-if="book.collective.length > 0">👥</span>
+      </div>
+      <div class="content-cell author">
+        {{
+          book.author.length > 0
+            ? book.author.join(", ")
+            : book.collective.length > 0
+              ? book.collective.join(", ")
+              : "Автор не указан"
+        }}
       </div>
     </div>
   </div>
@@ -23,59 +28,52 @@
 
 <script setup lang="ts">
 import type { Book } from "@/api/types";
-const { book, num } = defineProps<{
+const { book } = defineProps<{
   book: Book;
-  num: number;
 }>();
 </script>
 
 <style scoped lang="scss">
-.book-content {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.book-index {
-  min-width: 32px;
-  height: 32px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-}
-
 .book-details {
-  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.book-row {
+  display: flex;
+  line-height: 1.3;
+  justify-content: baseline;
+}
+
+.icon-cell {
+  min-width: 1.5rem;
+  text-align: center;
+  padding-right: 0.3rem;
+}
+
+.content-cell {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
 }
 
 .book-title {
-  margin: 0;
   font-size: 1.1rem;
-  color: #34495e;
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
 }
 
-.book-year {
-  font-size: 0.9rem;
-  color: #7f8c8d;
+.book {
+  font-size: 1.1rem;
+  color: var(--color-text-700);
 }
 
-.book-authors {
-  margin-top: 0.5rem;
+.author {
   font-size: 0.95rem;
-  color: #7f8c8d;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  color: var(--color-text-600);
 }
 
-.author-icon,
-.collective-icon {
-  font-size: 0.9em;
+.year {
+  font-size: 0.9rem;
+  color: var(--color-text-600);
 }
 </style>

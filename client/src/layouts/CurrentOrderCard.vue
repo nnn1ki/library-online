@@ -1,5 +1,5 @@
 <template>
-  <div class="card order-card">
+  <SurfaceCard class="order-card">
     <div class="order-header">
       <span class="order-status">● Еще не заказали </span>
     </div>
@@ -11,16 +11,17 @@
     </div>
     <div class="order-actions-footer">
       <RouterLink to="/order">
-        <button class="btn btn-cancel">Продолжить оформление</button>
+        <StyledButton theme="primary">Продолжить оформление</StyledButton>
       </RouterLink>
     </div>
-  </div>
+  </SurfaceCard>
 </template>
 
 <script setup lang="ts">
 import type { Book } from "@/api/types";
 import ShortBookCard from "@/components/ShortBookCard.vue";
-
+import StyledButton from "@/components/StyledButton.vue";
+import SurfaceCard from "@/components/SurfaceCard.vue";
 const { order } = defineProps<{
   order: Book[];
 }>();
@@ -28,19 +29,16 @@ const { order } = defineProps<{
 
 <style scoped lang="scss">
 .order-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition:
     transform 0.2s ease,
     box-shadow 0.3s ease;
-  background: #ffffff;
+  background-color: var(--color-background-200);
   margin: 1rem 0;
-  padding: 1.5rem;
 }
 
 .order-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .order-header {
@@ -49,33 +47,32 @@ const { order } = defineProps<{
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--color-primary-700);
 }
 
 .order-number {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--color-text-900);
 }
 
 .order-cancel {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--color-text-900);
 }
 
 .order-status {
   font-size: 0.9rem;
   padding: 4px 8px;
   border-radius: 16px;
-  background: #f0f0f0;
-  color: #212bc3;
+  background-color: var(--color-primary-500);
+  color: #ffffff;
 }
 
 .book-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .book-item {
@@ -84,14 +81,13 @@ const { order } = defineProps<{
 
 .divider {
   border: none;
-  border-top: 1px solid #eee;
   margin: 1rem 0;
 }
 
 .order-actions-footer {
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-primary-700);
   display: flex;
   gap: 1rem;
   justify-content: flex-end;

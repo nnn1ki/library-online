@@ -38,12 +38,9 @@ erDiagram
     Order ||--|{ OrderItem : contains
     Order ||--|{ OrderHistory : has
     Basket ||--o{ BasketItem : contains
-<<<<<<< HEAD
-=======
     OrderItem ||--o| OrderItem : references
     OrderItem ||--o| Order : returns
     Order }o--|| Library : references
->>>>>>> main
 
     LibraryDatabase }|--|| Library : includes
 

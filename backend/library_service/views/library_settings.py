@@ -1,31 +1,30 @@
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import mixins
-from rest_framework.exceptions import APIException
+from rest_framework.decorators import action
 
+from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
+from adrf import mixins as amixins
 
 from library_service.models.library_settings import LibrarySettings
-from library_service.serializers.library_settings import LibrarySettingsSerializer, CreateUpdateLibrarySettingsSerializer
+from library_service.serializers.library_settings import LibrarySettingsSerializer
 
-class LibrarySettingsViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    GenericViewSet
-):
-    permission_classes = [IsAuthenticated]
+
+class LibrarySettingsViewSet(amixins.ListModelMixin, AsyncGenericViewSet):
+    serializer_class = LibrarySettingsSerializer
     queryset = LibrarySettings.objects.all()
 
-    def get_serializer_class(self):
-        if self.action in ["create", "update"]:
-            return CreateUpdateLibrarySettingsSerializer
-        return LibrarySettingsSerializer
+    async def aget_object(self):
+        return await LibrarySettings.aget_settings()
 
-    def get_queryset(self):
-        """Фильтрация данных для пользователя (например, администратор библиотеки может видеть только свои настройки)."""
-        return super().get_queryset()
+    async def alist(self, *args, **kwargs):
+        settings: LibrarySettings = await self.aget_object()
+        serializer = self.get_serializer(settings)
+        return Response(await serializer.adata)
 
-    def destroy(self, request, *args, **kwargs):
-        """Блокировка удаления настроек библиотеки."""
-        raise APIException("Удаление настроек библиотеки запрещено", code=400)
+    @action(detail=False, url_path="update", methods=["put"], permission_classes=[IsAuthenticated])  # TODO: IsAdmin
+    async def update_settings(self, request, *args, **kwargs):
+        serializer = self.get_serializer(await self.aget_object(), data=request.data)
+        serializer.is_valid(raise_exception=True)
+        await serializer.asave()
+
+        return await self.alist(*args, **kwargs)

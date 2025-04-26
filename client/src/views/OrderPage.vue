@@ -3,7 +3,7 @@
     <BorrowedBooks v-if="orderStore.borrowedBooks.length > 0" />
 
     <div class="order-summary">
-      <h2 class="summary-title">📚 Оформление заказа</h2>
+      <h2 class="summary-title"><BookOpenIcon class="title-icon" /> Оформление заказа</h2>
 
       <div class="book-list">
         <h5 class="section-subtitle">Выбранные книги</h5>
@@ -28,7 +28,6 @@
         </TransitionGroup>
       </div>
 
-      <!-- Информация о заказе -->
       <div class="order-info card">
         <div class="info-item">
           <span class="info-label">Книг в заказе:</span>
@@ -40,50 +39,54 @@
         </div>
       </div>
 
-      <!-- Поле для email -->
       <div class="email-input card">
         <label for="email" class="input-label">📧 Email (для уведомлений)</label>
-        <input
+        <TextField
           id="email"
           type="email"
           v-model="email"
           placeholder="example@mail.com"
-          class="styled-input"
+          class="email-input"
         />
         <div class="notifcation">
           <label for="email" class="input-label">📨 Уведомления в кампусе</label>
-          <input type="checkbox" class="notifcation-checkbox" />
+          <StyledCheckbox v-model="notifcations" />
         </div>
       </div>
 
-      <!-- Кнопка оформления -->
-      <button
+      <StyledButton
         class="order-button"
         @click="placeOrder"
         :disabled="loading"
         :class="{ processing: loading }"
       >
-        <span v-if="!loading">✅ Оформить заказ</span>
-        <span v-else>
-          <span class="button-spinner"></span>
+        <span v-if="!loading">Оформить заказ</span>
+        <span v-else class="button-spinner">
+          <LoadingSpinner />
           Обработка...
         </span>
-      </button>
+      </StyledButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onBeforeMount, computed } from "vue";
+import { BookOpenIcon } from "@heroicons/vue/24/outline";
+
 import BorrowedBooks from "@/layouts/BorrowedBooks.vue";
 import ShortBookCard from "@/components/ShortBookCard.vue";
+import StyledButton from "@/components/StyledButton.vue";
 import { useOrderStore } from "@/stores/orderStore";
 import { borrowedList } from "@/api/order";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import TextField from "@/components/TextField.vue";
+import StyledCheckbox from "@/components/StyledCheckbox.vue";
 
 const orderStore = useOrderStore();
 
-// Поле для ввода email (опционально)
 const email = ref("");
+const notifcations = ref(false);
 
 const booksToreturn = computed(() => {
   return orderStore.borrowedBooks.filter((book) =>
@@ -110,26 +113,19 @@ const removeBook = (id: string) => {
 <style scoped lang="scss">
 .notifcation {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   margin-top: 1rem;
-}
-
-.notifcation-checkbox {
-  width: 20px;
-  height: 20px;
-  margin-top: 0.3rem;
-  accent-color: #42b983;
 }
 
 .book-activities {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
 }
 
 .remove-icon {
   padding-top: 1rem;
+  color: var(--color-text-400);
 }
 
 .remove-icon:hover {
@@ -142,16 +138,25 @@ const removeBook = (id: string) => {
   padding: 0 1rem;
 }
 
+.title-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
 .summary-title {
-  color: #2c3e50;
+  color: var(--color-text-600);
   font-size: 2rem;
   margin-bottom: 2rem;
   text-align: center;
   font-weight: 600;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .card {
-  background: white;
+  background: var(--color-background-100);
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -165,11 +170,11 @@ const removeBook = (id: string) => {
 
 .book-item {
   margin-bottom: 1rem;
-  border-left: 4px solid #42b983;
+  border-left: 4px solid var(--color-primary-500);
 }
 
 .section-subtitle {
-  color: #7f8c8d;
+  color: var(--color-text-400);
   margin-bottom: 1.5rem;
   font-size: 1.1rem;
   font-weight: 500;
@@ -178,7 +183,7 @@ const removeBook = (id: string) => {
 .order-info {
   display: grid;
   gap: 1rem;
-  background: linear-gradient(145deg, #f6f6f6, #ffffff);
+  background: var(--color-background-200);
 }
 
 .info-item {
@@ -188,86 +193,37 @@ const removeBook = (id: string) => {
 }
 
 .info-label {
-  color: #7f8c8d;
+  color: var(--color-text-600);
   font-weight: 500;
 }
 
 .info-value {
-  color: #2c3e50;
+  color: var(--color-text-800);
   font-weight: 600;
 }
 
 .input-label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #7f8c8d;
+  color: var(--color-text-600);
   font-size: 0.9em;
 }
 
-.styled-input {
+.email-input {
   width: 100%;
   padding: 0.8rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.styled-input:focus {
-  border-color: #42b983;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(66, 185, 131, 0.1);
 }
 
 .order-button {
   width: 100%;
   padding: 1rem;
-  background: #42b983;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.order-button:hover:not(:disabled) {
-  background: #3aa076;
-  box-shadow: 0 4px 6px rgba(66, 185, 131, 0.2);
-}
-
-.order-button:disabled {
-  background: #95a5a6;
-  cursor: not-allowed;
-  opacity: 0.8;
 }
 
 .button-spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-  box-sizing: border-box;
-  /* Важно для правильного размера */
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 0.5rem;
 }
 
 .list-move,

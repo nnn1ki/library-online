@@ -62,6 +62,27 @@
   --color-accent-800: #3f2731;
   --color-accent-900: #1f1419;
   --color-accent-950: #100a0c;
+
+  --color-status-new: var(--color-primary-500);
+  --background-status-new: var(--color-primary-50);
+
+  --color-status-processing: var(--color-secondary-500);
+  --background-status-processing: var(--color-secondary-50);
+
+  --color-status-ready: var(--color-accent-500);
+  --background-status-ready: var(--color-accent-50);
+
+  --color-status-done: var(--color-primary-600);
+  --background-status-done: var(--color-primary-100);
+
+  --color-status-cancelled: var(--color-text-700);
+  --background-status-cancelled: var(--color-background-200);
+
+  --color-status-error: var(--color-accent-700);
+  --background-status-error: var(--color-accent-100);
+
+  --color-status-archived: var(--color-text-600);
+  --background-status-archived: var(--color-background-300);
 }
 
 @mixin -dark-theme-variables {
@@ -124,6 +145,27 @@
   --color-accent-800: #d8c0ca;
   --color-accent-900: #ebe0e5;
   --color-accent-950: #f5eff2;
+
+  --color-status-new: var(--color-primary-400);
+  --background-status-new: var(--color-primary-900);
+
+  --color-status-processing: var(--color-secondary-400);
+  --background-status-processing: var(--color-secondary-900);
+
+  --color-status-ready: var(--color-accent-400);
+  --background-status-ready: var(--color-accent-900);
+
+  --color-status-done: var(--color-primary-300);
+  --background-status-done: var(--color-primary-800);
+
+  --color-status-cancelled: var(--color-text-300);
+  --background-status-cancelled: var(--color-background-700);
+
+  --color-status-error: var(--color-accent-300);
+  --background-status-error: var(--color-accent-800);
+
+  --color-status-archived: var(--color-text-400);
+  --background-status-archived: var(--color-background-600);
 }
 
 @mixin light-theme {
