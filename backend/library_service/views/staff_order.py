@@ -105,7 +105,7 @@ class StaffOrderGetUpdateViewset(
             return OrderSerializer
         
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("library", "user", "user__profile", Prefetch("statuses__staff", queryset=OrderHistory.objects.select_related("order")))
+        return super().get_queryset().prefetch_related("library", "user", "user__profile", Prefetch("statuses", queryset=OrderHistory.objects.select_related("order")), "statuses__staff", "statuses__staff__profile")
     
     @action(detail=False, methods=["GET"], url_path="check/(?P<order_id>\w+)")
     async def check_order(self, request, order_id = None):      
