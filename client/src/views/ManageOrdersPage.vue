@@ -1,44 +1,44 @@
 <template>
-  <div class="container">
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
+  <div class="tabs-container">
+    <ul class="tabs">
+      <li class="tab-item">
         <a
-          class="nav-link"
+          class="tab-link"
           :class="{ active: currentTab === tabsNumbers.new }"
           @click="currentTab = tabsNumbers.new"
           href="#"
         >
-          Новые <span class="badge bg-danger">{{ newOrdersCount }}</span>
+          Новые <span class="badge">{{ newOrdersCount }}</span>
         </a>
       </li>
-      <li class="nav-item">
+      <li class="tab-item">
         <a
-          class="nav-link"
+          class="tab-link"
           :class="{ active: currentTab === tabsNumbers.processing }"
           @click="currentTab = tabsNumbers.processing"
           href="#"
         >
-          В работе <span class="badge bg-danger">{{ processingOrdersCount }}</span>
+          В работе <span class="badge">{{ processingOrdersCount }}</span>
         </a>
       </li>
-      <li class="nav-item">
+      <li class="tab-item">
         <a
-          class="nav-link"
+          class="tab-link"
           :class="{ active: currentTab === tabsNumbers.ready }"
           @click="currentTab = tabsNumbers.ready"
           href="#"
         >
-          Готовые к выдаче <span class="badge bg-danger">{{ readyOrdersCount }}</span>
+          Готовые к выдаче <span class="badge">{{ readyOrdersCount }}</span>
         </a>
       </li>
-      <li class="nav-item">
+      <li class="tab-item">
         <a
-          class="nav-link"
+          class="tab-link"
           :class="{ active: currentTab === tabsNumbers.archive }"
           @click="currentTab = tabsNumbers.archive"
           href="#"
         >
-          Архив <span class="badge bg-danger">{{ archiveOrdersCount }}</span>
+          Архив <span class="badge">{{ archiveOrdersCount }}</span>
         </a>
       </li>
     </ul>
@@ -69,7 +69,6 @@ import {
 } from "@/api/order";
 import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@/api/types";
 import { getOrderStaff, updateOrderStatus, checkOrder } from "@/api/order";
-import { RefSymbol } from "@vue/reactivity";
 const toast = useToast();
 const notifStore = useNotificationStore();
 const isLoading = ref(false);
@@ -94,25 +93,25 @@ const tabs = ref<TabConfig[]>([
   {
     label: "Новые",
     fetchFn: fetchNewOrders,
-    interval: 500000,
+    interval: 50000,
     data: [],
   },
   {
     label: "В работе",
     fetchFn: fetchProcessingOrders,
-    interval: 1000000,
+    interval: 30000,
     data: [],
   },
   {
     label: "Готовые",
     fetchFn: fetchReadyOrders,
-    interval: 1000000,
+    interval: 10000,
     data: [],
   },
   {
     label: "Архив",
     fetchFn: fetchArchiveOrders,
-    interval: 1000000,
+    interval: 10000,
     data: [],
   },
 ]);
@@ -122,7 +121,6 @@ const processingOrdersCount = computed(() => tabs.value[tabsNumbers.processing].
 const readyOrdersCount = computed(() => tabs.value[tabsNumbers.ready].data.length);
 const archiveOrdersCount = computed(() => tabs.value[tabsNumbers.archive].data.length);
 const selectedOrder = ref<Order | null>(null);
-
 const startAllIntervals = () => {
   tabs.value.forEach((tab, index) => {
     const processNewOrders = (newData: UserOrder[]): UserOrder[] => {
@@ -137,12 +135,11 @@ const startAllIntervals = () => {
       if (document.visibilityState === "visible") {
         try {
           const data = await tab.fetchFn();
-          console.log(`Обновление вкладки ${tab.label}:`);
+          console.log(`Обновление вкладки ${data}:`, data);
           const newData = processNewOrders(data);
           if (newData.length > 0) {
             showNotifications(newData);
           }
-
           tabs.value[index].data = data;
           console.log("notifStore.loadedOrderIds", notifStore.loadedOrderIds);
         } catch (error) {
@@ -190,6 +187,12 @@ const currentData = computed<UserOrder[]>((): UserOrder[] => {
 const fetchOrder = async (orderId: number) => {
   isLoading.value = true;
   selectedOrder.value = await getOrderStaff(orderId);
+  // const staffIds = [...new Set(selectedOrder.value.statuses
+  // .filter(status => status.staff !== null)
+  // .map(status => status.staff))];
+
+  // const staffPromises = staffIds.map(id => profileInfo(id));
+
   isLoading.value = false;
 };
 
@@ -228,9 +231,41 @@ document.addEventListener("visibilitychange", () => {
 </script>
 
 <style lang="scss" scoped>
-.tab-buttons {
+.tabs-container {
+  padding: 16px;
+}
+
+.tabs {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-bottom: 2px solid #ddd;
+}
+
+.tab-item {
+  margin-right: 16px;
+}
+
+.tab-link {
+  text-decoration: none;
+  color: var(--color-text-800);
+  padding: 10px 15px;
+  font-weight: 500;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.tab-link.active {
+  background-color: var(--color-primary-200);
+}
+
+.badge {
+  background-color: var(--color-primary-400);
+  color: var(--color-text-50);
+  padding: 5px 10px;
+  border-radius: 20%;
+  font-size: 0.9em;
+  margin-left: 5px;
 }
 </style>

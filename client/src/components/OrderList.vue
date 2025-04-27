@@ -1,33 +1,31 @@
 <template>
-  <div class="table-responsive">
-    <table class="table table-light align-middle">
+  <div class="table-container">
+    <table class="table">
       <thead>
         <tr>
-          <th scope="col">#</th>
-          <th scope="col" @click="sortOrders('user')">
-            Клиент
-            <span v-if="sortKey === 'user'">
-              <i :class="sortOrder === 1 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+          <th>#</th>
+          <th @click="sortOrders('user')" class="sortable-th">
+            <span class="th-content">
+              Клиент  <div class="th-icon">⇅</div>
             </span>
           </th>
-          <th scope="col" @click="sortOrders('date')">
-            Дата и время
-            <span v-if="sortKey === 'date'">
-              <i :class="sortOrder === 1 ? 'bi bi-arrow-up' : 'bi bi-arrow-down'"></i>
+          <th @click="sortOrders('date')" class="sortable-th">
+            <span class="th-content">
+              Дата и время <span class="th-icon">⇅</span>
             </span>
+          </th>
+          <th @click="sortOrders('date')">
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="order in sortedOrders" :key="order.id">
-          <th scope="row">{{ order.id }}</th>
+          <th>{{ order.id }}</th>
           <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
           <td>{{ formatDate(order.statuses[0].date) }}</td>
           <td>
             <button
-              class="btn btn-primary"
-              data-bs-toggle="modal"
-              data-bs-target="#orderDetailsModal"
+              class="info-button"
               @click="handleOpenOrderDetails(order.id)"
             >
               Инфо
@@ -41,9 +39,7 @@
 
 <script setup lang="ts">
 import { defineProps, ref, computed } from "vue";
-import type { UserOrder, OrderStatusEnum } from "@/api/types";
-import { updateOrderStatus } from "@/api/order";
-import { EllipsisHorizontalIcon } from "@heroicons/vue/24/outline";
+import type { UserOrder} from "@/api/types";
 
 const props = defineProps<{
   orders: UserOrder[];
@@ -70,24 +66,24 @@ function formatDate(dateString: string): string {
 }
 
 // Функция для раскраски таблицы
-function getRowClass(order: UserOrder) {
-  const orderDate = new Date(order.statuses[0].date);
-  const currentDate = new Date();
-  const timeDifference = currentDate.getTime() - orderDate.getTime();
-  const hoursDifference = timeDifference / (1000 * 3600);
+// function getRowClass(order: UserOrder) {
+//   const orderDate = new Date(order.statuses[0].date);
+//   const currentDate = new Date();
+//   const timeDifference = currentDate.getTime() - orderDate.getTime();
+//   const hoursDifference = timeDifference / (1000 * 3600);
 
-  if (order.statuses[0].status === "new") {
-    if (hoursDifference < 2) {
-      return "table-success"; // Менее 2 часов - зеленый
-    } else if (hoursDifference < 6) {
-      return "table-warning"; // От 2 до 6 часов - желтый
-    } else {
-      return "table-danger"; // Более 6 часов - красный
-    }
-  }
+//   if (order.statuses[0].status === "new") {
+//     if (hoursDifference < 2) {
+//       return "table-success"; // Менее 2 часов - зеленый
+//     } else if (hoursDifference < 6) {
+//       return "table-warning"; // От 2 до 6 часов - желтый
+//     } else {
+//       return "table-danger"; // Более 6 часов - красный
+//     }
+//   }
 
-  return "";
-}
+//   return "";
+// }
 
 // Функция сортировки
 function sortOrders(key: string) {
@@ -123,8 +119,8 @@ const sortedOrders = computed(() => {
         bValue = b.id;
     }
 
-    if (aValue < bValue) return -1 * sortOrder.value;
-    if (aValue > bValue) return 1 * sortOrder.value;
+    if (aValue <= bValue) return -1 * sortOrder.value;
+    if (aValue >= bValue) return 1 * sortOrder.value;
     return 0;
   });
 });
@@ -134,8 +130,68 @@ const handleOpenOrderDetails = (orderId: number) => {
 };
 </script>
 
-<style scoped>
-tr {
+<style scoped lang="scss">
+.table-container {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  color: var(--color-text-800);
+  background-color: var(--color-background-100);
+}
+
+th {
   cursor: pointer;
 }
+
+.arrow-up, .arrow-down {
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.info-button {
+  padding: 6px 12px;
+  border: none;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: var(--color-primary-400);
+}
+
+.info-button:hover {
+  background-color: var(--color-accent-700);
+}
+
+.info-button:focus {
+  outline: none;
+}
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none; 
+}
+
+.th-content {
+  display: inline-flex; 
+  align-items: center;  
+  gap: 4px;            
+}
+
+.th-icon {
+  font-size: 0.9em;    
+  opacity: 0.7;        
+}
+
+.sortable-th:hover .th-icon {
+  opacity: 1;          
+}
+
+
 </style>

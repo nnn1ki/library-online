@@ -1,6 +1,6 @@
 // stores/orders.ts
 import { defineStore } from "pinia";
-import { ref, reactive } from "vue";
+import { reactive } from "vue";
 
 export const useNotificationStore = defineStore("orders", () => {
   const seenOrderIds = reactive(new Set<number>());

@@ -17,7 +17,10 @@
             <li v-for="status in selectedOrder.statuses" :key="status.date" class="status-item">
               <span class="status-date">{{ formatDate(status.date) }}</span>
               <span class="status-badge" :class="'status-' + status.status">
-                {{ orderStatuses[status.status] }}
+                {{ orderStatuses[status.status] }}  
+              </span>
+              <span v-if="status.staff">
+                {{ selectedOrder.statuses }}
               </span>
               <span v-if="status.description" class="status-description">
                 ({{ status.description }})
@@ -86,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed} from "vue";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "./StyledButton.vue";
 import type { Order, OrderCheckingInfo } from "@/api/types";
@@ -97,7 +100,6 @@ import VueHtmlToPaper from 'vue-html-to-paper';
 const props = defineProps<{
   order: Order;
 }>();
-
 const statusTransitions = {
   new: {
     next: "processing",
@@ -214,9 +216,6 @@ const changeToNextStatus = () => {
   }
 };
 
-const checkOrder = () => {
-  emit("checkOrder", selectedOrder.value.id);
-};
 </script>
 
 <style scoped>
