@@ -15,6 +15,8 @@ from library_service.opac.book import book_retrieve_by_id
 
 from aiohttp import ClientSession
 
+from django.db.models import Prefetch
+
 from library_service.mixins import (
     LockUserMixin,
     SessionCreateModelMixin,
@@ -103,7 +105,7 @@ class StaffOrderGetUpdateViewset(
             return OrderSerializer
         
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("library", "user", "user__profile")
+        return super().get_queryset().prefetch_related("library", "user", "user__profile", Prefetch("statuses__staff", queryset=OrderHistory.objects.select_related("order")))
     
     @action(detail=False, methods=["GET"], url_path="check/(?P<order_id>\w+)")
     async def check_order(self, request, order_id = None):      
