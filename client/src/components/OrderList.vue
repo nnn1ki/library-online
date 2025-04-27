@@ -6,16 +6,14 @@
           <th>#</th>
           <th @click="sortOrders('user')" class="sortable-th">
             <span class="th-content">
-              Клиент  <div class="th-icon">⇅</div>
+              Клиент
+              <div class="th-icon">⇅</div>
             </span>
           </th>
           <th @click="sortOrders('date')" class="sortable-th">
-            <span class="th-content">
-              Дата и время <span class="th-icon">⇅</span>
-            </span>
+            <span class="th-content"> Дата и время <span class="th-icon">⇅</span> </span>
           </th>
-          <th @click="sortOrders('date')">
-          </th>
+          <th @click="sortOrders('date')"></th>
         </tr>
       </thead>
       <tbody>
@@ -24,12 +22,7 @@
           <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
           <td>{{ formatDate(order.statuses[0].date) }}</td>
           <td>
-            <button
-              class="info-button"
-              @click="handleOpenOrderDetails(order.id)"
-            >
-              Инфо
-            </button>
+            <button class="info-button" @click="handleOpenOrderDetails(order.id)">Инфо</button>
           </td>
         </tr>
       </tbody>
@@ -39,7 +32,7 @@
 
 <script setup lang="ts">
 import { defineProps, ref, computed } from "vue";
-import type { UserOrder} from "@/api/types";
+import type { UserOrder } from "@/api/types";
 
 const props = defineProps<{
   orders: UserOrder[];
@@ -140,7 +133,8 @@ const handleOpenOrderDetails = (orderId: number) => {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   text-align: left;
   color: var(--color-text-800);
@@ -151,7 +145,8 @@ th {
   cursor: pointer;
 }
 
-.arrow-up, .arrow-down {
+.arrow-up,
+.arrow-down {
   font-size: 14px;
   margin-left: 8px;
 }
@@ -175,23 +170,21 @@ th {
 
 .sortable-th {
   cursor: pointer;
-  user-select: none; 
+  user-select: none;
 }
 
 .th-content {
-  display: inline-flex; 
-  align-items: center;  
-  gap: 4px;            
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .th-icon {
-  font-size: 0.9em;    
-  opacity: 0.7;        
+  font-size: 0.9em;
+  opacity: 0.7;
 }
 
 .sortable-th:hover .th-icon {
-  opacity: 1;          
+  opacity: 1;
 }
-
-
 </style>

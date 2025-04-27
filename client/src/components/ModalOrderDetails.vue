@@ -17,10 +17,10 @@
             <li v-for="status in selectedOrder.statuses" :key="status.date" class="status-item">
               <span class="status-date">{{ formatDate(status.date) }}</span>
               <span class="status-badge" :class="'status-' + status.status">
-                {{ orderStatuses[status.status] }}  
+                {{ orderStatuses[status.status] }}
               </span>
               <span v-if="status.staff !== null" class="staff-name">
-                {{ status.staff?.first_name + " " + status.staff?.last_name }} 
+                {{ status.staff?.first_name + " " + status.staff?.last_name }}
               </span>
               <span v-if="status.description" class="status-description">
                 ({{ status.description }})
@@ -31,9 +31,14 @@
 
         <div class="section">
           <h3>Книги ({{ selectedOrder.books.length }})</h3>
-          <div class="books-container" :class="{failed : isCheckFailed}">
-            <div v-for="orderBook in selectedOrder.books" :key="orderBook.id" class="book-card" :class="{failed : isCheckFailed}">
-              <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed"/>
+          <div class="books-container" :class="{ failed: isCheckFailed }">
+            <div
+              v-for="orderBook in selectedOrder.books"
+              :key="orderBook.id"
+              class="book-card"
+              :class="{ failed: isCheckFailed }"
+            >
+              <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed" />
               <!-- <div class="extend-info">
                 <div class="book-number">
                   <span class="status-label">Инвентраный номер книги: </span>
@@ -64,15 +69,11 @@
                 </div>
               </div> -->
               <template v-if="isCheckFailed">
-            <div class="some-info">
-              Пока
+                <div class="some-info">Пока</div>
+                <div class="some-info">все</div>
+              </template>
             </div>
-            <div class="some-info">
-              все
-            </div>
-          </template>
           </div>
-        </div>
         </div>
       </div>
 
@@ -92,19 +93,21 @@
           >{{ nextStatusButtonText }}</StyledButton
         >
       </div>
-      <button @click="isCheckFailed = !isCheckFailed">Престаиваем вид для неудачной проверки</button>
+      <button @click="isCheckFailed = !isCheckFailed">
+        Престаиваем вид для неудачной проверки
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed} from "vue";
+import { ref, computed } from "vue";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "./StyledButton.vue";
 import type { Order, OrderCheckingInfo } from "@/api/types";
 import type { OrderStatusEnum } from "@/api/types";
-import { orderStatuses} from "@/api/types";
-import VueHtmlToPaper from 'vue-html-to-paper';
+import { orderStatuses } from "@/api/types";
+import VueHtmlToPaper from "vue-html-to-paper";
 
 const props = defineProps<{
   order: Order;
@@ -175,14 +178,10 @@ function closeModal() {
 
 function printSearchList() {
   const options = {
-    name: 'searchList',
-    specs: [
-      'fullscreen=yes',
-      'titlebar=yes',
-      'scrollbars=yes'
-    ],
-    styles: []
-  }
+    name: "searchList",
+    specs: ["fullscreen=yes", "titlebar=yes", "scrollbars=yes"],
+    styles: [],
+  };
 }
 
 const currentStatus = computed(() => {
@@ -226,7 +225,6 @@ const changeToNextStatus = () => {
     emit("close");
   }
 };
-
 </script>
 
 <style scoped>

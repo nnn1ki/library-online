@@ -12,13 +12,13 @@
           <div class="col">
             <ShortBookCard :book="orderBook.book" />
           </div>
-            <StyledButton
-              @click="onAddToOrderClick(orderBook.book)"
-              theme="secondary"
-              v-if="canReorder"
-            >
-              Заказать еще раз
-            </StyledButton>
+          <StyledButton
+            @click="onAddToOrderClick(orderBook.book)"
+            theme="secondary"
+            v-if="canReorder"
+          >
+            Заказать еще раз
+          </StyledButton>
         </div>
       </div>
     </div>
