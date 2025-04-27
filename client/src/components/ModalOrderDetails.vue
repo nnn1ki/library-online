@@ -31,67 +31,60 @@
 
         <div class="section">
           <h3>Книги ({{ selectedOrder.books.length }})</h3>
-          <div class="books-container" :class="{ failed: isCheckFailed }">
-            <div
-              v-for="orderBook in selectedOrder.books"
-              :key="orderBook.id"
-              class="book-card"
-              :class="{ failed: isCheckFailed }"
-            >
-              <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed" />
-              <!-- <div class="extend-info">
-                <div class="book-number">
-                  <span class="status-label">Инвентраный номер книги: </span>
-                  <span class="status-value" :class="'status-' + orderBook.status">
-                    {{ orderBook.book.id }}
-                  </span>
-                </div>
-                <div class="book-status">
-                  <span class="status-label">Статус:</span>
-                  <span class="status-value" :class="'status-' + orderBook.status">
-                    {{ orderBookStatuses[orderBook.status] }}
-                  </span>
-                </div>
+          <div class="books-container">
+            <template v-for="orderBook in selectedOrder.books" :key="orderBook.id">
+              <div class="book-card">
+                <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed" />
+                <!-- <div class="extend-info">
+                  <div class="book-number">
+                    <span class="status-label">Инвентраный номер книги: </span>
+                    <span class="status-value" :class="'status-' + orderBook.status">
+                      {{ orderBook.book.id }}
+                    </span>
+                  </div>
+                  <div class="book-status">
+                    <span class="status-label">Статус:</span>
+                    <span class="status-value" :class="'status-' + orderBook.status">
+                      {{ orderBookStatuses[orderBook.status] }}
+                    </span>
+                  </div>
 
-                <div v-if="orderBook.handed_date" class="book-date">
-                  <span class="date-label">Выдана:</span>
-                  <span class="date-value">{{ formatDate(orderBook.handed_date) }}</span>
-                </div>
+                  <div v-if="orderBook.handed_date" class="book-date">
+                    <span class="date-label">Выдана:</span>
+                    <span class="date-value">{{ formatDate(orderBook.handed_date) }}</span>
+                  </div>
 
-                <div v-if="orderBook.to_return_date" class="book-date">
-                  <span class="date-label">Вернуть до:</span>
-                  <span class="date-value">{{ formatDate(orderBook.to_return_date) }}</span>
-                </div>
+                  <div v-if="orderBook.to_return_date" class="book-date">
+                    <span class="date-label">Вернуть до:</span>
+                    <span class="date-value">{{ formatDate(orderBook.to_return_date) }}</span>
+                  </div>
 
-                <div v-if="orderBook.returned_date" class="book-date">
-                  <span class="date-label">Возвращена:</span>
-                  <span class="date-value">{{ formatDate(orderBook.returned_date) }}</span>
-                </div>
-              </div> -->
-              <template v-if="isCheckFailed">
-                <div class="some-info">Пока</div>
-                <div class="some-info">все</div>
-              </template>
-            </div>
+                  <div v-if="orderBook.returned_date" class="book-date">
+                    <span class="date-label">Возвращена:</span>
+                    <span class="date-value">{{ formatDate(orderBook.returned_date) }}</span>
+                  </div>
+                </div> -->
+                
+                <!-- <template v-if="isCheckFailed">
+                  <div class="some-info">Пока</div>
+                  <div class="some-info">все</div>
+                </template> -->
+              </div>
+              <div v-if="isCheckFailed">
+                  <div class="some-info">Пока</div>
+                  <div class="some-info">все</div>
+              </div>
+            </template>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <StyledButton
-          v-if="prevStatus"
-          :disabled="!hasPrevStatus"
-          @click="changeToPrevStatus"
-          theme="accent"
-          >{{ prevStatusButtonText }}</StyledButton
-        >
-        <StyledButton
-          v-if="nextStatus"
-          :disabled="!hasNextStatus"
-          @click="changeToNextStatus"
-          theme="secondary"
-          >{{ nextStatusButtonText }}</StyledButton
-        >
+        <StyledButton v-if="prevStatus" :disabled="!hasPrevStatus" @click="changeToPrevStatus" theme="accent">
+          {{ prevStatusButtonText }}
+        </StyledButton>
+        <StyledButton v-if="nextStatus" :disabled="!hasNextStatus" @click="changeToNextStatus" theme="secondary">{{
+          nextStatusButtonText }}</StyledButton>
       </div>
       <button @click="isCheckFailed = !isCheckFailed">
         Престаиваем вид для неудачной проверки
@@ -392,9 +385,6 @@ const changeToNextStatus = () => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   gap: 1rem;
-  &.failed {
-    grid-template-columns: repeat(1, minmax(18rem, 1fr));
-  }
 }
 
 .book-card {
@@ -407,10 +397,6 @@ const changeToNextStatus = () => {
   transition:
     transform 0.2s,
     box-shadow 0.2s;
-
-  &.failed {
-    flex-direction: row;
-  }
 }
 
 .book-card:hover {
