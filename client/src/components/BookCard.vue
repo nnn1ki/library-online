@@ -1,14 +1,12 @@
 <template>
   <div class="card" :class="{ announcement: announcement }" :title="bookHint">
     <div class="book-image" :class="{ announcement: announcement }">
-      <BookImage
-        :class="{ 'rounded-left': !announcement, 'rounded-top': announcement }"
-        :book="book"
-      />
+      <BookImage class="book-image-inner" :class="{ announcement: announcement }" :book="book" />
     </div>
 
     <div class="card-body">
-      <h5 class="card-title">{{ book.title[0] }} ({{ book.year }})</h5>
+      <h5 class="card-title">{{ book.title[0] }}</h5>
+      <h5 class="card-year">{{ book.year }} г.</h5>
       <h6 v-if="book.author.length > 0" class="card-subtitle">
         {{ book.author.join(", ") }}
       </h6>
@@ -21,35 +19,46 @@
 
       <div class="buttons">
         <StyledButton
-          v-if="showCart"
+          v-if="!basketCart"
           theme="primary"
           @click="addBook"
           :disabled="isAdding || isInBasket"
+          class="button"
+          :class="{ announcement: announcement }"
         >
           В Корзину <ShoppingCartIcon class="button-icon" />
         </StyledButton>
 
-        <StyledButton theme="secondary" type="button" @click="isModalVisible = true">
+        <StyledButton
+          theme="secondary"
+          type="button"
+          @click="isModalVisible = true"
+          class="button"
+          :class="{ announcement: announcement }"
+        >
           Подробнее <Bars3Icon class="button-icon" />
         </StyledButton>
 
-        <a v-if="!announcement && bookLink !== undefined" :href="bookLink">
-          <StyledButton theme="accent">
-            Читать онлайн <BookOpenIcon class="button-icon" />
-          </StyledButton>
-        </a>
-
-        <StyledButton v-if="basketCart" theme="accent" @click="basketStore.removeBook(book)">
-          Удалить <TrashIcon class="button-icon" />
-        </StyledButton>
-      </div>
-
-      <div v-if="announcement && bookLink !== undefined" class="read-online-announcement">
-        <a :href="bookLink">
+        <a
+          v-if="bookLink !== undefined"
+          :href="bookLink"
+          class="button"
+          :class="{ announcement: announcement }"
+        >
           <StyledButton theme="accent" class="w-full">
             Читать онлайн <BookOpenIcon class="button-icon" />
           </StyledButton>
         </a>
+
+        <StyledButton
+          v-if="basketCart"
+          theme="accent"
+          @click="basketStore.removeBook(book)"
+          class="button"
+          :class="{ announcement: announcement }"
+        >
+          Удалить <TrashIcon class="button-icon" />
+        </StyledButton>
       </div>
     </div>
   </div>
@@ -70,12 +79,10 @@ import BookImage from "@/components/BookImage.vue";
 const {
   book,
   announcement = false,
-  showCart = true,
   basketCart = false,
 } = defineProps<{
   book: Book;
   announcement?: boolean;
-  showCart?: boolean;
   basketCart?: boolean;
 }>();
 
@@ -123,6 +130,18 @@ const bookHint = computed(() => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+
+@mixin vertical-layout {
+  &.announcement {
+    @content;
+  }
+
+  @include media-max-lg {
+    @content;
+  }
+}
+
 .card {
   width: 100%;
 
@@ -136,8 +155,9 @@ const bookHint = computed(() => {
   display: flex;
   flex-direction: row;
 
-  &.announcement {
+  @include vertical-layout {
     flex-direction: column;
+    min-width: 400px;
   }
 }
 
@@ -148,45 +168,54 @@ const bookHint = computed(() => {
 .card-title {
   font-size: var(--text-lg);
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-year {
+  font-size: var(--text-md);
+  font-weight: bold;
 }
 
 .card-subtitle {
   color: var(--color-text-700);
   margin-bottom: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .book-image {
   flex-shrink: 0;
   flex-grow: 0;
   flex-basis: 190px;
-  height: 290px;
 
-  &.announcement {
-    flex-basis: 490px;
-    height: 490px;
-  }
-
-  .rounded-left {
-    border-top-left-radius: 0.5rem;
-    border-bottom-left-radius: 0.5rem;
-  }
-
-  .rounded-top {
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+  @include vertical-layout {
+    height: 290px;
+    flex-basis: 200px;
   }
 }
 
-.read-online-announcement {
-  padding-top: 1rem;
-  width: 100%;
+.book-image-inner {
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+
+  @include vertical-layout {
+    border-top-right-radius: 0.5rem;
+    border-bottom-left-radius: 0rem;
+  }
 }
 
 .buttons {
   display: flex;
   flex-direction: row;
-  column-gap: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.button {
+  @include vertical-layout {
+    flex-grow: 1;
+  }
 }
 
 .button-icon {

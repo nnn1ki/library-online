@@ -24,6 +24,8 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+
 .container {
   padding-top: 20px;
 }
@@ -38,6 +40,9 @@ onMounted(async () => {
 }
 
 .announce-book {
-  flex-basis: 20%;
+  flex-basis: 90%;
+  @include media-lg {
+    flex-basis: 20%;
+  }
 }
 </style>

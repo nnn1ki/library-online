@@ -7,7 +7,7 @@
       >
     </div>
     <div class="book-list">
-      <div v-for="orderBook in order.books" :key="orderBook.book.id" class="book-item">
+      <div v-for="(orderBook, index) in order.books" :key="orderBook.book.id" class="book-item">
         <div class="book-info">
           <ShortBookCard :book="orderBook.book" />
           <StyledButton
@@ -18,6 +18,8 @@
             Заказать еще раз
           </StyledButton>
         </div>
+
+        <hr v-if="index < order.books.length - 1" class="divider" />
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
@@ -30,8 +32,8 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { type OrderStatusEnum, type Order, orderStatuses } from "@/api/types";
-import type { Book } from "@/api/types";
+import type { OrderStatusEnum, Order, Book } from "@/api/types";
+import { orderStatuses } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";

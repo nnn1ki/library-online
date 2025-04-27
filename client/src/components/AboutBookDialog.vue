@@ -69,14 +69,27 @@ const visible = defineModel<boolean>({ required: true });
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+
 .dialog {
-  max-width: 1000px;
+  width: 90vw;
+
+  @include media-lg {
+    max-width: 1000px;
+    width: auto;
+  }
 }
 
 .body {
   display: flex;
-  flex-direction: row;
-  column-gap: 1rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  @include media-lg {
+    flex-direction: row;
+    align-items: start;
+  }
 }
 
 .title {
@@ -98,6 +111,13 @@ const visible = defineModel<boolean>({ required: true });
   flex-shrink: 0;
   flex-grow: 0;
   flex-basis: 200px;
-  height: 290px;
+
+  width: 50%;
+  height: auto;
+
+  @include media-lg {
+    width: auto;
+    height: 290px;
+  }
 }
 </style>

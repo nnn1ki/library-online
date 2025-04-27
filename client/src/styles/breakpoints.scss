@@ -33,3 +33,33 @@ $breakpoint-2xl: 96rem;
     @content;
   }
 }
+
+@mixin media-max-sm {
+  @media screen and (max-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin media-max-md {
+  @media screen and (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin media-max-lg {
+  @media screen and (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin media-max-xl {
+  @media screen and (max-width: $breakpoint-xl) {
+    @content;
+  }
+}
+
+@mixin media-max-2xl {
+  @media screen and (max-width: $breakpoint-2xl) {
+    @content;
+  }
+}

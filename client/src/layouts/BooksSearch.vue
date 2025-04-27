@@ -1,6 +1,4 @@
 <template>
-  <!-- TODO: адаптация под мобилки -->
-
   <SurfaceCard>
     <form @submit.prevent="search" class="flex flex-col">
       <SelectList
@@ -15,30 +13,34 @@
       />
 
       <div v-for="(condition, index) in conditions" :key="index" class="filter-condition">
-        <SelectList
-          v-if="index !== 0"
-          v-model="condition.operator"
-          :options="[
-            { id: '*', name: 'И' },
-            { id: '+', name: 'ИЛИ' },
-          ]"
-          :default-option="'*'"
-          @change="updateSearchParams"
-        />
+        <div class="filter-parameter">
+          <SelectList
+            class="and-or"
+            v-if="index !== 0"
+            v-model="condition.operator"
+            :options="[
+              { id: '*', name: 'И' },
+              { id: '+', name: 'ИЛИ' },
+            ]"
+            :default-option="'*'"
+            @change="updateSearchParams"
+          />
 
-        <SelectList
-          v-model="condition.scenarioPrefix"
-          :options="
-            scenarios.map((x) => {
-              return {
-                id: x.prefix,
-                name: `${x.description}`,
-              };
-            })
-          "
-          :default-option="defaultScenario"
-          @change="updateSearchParams"
-        />
+          <SelectList
+            class="scenarios"
+            v-model="condition.scenarioPrefix"
+            :options="
+              scenarios.map((x) => {
+                return {
+                  id: x.prefix,
+                  name: `${x.description}`,
+                };
+              })
+            "
+            :default-option="defaultScenario"
+            @change="updateSearchParams"
+          />
+        </div>
 
         <TextField
           v-model="condition.value"
@@ -275,13 +277,53 @@ onBeforeMount(async () => {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 0.5rem;
+
+  @include media-max-lg {
+    flex-direction: column;
+    padding-top: 2rem;
+  }
+}
+
+.filter-parameter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   column-gap: 0.5rem;
+
+  @include media-max-lg {
+    width: 100%;
+  }
+}
+
+@include media-max-lg {
+  .and-or {
+    width: 30%;
+  }
+
+  .scenarios {
+    width: 100%;
+  }
+
+  .remove-button {
+    width: 100%;
+  }
 }
 
 .actions {
   padding-top: 2rem;
+
   display: flex;
+  flex-direction: row;
+  column-gap: 0.5rem;
+
   justify-content: space-between;
+
+  @include media-max-lg {
+    button {
+      width: 50%;
+    }
+  }
 }
 
 .remove-button {
