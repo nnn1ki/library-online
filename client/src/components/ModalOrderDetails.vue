@@ -64,15 +64,48 @@
                     <span class="date-value">{{ formatDate(orderBook.returned_date) }}</span>
                   </div>
                 </div> -->
-                
                 <!-- <template v-if="isCheckFailed">
                   <div class="some-info">Пока</div>
                   <div class="some-info">все</div>
                 </template> -->
               </div>
               <div v-if="isCheckFailed">
-                  <div class="some-info">Пока</div>
-                  <div class="some-info">все</div>
+                <div class="">
+                  <label>Причина:</label>
+                  <select
+                    v-model="unavailableBookReason" 
+                    class="form-select"
+                    aria-label="Причина, почему книга не найдена"
+                  >
+                    <option
+                      v-for="reason in unavailableReasons"
+                      :key="reason.value"
+                      :value="reason.value"
+                    >
+                      {{ reason.label }}
+                    </option>
+                  </select>
+                </div>
+                <div class="comment-card">
+                  <label>Комментарий:</label>
+                  <textarea v-model="unavailableBookComment" placeholder="Введите комментарий..."></textarea>
+                </div>
+                <div class="" v-if="unavailableBookReason === 'analog'">
+                  <label>Аналог:</label>
+                  <select
+                    v-model="selectedAnalogBookId"
+                    class="form-select"
+                    aria-label="Возможные аналоги"
+                  >
+                    <option 
+                      v-for="analog in availableAnalogs" 
+                      :key="analog.id" 
+                      :value="analog.id"
+                    >
+                      {{ analog.title }} ({{ analog.author }})
+                    </option>
+                  </select>
+                </div>
               </div>
             </template>
           </div>
@@ -87,7 +120,7 @@
           nextStatusButtonText }}</StyledButton>
       </div>
       <button @click="isCheckFailed = !isCheckFailed">
-        Престаиваем вид для неудачной проверки
+        Перестраиваем вид для неудачной проверки
       </button>
     </div>
   </div>
@@ -101,6 +134,21 @@ import type { Order, OrderCheckingInfo } from "@/api/types";
 import type { OrderStatusEnum } from "@/api/types";
 import { orderStatuses } from "@/api/types";
 import VueHtmlToPaper from "vue-html-to-paper";
+
+const unavailableReasons = ref([
+  { value: 'analog', label: 'Аналог' },
+  { value: 'noAvailableCopies', label: 'Нет доступных экземпляров' },
+  { value: 'damaged', label: 'Книга испорчена' }
+]);
+
+const unavailableBookReason = ref('');
+const unavailableBookComment = ref('');
+const selectedAnalogBookId = ref(null);
+
+const availableAnalogs = ref([
+  { id: 1, title: 'Война и мир', author: 'Л.Н. Толстой' },
+  { id: 2, title: 'Преступление и наказание', author: 'Ф.М. Достоевский' }
+]);
 
 const props = defineProps<{
   order: Order;
@@ -408,6 +456,21 @@ const changeToNextStatus = () => {
   padding: 1rem;
   background-color: var(--color-accent-200);
   font-size: 0.875rem;
+}
+
+.form-select {
+  border: 1px solid var(--color-text-200);
+}
+.comment-card {
+  display: flex;
+  flex-direction: column;
+}
+.comment-card textarea {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.75rem;
+  border: 1px solid var(--color-text-200);
+  border-radius: 0.5rem;
 }
 
 .book-number,
