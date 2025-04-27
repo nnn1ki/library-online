@@ -19,8 +19,8 @@
               <span class="status-badge" :class="'status-' + status.status">
                 {{ orderStatuses[status.status] }}  
               </span>
-              <span v-if="status.staff">
-                {{ selectedOrder.statuses }}
+              <span v-if="status.staff !== null" class="staff-name">
+                {{ status.staff?.first_name + " " + status.staff?.last_name }} 
               </span>
               <span v-if="status.description" class="status-description">
                 ({{ status.description }})
@@ -31,10 +31,10 @@
 
         <div class="section">
           <h3>Книги ({{ selectedOrder.books.length }})</h3>
-          <div class="books-container">
-            <div v-for="orderBook in selectedOrder.books" :key="orderBook.id" class="book-card">
-              <ShortBookCard :book="orderBook.book" />
-              <div class="extend-info">
+          <div class="books-container" :class="{failed : isCheckFailed}">
+            <div v-for="orderBook in selectedOrder.books" :key="orderBook.id" class="book-card" :class="{failed : isCheckFailed}">
+              <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed"/>
+              <!-- <div class="extend-info">
                 <div class="book-number">
                   <span class="status-label">Инвентраный номер книги: </span>
                   <span class="status-value" :class="'status-' + orderBook.status">
@@ -62,9 +62,17 @@
                   <span class="date-label">Возвращена:</span>
                   <span class="date-value">{{ formatDate(orderBook.returned_date) }}</span>
                 </div>
-              </div>
+              </div> -->
+              <template v-if="isCheckFailed">
+            <div class="some-info">
+              Пока
             </div>
+            <div class="some-info">
+              все
+            </div>
+          </template>
           </div>
+        </div>
         </div>
       </div>
 
@@ -84,6 +92,7 @@
           >{{ nextStatusButtonText }}</StyledButton
         >
       </div>
+      <button @click="isCheckFailed = !isCheckFailed">Престаиваем вид для неудачной проверки</button>
     </div>
   </div>
 </template>
@@ -94,7 +103,7 @@ import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "./StyledButton.vue";
 import type { Order, OrderCheckingInfo } from "@/api/types";
 import type { OrderStatusEnum } from "@/api/types";
-import { orderStatuses, orderBookStatuses } from "@/api/types";
+import { orderStatuses} from "@/api/types";
 import VueHtmlToPaper from 'vue-html-to-paper';
 
 const props = defineProps<{
@@ -152,6 +161,8 @@ const emit = defineEmits<{
 }>();
 
 const selectedOrder = ref<Order>(props.order);
+
+const isCheckFailed = ref(false);
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -227,6 +238,12 @@ const changeToNextStatus = () => {
   place-items: center;
   z-index: 1000;
   padding: 1rem;
+}
+
+.some-info {
+  background-color: red;
+  text-align: center;
+  width: 150px;
 }
 
 .modal-content {
@@ -377,6 +394,9 @@ const changeToNextStatus = () => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   gap: 1rem;
+  &.failed {
+    grid-template-columns: repeat(1, minmax(18rem, 1fr));
+  }
 }
 
 .book-card {
@@ -389,6 +409,10 @@ const changeToNextStatus = () => {
   transition:
     transform 0.2s,
     box-shadow 0.2s;
+
+  &.failed {
+    flex-direction: row;
+  }
 }
 
 .book-card:hover {

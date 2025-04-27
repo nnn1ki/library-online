@@ -2,35 +2,66 @@
   <div class="book-details">
     <div class="book-row">
       <div class="icon-cell">📖</div>
-      <div class="content-cell">
-        <span class="book-title book"
-          >{{ book.title[0] }} <span class="year"> ({{ book.year }}) </span></span
-        >
+      <div class="content-cell" @click="toggleExpand">
+        <span class="book-title book">
+          {{ displayedTitle }}
+          <span v-if="!expanded && isTruncated">...</span>
+          <span class="year"> ({{ book.year }}) </span>
+        </span>
       </div>
     </div>
+
     <div v-if="book.author.length > 0 || book.collective.length > 0" class="book-row">
       <div class="icon-cell">
         <span v-if="book.author.length > 0">✍️</span>
         <span v-else-if="book.collective.length > 0">👥</span>
       </div>
-      <div class="content-cell author">
-        {{
-          book.author.length > 0
-            ? book.author.join(", ")
-            : book.collective.length > 0
-              ? book.collective.join(", ")
-              : "Автор не указан"
-        }}
+      <div class="content-cell" @click="toggleExpandAuthor">
+        <span class="author">
+          {{ displayedAuthor }}
+          <span v-if="!expandedAuthor && isTruncatedAuthor">...</span>
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from "vue";
 import type { Book } from "@/api/types";
-const { book } = defineProps<{
+
+const { book, truncate = false } = defineProps<{
   book: Book;
+  truncate?: boolean;
 }>();
+
+const expanded = ref(false);
+const expandedAuthor = ref(false);
+
+const maxLength = 15;
+
+const isTruncated = computed(() => truncate && book.title[0].length > maxLength);
+const displayedTitle = computed(() => {
+  if (!truncate) return book.title[0];
+  return expanded.value ? book.title[0] : book.title[0].slice(0, maxLength);
+});
+
+const isTruncatedAuthor = computed(() => {
+  const fullAuthor = book.author.length > 0 ? book.author.join(", ") : book.collective.join(", ");
+  return truncate && fullAuthor.length > maxLength;
+});
+const displayedAuthor = computed(() => {
+  const fullAuthor = book.author.length > 0 ? book.author.join(", ") : book.collective.join(", ");
+  if (!truncate) return fullAuthor;
+  return expandedAuthor.value ? fullAuthor : fullAuthor.slice(0, maxLength);
+});
+
+function toggleExpand() {
+  if (truncate) expanded.value = !expanded.value;
+}
+function toggleExpandAuthor() {
+  if (truncate) expandedAuthor.value = !expandedAuthor.value;
+}
 </script>
 
 <style scoped lang="scss">
@@ -56,20 +87,20 @@ const { book } = defineProps<{
   flex: 1;
   display: flex;
   align-items: flex-end;
+  min-width: 0;
+  cursor: pointer;
 }
 
 .book-title {
   font-size: 1.1rem;
-}
-
-.book {
-  font-size: 1.1rem;
   color: var(--color-text-700);
+  display: inline;
 }
 
 .author {
   font-size: 0.95rem;
   color: var(--color-text-600);
+  display: inline;
 }
 
 .year {
