@@ -8,7 +8,7 @@
     </div>
     <div class="book-list">
       <div
-        v-for="(orderBook, index) in props.order.books"
+        v-for="[index, orderBook] in order.books.entries()"
         :key="orderBook.book.id"
         class="book-item"
       >
@@ -23,7 +23,7 @@
           </StyledButton>
         </div>
 
-        <hr v-if="index < props.order.books.length - 1" class="divider" />
+        <hr v-if="index < order.books.length - 1" class="divider" />
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
@@ -38,7 +38,6 @@
 import { computed } from "vue";
 import type { OrderStatusEnum, Order, Book } from "@/api/types";
 import { orderStatuses } from "@/api/types";
-import ShortBook from "@/components/ShortBookCard.vue";
 import { useOrderStore } from "@/stores/orderStore";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
@@ -47,7 +46,7 @@ const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];
 const orderStore = useOrderStore();
 
-const props = defineProps<{
+const { order, num } = defineProps<{
   order: Order;
   num: number;
 }>();
@@ -65,7 +64,7 @@ const orderedDate = order.statuses.at(0)?.date.slice(0, 10);
 const lastStatusDate = order.statuses.at(-1)?.date.slice(0, 10);
 
 const currentStatus = computed(() => {
-  const lastStatus = props.order.statuses[props.order.statuses.length - 1]?.status;
+  const lastStatus = order.statuses[order.statuses.length - 1]?.status;
   return lastStatus;
 });
 
@@ -77,8 +76,7 @@ const statusClass = computed(() => {
 });
 
 async function onCancelOrderClick() {
-  emit("cancel", props.order.id);
-  // await orderStore.handleDeleteOrder(props.order.id);
+  emit("cancel", order.id);
 }
 
 const onAddToOrderClick = (bookToOrder: Book) => {
