@@ -1,10 +1,7 @@
 <template>
   <div class="card" :class="{ announcement: announcement }" :title="bookHint">
     <div class="book-image" :class="{ announcement: announcement }">
-      <BookImage
-        :class="{ 'rounded-left': !announcement, 'rounded-top': announcement }"
-        :book="book"
-      />
+      <BookImage class="book-image-inner" :class="{ announcement: announcement }" :book="book" />
     </div>
 
     <div class="card-body">
@@ -22,35 +19,46 @@
 
       <div class="buttons">
         <StyledButton
-          v-if="showCart"
+          v-if="!basketCart"
           theme="primary"
           @click="addBook"
           :disabled="isAdding || isInBasket"
+          class="button"
+          :class="{ announcement: announcement }"
         >
           В Корзину <ShoppingCartIcon class="button-icon" />
         </StyledButton>
 
-        <StyledButton theme="secondary" type="button" @click="isModalVisible = true">
+        <StyledButton
+          theme="secondary"
+          type="button"
+          @click="isModalVisible = true"
+          class="button"
+          :class="{ announcement: announcement }"
+        >
           Подробнее <Bars3Icon class="button-icon" />
         </StyledButton>
 
-        <a v-if="!announcement && bookLink !== undefined" :href="bookLink">
-          <StyledButton theme="accent">
-            Читать онлайн <BookOpenIcon class="button-icon" />
-          </StyledButton>
-        </a>
-
-        <StyledButton v-if="basketCart" theme="accent" @click="basketStore.removeBook(book)">
-          Удалить <TrashIcon class="button-icon" />
-        </StyledButton>
-      </div>
-
-      <div v-if="announcement && bookLink !== undefined" class="read-online-announcement">
-        <a :href="bookLink">
+        <a
+          v-if="bookLink !== undefined"
+          :href="bookLink"
+          class="button"
+          :class="{ announcement: announcement }"
+        >
           <StyledButton theme="accent" class="w-full">
             Читать онлайн <BookOpenIcon class="button-icon" />
           </StyledButton>
         </a>
+
+        <StyledButton
+          v-if="basketCart"
+          theme="accent"
+          @click="basketStore.removeBook(book)"
+          class="button"
+          :class="{ announcement: announcement }"
+        >
+          Удалить <TrashIcon class="button-icon" />
+        </StyledButton>
       </div>
     </div>
   </div>
@@ -71,12 +79,10 @@ import BookImage from "@/components/BookImage.vue";
 const {
   book,
   announcement = false,
-  showCart = true,
   basketCart = false,
 } = defineProps<{
   book: Book;
   announcement?: boolean;
-  showCart?: boolean;
   basketCart?: boolean;
 }>();
 
@@ -124,6 +130,18 @@ const bookHint = computed(() => {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+
+@mixin vertical-layout {
+  &.announcement {
+    @content;
+  }
+
+  @include media-max-lg {
+    @content;
+  }
+}
+
 .card {
   width: 100%;
 
@@ -137,8 +155,9 @@ const bookHint = computed(() => {
   display: flex;
   flex-direction: row;
 
-  &.announcement {
+  @include vertical-layout {
     flex-direction: column;
+    min-width: 400px;
   }
 }
 
@@ -149,23 +168,13 @@ const bookHint = computed(() => {
 .card-title {
   font-size: var(--text-lg);
   font-weight: bold;
-  margin-bottom: 0;
-  margin-top: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: bold;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-pack: end;
 }
 
 .card-year {
-  font-size: 1.2rem;
+  font-size: var(--text-md);
   font-weight: bold;
-  margin-bottom: 0;
-  margin-top: 0.5rem;
 }
 
 .card-subtitle {
@@ -173,144 +182,45 @@ const bookHint = computed(() => {
   margin-bottom: 1rem;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: bold;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
-  -webkit-box-pack: end;
-}
-
-.card .announcement {
-  .book-image {
-    flex-shrink: 0;
-    flex-grow: 0;
-    flex-basis: 190px;
-    height: 290px;
-
-    &.announcement {
-      flex-basis: 490px;
-      height: 490px;
-    }
-  }
 }
 
 .book-image {
   flex-shrink: 0;
   flex-grow: 0;
   flex-basis: 190px;
-  height: 290px;
 
-  &.announcement {
-    flex-basis: 490px;
-    height: 490px;
-  }
-
-  .rounded-left {
-    border-top-left-radius: 0.5rem;
-    border-bottom-left-radius: 0.5rem;
-  }
-
-  .rounded-top {
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+  @include vertical-layout {
+    height: 290px;
+    flex-basis: 200px;
   }
 }
 
-.read-online-announcement {
-  padding-top: 1rem;
-  width: 100%;
+.book-image-inner {
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+
+  @include vertical-layout {
+    border-top-right-radius: 0.5rem;
+    border-bottom-left-radius: 0rem;
+  }
 }
 
 .buttons {
   display: flex;
   flex-direction: row;
-  column-gap: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.button {
+  @include vertical-layout {
+    flex-grow: 1;
+  }
 }
 
 .button-icon {
   width: 1.2em;
   height: 1.2em;
   margin-left: 0.5em;
-}
-
-@media (min-width: 992px) {
-  .card {
-    align-items: center;
-  }
-
-  .book-image {
-    &.announcement {
-      margin-top: 16px;
-    }
-  }
-
-  .card-title {
-    min-height: calc(var(--text-lg) * 3.5);
-  }
-
-  .card-subtitle {
-    min-height: calc(0.67em * 3.5);
-  }
-}
-
-@media (max-width: 992px) {
-  .card {
-    word-break: break-word;
-
-    &.announcement {
-      align-items: center;
-    }
-  }
-
-  .book-image {
-    height: auto;
-    flex-shrink: 0;
-    flex-grow: 0;
-    flex-basis: 90px;
-
-    &.announcement {
-      flex-shrink: 0;
-      flex-grow: 0;
-      flex-basis: 100px;
-      max-height: 200px;
-      padding-top: 16px;
-    }
-  }
-
-  .books-list .card {
-    .book-image {
-      height: auto;
-      width: 40%;
-      max-width: 40%;
-      min-width: 40%;
-    }
-  }
-
-  .buttons {
-    flex-direction: column;
-    gap: 8px;
-
-    button {
-      width: 100%;
-    }
-  }
-
-  button {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-}
-
-@media (max-width: 375px) {
-  .buttons {
-    button {
-      text-indent: -9999px;
-    }
-
-    svg {
-      margin: 0;
-    }
-  }
 }
 </style>

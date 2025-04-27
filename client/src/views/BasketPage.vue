@@ -21,7 +21,7 @@
             @change="toggleBookSelection(book.id)"
             aria-label="Выбрать книгу"
           />
-          <BookCard :book="book" :show-cart="false" :basket-cart="true" />
+          <BookCard :book="book" :basket-cart="true" />
         </div>
 
         <AboutBookDialog v-if="modalBook !== undefined" :book="modalBook" v-model="bookModalOpen" />
