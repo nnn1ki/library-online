@@ -51,8 +51,6 @@ class StaffOrderViewset(
     def get_serializer_class(self):
         if self.action in ["get_orders"]:
             return UserOrderSerializer
-        elif self.action in ["update_order"]:
-            return UpdateOrderSerializer
         else: 
             return OrderSerializer
     
@@ -105,7 +103,7 @@ class StaffOrderGetUpdateViewset(
             return OrderSerializer
         
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("library")
+        return super().get_queryset().prefetch_related("library", "user", "user__profile")
     
     @action(detail=False, methods=["GET"], url_path="check/(?P<order_id>\w+)")
     async def check_order(self, request, order_id = None):      
@@ -113,6 +111,7 @@ class StaffOrderGetUpdateViewset(
         profile: UserProfile = await UserProfile.objects.prefetch_related("user").aget(user = order.user)
 
         loans_id_list = []
+        loans = []
 
         async with ClientSession() as client:
             self.client_session = client
@@ -126,8 +125,12 @@ class StaffOrderGetUpdateViewset(
             found_books = []
             
             async for book in books:
-                if book.book_id in loans_id_list:
-                    found_books.append(book)
+                for loan_index in len(loans_id_list):
+                    if book.book_id == (loans_id_list[loan_index]):
+                        found_books.append(book)
+                        book.handed_date = loans[loan_index].date
+                        book.to_return_date = loans[loan_index].deadline
+                        await book.asave()
 
             notfound_books = []
             

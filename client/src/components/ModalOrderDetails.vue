@@ -8,6 +8,10 @@
 
       <div class="modal-body">
         <div class="section">
+          <h3>Заказчик:</h3>
+          <span>{{ selectedOrder.user.last_name + " " + selectedOrder.user.first_name }}</span>
+        </div>
+        <div class="section">
           <h3>История статусов</h3>
           <ul class="status-list">
             <li v-for="status in selectedOrder.statuses" :key="status.date" class="status-item">
@@ -88,6 +92,7 @@ import StyledButton from "./StyledButton.vue";
 import type { Order, OrderCheckingInfo } from "@/api/types";
 import type { OrderStatusEnum } from "@/api/types";
 import { orderStatuses, orderBookStatuses } from "@/api/types";
+import VueHtmlToPaper from 'vue-html-to-paper';
 
 const props = defineProps<{
   order: Order;
@@ -153,6 +158,18 @@ function formatDate(dateString: string): string {
 
 function closeModal() {
   emit("close");
+}
+
+function printSearchList() {
+  const options = {
+    name: 'searchList',
+    specs: [
+      'fullscreen=yes',
+      'titlebar=yes',
+      'scrollbars=yes'
+    ],
+    styles: []
+  }
 }
 
 const currentStatus = computed(() => {

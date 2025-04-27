@@ -90,6 +90,7 @@ export type Order = {
   books: OrderBook[];
   statuses: OrderStatus[];
   library: Library;
+  user: UserInfo;
 };
 
 export type BorrowedBook = {
