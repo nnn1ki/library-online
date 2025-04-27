@@ -67,39 +67,28 @@
         </span>
       </StyledButton>
 
-
-      <OrderProgressModal      
-      v-model="orderStore.modalState.isOpen"
-    :currentStep="orderStore.modalState.currentStep"
-    :steps="orderStore.modalState.steps"
-    :isSuccess="orderStore.modalState.isSuccess"
-    :isError="orderStore.modalState.isError"
-    :orderId="orderStore.modalState.orderId"
-    :errorMessage="orderStore.modalState.errorMessage"
-  />
-  </div>
+      <OrderProgressModal v-model="modalState.isOpen" :state="modalState" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, computed, watch } from "vue";
+import { ref, onBeforeMount, computed } from "vue";
 import { BookOpenIcon } from "@heroicons/vue/24/outline";
-
 import BorrowedBooks from "@/layouts/BorrowedBooks.vue";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import { useOrderStore } from "@/stores/orderStore";
-import { borrowedList } from "@/api/order";
+import { useCreateOrder } from "@/composables/useCreateOrder";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import TextField from "@/components/TextField.vue";
 import StyledCheckbox from "@/components/StyledCheckbox.vue";
-import OrderProgressModal from '@/components/OrderProgressModal.vue';
+import OrderProgressModal from "@/components/OrderProgressModal.vue";
 
 const orderStore = useOrderStore();
-
+const { execute, modalState } = useCreateOrder();
 const email = ref("");
 const notifcations = ref(false);
-const processingStep = ref(-1);
 
 const booksToreturn = computed(() => {
   return orderStore.borrowedBooks.filter((book) =>
@@ -109,21 +98,15 @@ const booksToreturn = computed(() => {
 
 const loading = ref(false);
 const placeOrder = async () => {
-  loading.value = true;
-  await orderStore.handleCreateOrder();
-  loading.value = false;
-};
-
-const retryOrder = async () => {
-  orderStore.closeModal();
+  await execute();
 };
 
 onBeforeMount(async () => {
-  orderStore.borrowedBooks = await borrowedList();
+  orderStore.getBorrowedBooks();
 });
 
 const removeBook = (id: string) => {
-  orderStore.selectedBooks = orderStore.selectedBooks.filter((book) => book.id !== id);
+  orderStore.removeSelectedBook(id);
 };
 </script>
 

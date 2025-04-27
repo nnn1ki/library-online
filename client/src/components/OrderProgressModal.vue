@@ -1,136 +1,281 @@
 <template>
-    <ModalDialog v-model="open">
-        <div class="order-modal">
-            <div class="modal-header">
-                <h3>Оформление заказа</h3>
-            </div>
+  <ModalDialog v-model="open" :esc-close="false" :mask-closable="false">
+    <motion.div
+      class="order-modal"
+      :initial="{ opacity: 0, y: -10 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.7, ease: 'easeOut' }"
+    >
+      <motion.div
+        class="modal-header"
+        :initial="{ opacity: 0, y: -10 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.7, ease: 'easeOut' }"
+      >
+        <h3>Оформление заказа</h3>
+      </motion.div>
+      <ul class="steps-list">
+        <li
+          v-for="(step, index) in state.steps"
+          :key="index"
+          class="step-item"
+          :class="{ error: state.isError }"
+        >
+          <div class="step-icon-container">
+            <motion.div
+              v-if="animationStep === index && !state.isError && animationStep < 5"
+              class="spinner"
+              :animate="{
+                rotate: [0, 360],
+              }"
+              :transition="{
+                repeat: Infinity,
+                duration: 1,
+                ease: 'linear',
+              }"
+            >
+            </motion.div>
 
-            <div class="steps-container">
-                <div v-for="(step, index) in steps" :key="index" class="step-item" :class="{
-                    active: currentStep === index,
-                    completed: currentStep > index,
-                    error: step.error
-                }">
-                    <div class="step-indicator">
-                        <span v-if="currentStep > index">✓</span>
-                        <span v-else>{{ index + 1 }}</span>
-                    </div>
-                    <div class="step-content">
-                        <div class="step-title">{{ step.title }}</div>
-                        <div v-if="step.error" class="step-error">{{ step.error }}</div>
-                    </div>
+            <motion.div
+              v-if="animationStep > index || (isLastStep && state.isSuccess)"
+              class="checkmark"
+              :initial="{ scale: 0, opacity: 0 }"
+              :animate="{ scale: 1, opacity: 1 }"
+              :transition="{ type: 'spring', stiffness: 500, damping: 20 }"
+            >
+              ✓
+            </motion.div>
+          </div>
+
+          <motion.div
+            class="step-content"
+            :initial="{ x: -10, opacity: 0 }"
+            :animate="{ x: 0, opacity: 1 }"
+            :transition="{ duration: 0.3, ease: 'easeOut' }"
+          >
+            <h3
+              :class="{
+                active: animationStep > index || (isLastStep && state.isSuccess),
+                'error-text': step.error && index == state.currentStep,
+              }"
+            >
+              {{ step.title }}
+            </h3>
+            <template v-if="step.messages !== null">
+              <div v-for="msg in step.messages" :key="msg" class="messages">
+                <div class="message-item">
+                  {{ msg }}
                 </div>
-            </div>
+              </div>
+            </template>
+            <p v-if="state.currentStep === index && state.isError" class="step-error">
+              {{ step.error }}
+            </p>
+          </motion.div>
+        </li>
+      </ul>
 
-            <div v-if="isSuccess" class="result-message success">
-                <h4>✅ Заказ успешно оформлен!</h4>
-                <p v-if="orderId">
-                    Номер вашего заказа:
-                    <strong>{{ orderId }}</strong>
-                </p>
-            </div>
+      <motion.div
+        v-if="state.isSuccess && isLastStep"
+        class="result-message success"
+        :initial="{ opacity: 0, scale: 0.9 }"
+        :animate="{ opacity: 1, scale: 1 }"
+        :transition="{ duration: 0.4, ease: 'easeOut' }"
+      >
+        <h4>✅ Заказ успешно оформлен!</h4>
+      </motion.div>
 
-            <div v-if="isError" class="result-message error">
-                <h4>❌ Ошибка оформления заказа</h4>
-                <p>{{ errorMessage }}</p>
-            </div>
-        </div>
-    </ModalDialog>
+      <motion.div
+        v-if="state.isError && isLastStep"
+        class="result-message error"
+        :initial="{ opacity: 0, y: 20 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.4, ease: 'easeOut' }"
+      >
+        <h4>❌ Ошибка оформления заказа</h4>
+      </motion.div>
+    </motion.div>
+    <div class="btn-close">
+      <StyledButton v-if="state.isError || state.currentStep === 5" @click="handleCLoseClick">
+        Закрыть окно
+      </StyledButton>
+    </div>
+  </ModalDialog>
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from "vue";
+import { motion } from "motion-v";
 import ModalDialog from "@/components/ModalDialog.vue";
+import StyledButton from "./StyledButton.vue";
+import router from "@/router";
+type ModalStep = {
+  title: string;
+  error: string;
+  messages: string[] | null;
+};
+
+type ModalState = {
+  isOpen: boolean;
+  currentStep: number;
+  steps: ModalStep[];
+  isSuccess: boolean;
+  isError: boolean;
+};
+
 const open = defineModel<boolean>({ required: true });
-defineProps({
-    currentStep: Number,
-    steps: Array as () => Array<{ title: string; error: string | null }>,
-    isSuccess: Boolean,
-    isError: Boolean,
-    orderId: String,
-    errorMessage: String
+const animationStep = ref(0);
+const isLastStep = computed(()=> {
+  return animationStep.value == 5;
+})
+const props = defineProps({
+  state: {
+    type: Object as () => ModalState,
+    required: true,
+  },
 });
+
+setInterval(async () => {
+  if ((await props.state.currentStep) > animationStep.value) {
+    animationStep.value++;
+  }
+}, 800);
+
+
+const handleCLoseClick = () => {
+  open.value = false;
+  if(props.state.isSuccess) {
+    router.push('/');
+  }
+
+}
 </script>
 
-
 <style lang="scss" scoped>
+.btn-close {
+  display: flex;
+  justify-content: center;
+}
+
+.order-modal {
+  max-width: 500px;
+  margin: 5vh auto;
+  padding: 2rem;
+  border-radius: 20px;
+  background: var(--color-surface-100);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+  margin-bottom: 2rem;
+  text-align: center;
 
-.step-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-    color: var(--color-text-600);
-}
-
-.step-item.active {
+  h3 {
+    font-size: 2.5rem;
     color: var(--color-text-900);
-    font-weight: bold;
+  }
 }
 
-.step-item.completed {
-    color: var(--color-status-done);
-}
-
-.step-item.error .step-title {
-    color: var(--color-status-error);
-}
-
-.step-indicator {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--color-background-200);
+.steps-list {
+  .step-item {
     display: flex;
-    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
     align-items: center;
-    margin-right: 10px;
-    flex-shrink: 0;
-    color: var(--color-text-500);
+  }
+
+  .step-icon-container {
+    position: relative;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .step-content {
+    flex-grow: 1;
+
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 1.5rem;
+      color: var(--color-text-600);
+      font-weight: 300;
+      transition:
+        color 0.3s,
+        font-weight 0.3s;
+
+      &.active {
+        color: var(--color-text-900);
+        font-weight: 600;
+      }
+
+      &.error-text {
+        color: var(--color-status-error);
+      }
+    }
+  }
 }
 
-.step-item.active .step-indicator {
-    background: var(--color-status-new);
-    color: var(--color-background-50);
+.spinner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--color-status-new);
+  border-top-color: transparent;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.step-item.completed .step-indicator {
-    background: var(--color-status-done);
-    color: var(--color-background-100);
-}
-
-.step-item.error .step-indicator {
-    background: var(--color-status-error);
-    color: var(--color-background-100);
+.checkmark {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-status-done);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 .step-error {
-    color: var(--color-status-error);
-    font-size: 0.9em;
-    margin-top: 5px;
+  background: rgba(244, 67, 54, 0.1);
+  border-radius: 30px;
+  padding: 1rem;
+  color: var(--color-status-error);
+  font-size: 0.9em;
 }
 
 .result-message {
-    text-align: center;
-    margin-top: 20px;
-    color: var(--color-text-700);
-}
-
-.result-message.success {
+  text-align: center;
+  padding: 0.1rem 1rem;
+  border-radius: 8px;
+  h4 {
+    font-size: 26px;
+  }
+  &.success {
+    background: rgba(76, 175, 80, 0.1);
     color: var(--color-status-done);
-}
+  }
 
-.result-message.error {
+  &.error {
+    background: rgba(244, 67, 54, 0.1);
     color: var(--color-status-error);
+  }
 }
 
-@media (max-width: 600px) {
-    .step-content {
-        font-size: 0.9em;
-    }
+.messages {
+  .message-item {
+    display: flex;
+    padding: 1rem;
+    font-weight: 300;
+    border-radius: 30px;
+    color: var(--color-status-done);
+  }
 }
 </style>
