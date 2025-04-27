@@ -1,6 +1,4 @@
 <template>
-  <!-- TODO: адаптация под мобилки -->
-
   <SurfaceCard>
     <form @submit.prevent="search" class="flex flex-col">
       <SelectList
@@ -29,6 +27,7 @@
           />
 
           <SelectList
+            class="scenarios"
             v-model="condition.scenarioPrefix"
             :options="
               scenarios.map((x) => {
@@ -278,7 +277,37 @@ onBeforeMount(async () => {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 0.5rem;
+
+  @include media-max-lg {
+    flex-direction: column;
+    padding-top: 2rem;
+  }
+}
+
+.filter-parameter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   column-gap: 0.5rem;
+
+  @include media-max-lg {
+    width: 100%;
+  }
+}
+
+@include media-max-lg {
+  .and-or {
+    width: 30%;
+  }
+
+  .scenarios {
+    width: 100%;
+  }
+
+  .remove-button {
+    width: 100%;
+  }
 }
 
 .actions {
@@ -289,6 +318,12 @@ onBeforeMount(async () => {
   column-gap: 0.5rem;
 
   justify-content: space-between;
+
+  @include media-max-lg {
+    button {
+      width: 50%;
+    }
+  }
 }
 
 .remove-button {
@@ -385,68 +420,6 @@ onBeforeMount(async () => {
       &.active {
         background-color: var(--color-background-200);
       }
-    }
-  }
-}
-
-@media (min-width: 992px) {
-  .filter-parameter {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    column-gap: 0.5rem;
-  }
-}
-
-@media (max-width: 992px) {
-  .filter-condition {
-    padding-top: 1rem;
-
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-    column-gap: 0.5rem;
-
-    .filter-parameter {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      column-gap: 0.5rem;
-
-      width: 100%;
-    }
-
-    .and-or {
-      width: 30%;
-    }
-
-    .and-or:hover {
-      width: 30%;
-    }
-
-    select {
-      width: 100%;
-    }
-
-    select:focus {
-      width: 100%;
-    }
-
-    input {
-      width: 100%;
-    }
-
-    button {
-      width: 100%;
-    }
-  }
-
-  .actions {
-    button {
-      width: 50%;
-      padding-right: 16px;
-      padding-left: 16px;
     }
   }
 }
