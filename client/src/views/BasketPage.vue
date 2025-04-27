@@ -1,6 +1,4 @@
 <template>
-  <!-- TODO: адаптация под мобилки -->
-
   <div class="container">
     <SurfaceCard v-if="books.length !== 0">
       <div class="books">
@@ -239,18 +237,18 @@ async function saveBooks() {
       throw new Error("Неподдерживаемый формат файла.");
     }
   } catch (error) {
-    alert(`Ошибка: ${error.message}`);
+    alert(`Ошибка: ${error}`);
   }
 }
 
-async function saveAsText(defaultFileName) {
+async function saveAsText(defaultFileName: string) {
   // Формируем содержимое для текстового файла
   const content = bookList.value.split("<hr>").join("\n");
   const blob = new Blob([content], { type: "text/plain" });
   downloadBlob(blob, defaultFileName);
 }
 
-async function saveAsDocx(defaultFileName) {
+async function saveAsDocx(defaultFileName: string) {
   // Формируем содержимое для Word документа
   const content = bookList.value.split("<hr>");
   const doc = new Document({
@@ -276,7 +274,7 @@ async function saveAsDocx(defaultFileName) {
   downloadBlob(blob, defaultFileName);
 }
 
-async function saveAsPdf(defaultFileName) {
+async function saveAsPdf(defaultFileName: string) {
   const pdf = new jsPDF();
   await loadFont(pdf);
 
@@ -306,7 +304,7 @@ async function saveAsPdf(defaultFileName) {
 }
 
 // Функция для загрузки шрифта
-async function loadFont(pdf) {
+async function loadFont(pdf: jsPDF) {
   try {
     const fontName = "Tinos-Regular";
     const response = await fetch(`src/views/${fontName}.ttf`);
@@ -328,7 +326,7 @@ async function loadFont(pdf) {
   }
 }
 
-function downloadBlob(blob, defaultFilename) {
+function downloadBlob(blob: Blob, defaultFilename: string) {
   // Запрашиваем имя файла у пользователя
   const filename = prompt("Введите имя файла:", defaultFilename);
 
@@ -362,14 +360,22 @@ async function onCreateOrderClick() {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/breakpoints.scss" as *;
+
 .container {
   padding-top: 20px;
 
   display: flex;
   flex-direction: row;
-  column-gap: 3rem;
   align-items: start;
   justify-content: center;
+  gap: 3rem;
+
+  @include media-max-lg {
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+  }
 }
 
 .books {
@@ -387,9 +393,13 @@ async function onCreateOrderClick() {
 
 .book-card {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  column-gap: 1rem;
+  gap: 1rem;
+
+  @include media-lg {
+    flex-direction: row;
+  }
 }
 
 hr {
@@ -401,6 +411,16 @@ hr {
 .sticky {
   position: sticky;
   top: 1rem;
+
+  @include media-max-lg {
+    width: 100%;
+    bottom: 1rem;
+    top: 0;
+    border-style: solid;
+    border-radius: 0.5rem;
+    border-width: 1px;
+    border-color: var(--color-text-300);
+  }
 }
 
 .options-card {
@@ -408,6 +428,13 @@ hr {
   flex-direction: column;
   row-gap: 1rem;
   min-width: 14rem;
+
+  @include media-max-lg {
+    row-gap: 0.5rem;
+    h5 {
+      margin: 0;
+    }
+  }
 }
 
 .save-buttons {
@@ -415,38 +442,5 @@ hr {
   display: flex;
   flex-direction: row;
   column-gap: 1rem;
-}
-
-@media (max-width: 992px) {
-  .sticky {
-    position: sticky;
-    bottom: 20px;
-    top: 0;
-    border-style: solid;
-    border-radius: 0.5rem;
-    border-width: 1px;
-    border-color: var(--color-text-300);
-  }
-
-  .surface {
-    width: 90%;
-  }
-
-  .container {
-    padding-top: 16px;
-
-    display: flex;
-    flex-direction: column;
-    column-gap: 3rem;
-    align-items: center;
-  }
-
-  .options-card {
-    row-gap: 8px;
-
-    h5 {
-      margin: 0;
-    }
-  }
 }
 </style>
