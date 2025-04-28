@@ -192,6 +192,11 @@ const bookHint = computed(() => {
   @include vertical-layout {
     height: 290px;
     flex-basis: 200px;
+    transition: all 0.2s;
+
+    &:hover {
+      height: 600px;
+    }
   }
 }
 
