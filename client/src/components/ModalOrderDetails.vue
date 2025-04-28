@@ -33,7 +33,10 @@
           <h3>Книги ({{ selectedOrder.books.length }})</h3>
           <div class="books-container">
             <template v-for="orderBook in selectedOrder.books" :key="orderBook.id">
-              <div class="book-card">
+              <div class="book-card" :class="{
+  error: isCheckFailed && orderBook.id !== selectedOrder.books[0].id,
+  succes: isCheckFailed && orderBook.id === selectedOrder.books[0].id
+}">
                 <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed" />
                 <!-- <div class="extend-info">
                   <div class="book-number">
@@ -69,8 +72,8 @@
                   <div class="some-info">все</div>
                 </template> -->
               </div>
-              <div v-if="isCheckFailed">
-                <div class="">
+              <div v-if="isCheckFailed && orderBook.id !== 51">
+                <div>
                   <label>Причина:</label>
                   <select
                     v-model="unavailableBookReason" 
@@ -106,6 +109,8 @@
                     </option>
                   </select>
                 </div>
+              </div>
+              <div v-else-if="isCheckFailed && orderBook.id === selectedOrder.books[0].id">
               </div>
             </template>
           </div>
@@ -444,6 +449,13 @@ const changeToNextStatus = () => {
   transition:
     transform 0.2s,
     box-shadow 0.2s;
+  &.error {
+    background-color: var(--background-status-error);
+  }
+
+  &.succes {
+    background-color: var(--background-status-done);
+  }
 }
 
 .book-card:hover {
