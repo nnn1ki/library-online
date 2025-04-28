@@ -127,7 +127,7 @@ class StaffOrderGetUpdateViewset(
             found_books = []
             
             async for book in books:
-                for loan_index in len(loans_id_list):
+                for loan_index in range(len(loans_id_list)):
                     if book.book_id == (loans_id_list[loan_index]):
                         found_books.append(book)
                         book.handed_date = loans[loan_index].date
