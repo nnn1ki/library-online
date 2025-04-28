@@ -2,7 +2,8 @@
   <div v-if="selectedOrder" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Детали заказа #{{ selectedOrder.id }}</h2>
+        <h2>Детали заказа #{{ selectedOrder.id }}</h2>          
+        <button v-if="nextStatus" :disabled="!hasNextStatus" @click="openPrintModal=true"> Печать </button>
         <button class="close-button" @click="closeModal">×</button>
       </div>
 
@@ -129,12 +130,14 @@
       </button>
     </div>
   </div>
+  <PrintModal v-model="openPrintModal" :order="selectedOrder"/>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import ShortBookCard from "@/components/ShortBookCard.vue";
-import StyledButton from "./StyledButton.vue";
+import StyledButton from "@/components/StyledButton.vue";
+import PrintModal from "@/components/PrintModal.vue"; 
 import type { Order, OrderCheckingInfo } from "@/api/types";
 import type { OrderStatusEnum } from "@/api/types";
 import { orderStatuses } from "@/api/types";
@@ -148,6 +151,7 @@ const unavailableReasons = ref([
 const unavailableBookReason = ref('');
 const unavailableBookComment = ref('');
 const selectedAnalogBookId = ref(null);
+const openPrintModal = ref(false);
 
 const availableAnalogs = ref([
   { id: 1, title: 'Война и мир', author: 'Л.Н. Толстой' },
@@ -157,6 +161,7 @@ const availableAnalogs = ref([
 const props = defineProps<{
   order: Order;
 }>();
+
 const statusTransitions = {
   new: {
     next: "processing",
