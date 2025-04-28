@@ -597,10 +597,8 @@ paths:
                   items:
                     type: object
                     properties:
-                      id:
-                        $ref: "#/components/schemas/OrderBookId"
-                      exemplar_id:
-                        $ref: "#/components/schemas/ExemplarId"
+                      book_id:
+                        $ref: "#/components/schemas/BookId"
                       status:
                         type: string
                         description: Статус книги
@@ -612,8 +610,9 @@ paths:
                       description:
                         type: string
                         description: Комментарий по ненайденной книге
-                      analogous_order_item:
-                        $ref: "#/components/schemas/AnalogousOrderItem"
+                      analogous:
+                        $ref: "#/components/schemas/BookId"
+                        nullable: true
       responses:
         '200':
           description: OK
@@ -1162,13 +1161,6 @@ components:
           description: Фамилия
           type: string
 
-    AnalogousOrderItem:
-      type: object
-      properties:
-        book_id:
-          $ref: "#/components/schemas/BookId"
-        exemplar_id:
-          $ref: "#/components/schemas/ExemplarId"
 
     LibraryParams:
       type: object
