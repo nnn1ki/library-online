@@ -133,7 +133,6 @@ import StyledButton from "./StyledButton.vue";
 import type { Order, OrderCheckingInfo } from "@/api/types";
 import type { OrderStatusEnum } from "@/api/types";
 import { orderStatuses } from "@/api/types";
-import VueHtmlToPaper from "vue-html-to-paper";
 
 const unavailableReasons = ref([
   { value: 'analog', label: 'Аналог' },

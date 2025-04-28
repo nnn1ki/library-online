@@ -117,11 +117,12 @@ class UpdateOrderSerializer(aserializers.Serializer):
             )
             
         elif (new_status["status"] == OrderHistory.Status.NEW):
-            await OrderHistory.objects.filter(
-                order = instance,
-                staff = user,
-                status=OrderHistory.Status.PROCESSING
-            ).adelete()
+            await OrderHistory.objects.acreate(
+                order=instance, 
+                status=OrderHistory.Status.NEW,
+                description=new_status["description"],
+                staff=user
+            )
             
         elif (new_status["status"] == OrderHistory.Status.READY):
             order_books = validated_data["books"]
