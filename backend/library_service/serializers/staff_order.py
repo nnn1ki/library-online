@@ -125,8 +125,15 @@ class UpdateOrderSerializer(aserializers.Serializer):
             )
             
         elif (new_status["status"] == OrderHistory.Status.READY):
-            order_books = validated_data["books"]
+            books = validated_data["books"]
 
+            async for book in books:
+                order_item = await OrderItem.objects.filter(book_id = book.book_id, order = instance).afirst()
+
+                if (validated_data["analogous"] is not None):
+                    analogous_order_item = await OrderItem.objects.acreate(
+
+                    )
             # async for order_item in order_books:
             #     if validated_data["exemplar_id"] is not None:
             #         order_item.exemplar_id = validated_data["exemplar_id"]
