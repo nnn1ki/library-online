@@ -2,65 +2,44 @@
   <div class="tabs-container">
     <ul class="tabs">
       <li class="tab-item">
-        <a
-          class="tab-link"
-          :class="{ active: currentTab === tabsNumbers.new }"
-          @click="currentTab = tabsNumbers.new"
-          href="#"
-        >
+        <a class="tab-link" :class="{ active: currentTab === tabsNumbers.new }" @click="currentTab = tabsNumbers.new"
+          href="#">
           Новые <span class="badge">{{ newOrdersCount }}</span>
         </a>
       </li>
       <li class="tab-item">
-        <a
-          class="tab-link"
-          :class="{ active: currentTab === tabsNumbers.processing }"
-          @click="currentTab = tabsNumbers.processing"
-          href="#"
-        >
+        <a class="tab-link" :class="{ active: currentTab === tabsNumbers.processing }"
+          @click="currentTab = tabsNumbers.processing" href="#">
           В работе <span class="badge">{{ processingOrdersCount }}</span>
         </a>
       </li>
       <li class="tab-item">
-        <a
-          class="tab-link"
-          :class="{ active: currentTab === tabsNumbers.ready }"
-          @click="currentTab = tabsNumbers.ready"
-          href="#"
-        >
+        <a class="tab-link" :class="{ active: currentTab === tabsNumbers.ready }"
+          @click="currentTab = tabsNumbers.ready" href="#">
           Готовые к выдаче <span class="badge">{{ readyOrdersCount }}</span>
         </a>
       </li>
       <li class="tab-item">
-        <a
-          class="tab-link"
-          :class="{ active: currentTab === tabsNumbers.archive }"
-          @click="currentTab = tabsNumbers.archive"
-          href="#"
-        >
+        <a class="tab-link" :class="{ active: currentTab === tabsNumbers.archive }"
+          @click="currentTab = tabsNumbers.archive" href="#">
           Архив <span class="badge">{{ archiveOrdersCount }}</span>
         </a>
       </li>
     </ul>
     <OrderList @get-order="fetchOrder" :orders="currentData" />
-    <ModalOrderDetails
-      v-if="selectedOrder"
-      :order="selectedOrder"
-      @close="selectedOrder = null"
-      @next-order-status="handleUpdateOrderStatus"
-      @check-order="handleCheckOrder"
-    />
+    <ModalOrderDetails v-if="selectedOrder" :order="selectedOrder" @close="selectedOrder = null"
+      @next-order-status="handleUpdateOrderStatus" @check-order="handleCheckOrder" />
     <LoadingModal v-model="isLoading" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
 import OrderList from "@/components/OrderList.vue";
 import ModalOrderDetails from "@/components/ModalOrderDetails.vue";
 import LoadingModal from "@/components/LoadingModal.vue";
-import { useToast } from "vue-toastification";
-import { useNotificationStore } from "@/stores/notificationStore";
+
 import {
   fetchNewOrders,
   fetchProcessingOrders,
@@ -69,8 +48,9 @@ import {
 } from "@/api/order";
 import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@/api/types";
 import { getOrderStaff, updateOrderStatus, checkOrder } from "@/api/order";
-const toast = useToast();
-const notifStore = useNotificationStore();
+
+const authStore = useAuthStore()
+
 const isLoading = ref(false);
 interface TabConfig {
   label: string;
@@ -99,7 +79,7 @@ const tabs = ref<TabConfig[]>([
   {
     label: "В работе",
     fetchFn: fetchProcessingOrders,
-    interval: 30000,
+    interval: 5000,
     data: [],
   },
   {
@@ -123,43 +103,37 @@ const archiveOrdersCount = computed(() => tabs.value[tabsNumbers.archive].data.l
 const selectedOrder = ref<Order | null>(null);
 const startAllIntervals = () => {
   tabs.value.forEach((tab, index) => {
-    const processNewOrders = (newData: UserOrder[]): UserOrder[] => {
-      const newOrders = newData.filter((order) => !notifStore.loadedOrderIds.has(order.id));
-      newData.forEach((order) => {
-        notifStore.addToLoadedOrders(order.id);
-      });
-      return newOrders;
-    };
-
     tab.timerId = window.setInterval(async () => {
       if (document.visibilityState === "visible") {
         try {
-          const data = await tab.fetchFn();
-          console.log(`Обновление вкладки ${data}:`, data);
-          const newData = processNewOrders(data);
-          if (newData.length > 0) {
-            showNotifications(newData);
-          }
-          tabs.value[index].data = data;
-          console.log("notifStore.loadedOrderIds", notifStore.loadedOrderIds);
+          tabs.value[index].data = await fetchUserOrders(tab);
         } catch (error) {
           console.error(`Ошибка обновления вкладки ${tab.label}:`, error);
         }
       }
     }, tab.interval);
 
-    tab.fetchFn().then((data) => {
-      tabs.value[index].data = data;
-      processNewOrders(tabs.value[index].data);
+    tab.fetchFn().then(async () => {
+      tabs.value[index].data = await fetchUserOrders(tab);
     });
   });
 };
 
-const showNotifications = (orders: UserOrder[]) => {
-  orders.forEach((order) => {
-    toast.success(order.id.toString());
-  });
-};
+const fetchUserOrders = async (tab: TabConfig): Promise<UserOrder[]> => {
+  let data = await tab.fetchFn();
+  if (tab.label === "В работе") {
+    data = data.filter(order => {
+      let name = "";
+      order.statuses.forEach((status) => {
+        if (status.status === 'processing') {
+          name = status.staff.username;
+        }
+      })
+      return name === authStore.currentUser?.username;
+    })
+  }
+  return data;
+}
 
 const clearAllIntervals = () => {
   tabs.value.forEach((tab) => {
@@ -187,11 +161,6 @@ const currentData = computed<UserOrder[]>((): UserOrder[] => {
 const fetchOrder = async (orderId: number) => {
   isLoading.value = true;
   selectedOrder.value = await getOrderStaff(orderId);
-  // const staffIds = [...new Set(selectedOrder.value.statuses
-  // .filter(status => status.staff !== null)
-  // .map(status => status.staff))];
-
-  // const staffPromises = staffIds.map(id => profileInfo(id));
 
   isLoading.value = false;
 };
@@ -257,7 +226,7 @@ document.addEventListener("visibilitychange", () => {
 }
 
 .tab-link.active {
-  background-color: var(--color-primary-200);
+  background-color: var(--color-background-100);
 }
 
 .badge {

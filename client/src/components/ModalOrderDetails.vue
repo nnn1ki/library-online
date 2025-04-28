@@ -12,7 +12,7 @@
           <span>{{ selectedOrder.user.last_name + " " + selectedOrder.user.first_name }}</span>
         </div>
         <div class="section">
-          <h3>История статусов</h3>
+          <h3>История статусов:</h3>
           <ul class="status-list">
             <li v-for="status in selectedOrder.statuses" :key="status.date" class="status-item">
               <span class="status-date">{{ formatDate(status.date) }}</span>
@@ -34,9 +34,9 @@
           <div class="books-container">
             <template v-for="orderBook in selectedOrder.books" :key="orderBook.id">
               <div class="book-card" :class="{
-  error: isCheckFailed && orderBook.id !== selectedOrder.books[0].id,
-  succes: isCheckFailed && orderBook.id === selectedOrder.books[0].id
-}">
+                    error: isCheckFailed && orderBook.id !== selectedOrder.books[0].id,
+                    succes: isCheckFailed && orderBook.id === selectedOrder.books[0].id
+                  }">
                 <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed" />
                 <!-- <div class="extend-info">
                   <div class="book-number">
@@ -339,14 +339,13 @@ const changeToNextStatus = () => {
 
 .section {
   margin-bottom: 1.5rem;
+  border-bottom: 3px solid var(--color-text-100);
+  padding-bottom: 1rem;
 }
 
 .section h3 {
-  margin: 0 0 1rem;
   font-size: 1.125rem;
   color: var(--color-text-700);
-  border-bottom: 1px solid var(--color-text-100);
-  padding-bottom: 0.5rem;
   font-weight: 500;
 }
 
