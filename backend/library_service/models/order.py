@@ -50,17 +50,18 @@ class OrderItem(models.Model):
         CANCELLED = "cancelled", "Заказ отменен"
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="books")
-    exemplar_id = models.CharField(max_length=25, blank=True)  # TODO: убрать потом blank=True
     book_id = models.CharField(max_length=255)
     status = models.CharField(max_length=255, choices=Status.choices, default=Status.ORDERED)
+    description = models.CharField(max_length=255, null=True, blank=True)
     order_to_return = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
     handed_date = models.DateField(null=True, blank=True)
     to_return_date = models.DateField(null=True, blank=True)
     returned_date = models.DateField(null=True, blank=True)
+    analogous_order_item = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = "Элемент заказа"
         verbose_name_plural = "Элементы заказа"
 
     def __str__(self):
-        return f"Exemplar ID {self.exemplar_id} in Order {self.order.id}"
+        return f"Exemplar ID {self.book_id} in Order {self.order.id}"

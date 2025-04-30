@@ -23,6 +23,7 @@ services:
       SERVICE_HOSTNAME: "${SERVICE_HOSTNAME}"
       OAUTH_CLIENT_ID: "${OAUTH_CLIENT_ID}"
       OAUTH_CLIENT_SECRET: "${OAUTH_CLIENT_SECRET}"
+      OPAC_INTERNAL_TOKEN: "${OPAC_INTERNAL_TOKEN}"
     volumes:
       - media:/app/media
       - django-static:/app/staticfiles

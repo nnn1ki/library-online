@@ -65,6 +65,7 @@ export type OrderStatus = {
   status: OrderStatusEnum;
   date: string;
   description: string;
+  staff: ProfileInfo;
 };
 
 export const orderBookStatuses = {
@@ -89,6 +90,7 @@ export type Order = {
   books: OrderBook[];
   statuses: OrderStatus[];
   library: Library;
+  user: UserInfo;
 };
 
 export type BorrowedBook = {
@@ -121,4 +123,10 @@ export type PaginatedOrders = {
   next: string | null;
   previous: string | null;
   results: UserOrder[];
+};
+
+export type OrderCheckingInfo = {
+  found_books: OrderBook[];
+  notfound_books: OrderBook[];
+  additional_books: string[];
 };

@@ -598,7 +598,7 @@ paths:
                     type: object
                     properties:
                       book_id:
-                        $ref: "#/components/schemas/OrderBookId"
+                        $ref: "#/components/schemas/BookId"
                       status:
                         type: string
                         description: Статус книги
@@ -610,10 +610,9 @@ paths:
                       description:
                         type: string
                         description: Комментарий по ненайденной книге
-                      analogous_order_item_id:
-                        type: number
+                      analogous:
+                        $ref: "#/components/schemas/BookId"
                         nullable: true
-                        description: ID элемента заказа, на который заменена книга
       responses:
         '200':
           description: OK
@@ -662,8 +661,35 @@ paths:
         '403':
           description: Forbidden
         '404':
-          description: Not Found                  
-  
+          description: Not Found         
+
+  /api/staff/order/borrowed/{id}/:
+    get:
+      tags:
+        - staff
+      security:
+        - bearer: []         
+      summary: Получение списка долгов, которые обещали принести при получении заказа с текущем id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/OrderId"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BorrowedBook"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+
   /api/admin/settings/:
     get:
       tags:
@@ -1134,6 +1160,7 @@ components:
         last_name:
           description: Фамилия
           type: string
+
 
     LibraryParams:
       type: object

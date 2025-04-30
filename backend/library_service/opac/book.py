@@ -7,7 +7,7 @@ from django.conf import settings
 
 from library_service.opac.api.announces import opac_announces_list
 from library_service.models.catalog import Library, LibraryDatabase
-from library_service.opac.api.book import OpacBook, opac_book_retrieve, opac_search
+from library_service.opac.api.book import OpacBook, opac_book_retrieve, opac_search, opac_book_retrieve_by_id
 
 
 @dataclass
@@ -126,3 +126,9 @@ async def book_retrieve_safe(client: ClientSession, book_id: str, library: Libra
         return await book_retrieve(client, book_id)
     except Exception:  # pylint: disable=broad-exception-caught # TODO: на самом деле, pylint здесь прав
         return None
+    
+async def book_retrieve_by_id(client: ClientSession, database: str, id: str) -> Book:
+    library = (await LibraryDatabase.objects.filter(database=database).prefetch_related("library").afirst()).library
+    book = await opac_book_retrieve_by_id(client, database, id)
+
+    return Book(book, library.id)

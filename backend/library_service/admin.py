@@ -3,7 +3,7 @@ from django.contrib import admin
 from library_service.models.catalog import Library, LibraryDatabase
 from library_service.models.order import Order, OrderHistory, OrderItem
 from library_service.models.user import Basket, BasketItem, UserProfile
-
+from library_service.models.comments import OrderComment, OrderItemComment
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -47,7 +47,7 @@ class HistoryAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ["id", "order", "book_id", "exemplar_id", "status"]
+    list_display = ["id", "order", "book_id", "status"]
     list_filter = ["order", "status"]
 
 
@@ -62,3 +62,11 @@ class LibraryAdmin(admin.ModelAdmin):
 @admin.register(LibraryDatabase)
 class LibraryDatabaseAdmin(admin.ModelAdmin):
     list_display = ["id", "database", "library"]
+
+@admin.register(OrderComment)
+class OrderCommentAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment"]
+
+@admin.register(OrderItemComment)
+class OrderItemCommentAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment"]

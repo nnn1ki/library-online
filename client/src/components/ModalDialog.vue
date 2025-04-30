@@ -1,7 +1,9 @@
 <template>
   <div v-if="open" @click="open &&= !escCloseable" class="modal-overlay">
     <div class="modal-dialog" @click.stop>
-      <slot></slot>
+      <div class="modal-content">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
