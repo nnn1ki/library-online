@@ -7,7 +7,7 @@
       >
     </div>
     <div class="book-list">
-      <div v-for="orderBook in order.books" :key="orderBook.book.id" class="book-item">
+      <div v-for="(orderBook, index) in order.books" :key="orderBook.book.id" class="book-item">
         <div class="book-info">
           <div class="col">
             <ShortBookCard :book="orderBook.book" />
@@ -20,6 +20,8 @@
             Заказать еще раз
           </StyledButton>
         </div>
+
+        <hr v-if="index < order.books.length - 1" class="divider" />
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
@@ -32,13 +34,15 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { type OrderStatusEnum, type Order, orderStatuses } from "@/api/types";
-import type { Book } from "@/api/types";
+import type { OrderStatusEnum, Order, Book } from "@/api/types";
+import { orderStatuses } from "@/api/types";
 import { useOrderStore } from "@/stores/orderStore";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import SurfaceCard from "@/components/SurfaceCard.vue";
 import { log } from "console";
+import { useFormattedDate } from "@/composables/useFormattedDate";
+
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];
 const orderStore = useOrderStore();
@@ -51,6 +55,8 @@ const { order, num } = defineProps<{
 const emit = defineEmits<{
   (e: "cancel", orderId: number): number;
 }>();
+
+const { formatDate } = useFormattedDate();
 
 const canCancelOrder = computed(() => allowedCancelStatuses.includes(currentStatus.value));
 

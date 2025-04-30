@@ -37,7 +37,17 @@ export const useBasketStore = defineStore("basket", () => {
         localBooks.value.push(book);
       }
     }
-    toast.success(book.title[0] + " добавлен(a) в корзину");
+
+    let shortTitle: string = "Книга";
+    const limit = 60;
+    if (book.title[0].length <= limit) {
+      shortTitle = book.title[0].substring(0, limit);
+    } else {
+      shortTitle = `${book.title[0].substring(0, limit - 3)}...`;
+    }
+
+    toast.success(shortTitle + " добавленa в корзину");
+
     await updateBooks();
   }
 
@@ -59,6 +69,13 @@ export const useBasketStore = defineStore("basket", () => {
     await updateBooks();
   }
 
+  async function clearOrderedBooks(selectedIds: string[]) {
+    for (const id of selectedIds) {
+      console.log(id);
+      await deleteBasketBook(id).catch(() => console.log("Ошибка при удалении элемента корзины"));
+    }
+  }
+
   useAuthentication(async (auth) => {
     if (auth) {
       await addBasketBooks(localBooks.value.map((book) => book.id));
@@ -74,5 +91,6 @@ export const useBasketStore = defineStore("basket", () => {
     addBook,
     removeBook,
     clearBooks,
+    clearOrderedBooks,
   };
 });
