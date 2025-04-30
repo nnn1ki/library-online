@@ -38,6 +38,8 @@ import { useOrderStore } from "@/stores/orderStore";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
 import SurfaceCard from "@/components/SurfaceCard.vue";
+import { useFormattedDate } from "@/composables/useFormattedDate";
+
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
 const notAllowedToReOrderBoookStatuses: OrderStatusEnum[] = ["new"];
 const orderStore = useOrderStore();
@@ -51,13 +53,15 @@ const emit = defineEmits<{
   (e: "cancel", orderId: number): number;
 }>();
 
+const { formatDate } = useFormattedDate();
+
 const canCancelOrder = computed(() => allowedCancelStatuses.includes(currentStatus.value));
 
 const canReorder = computed(() => !notAllowedToReOrderBoookStatuses.includes(currentStatus.value));
 const showOrderActions = computed(() => canCancelOrder.value);
 
-const orderedDate = order.statuses.at(0)?.date.slice(0, 10);
-const lastStatusDate = order.statuses.at(-1)?.date.slice(0, 10);
+const orderedDate = formatDate(order.statuses.at(0)?.date.slice(0, 10));
+const lastStatusDate = formatDate(order.statuses.at(-1)?.date.slice(0, 10));
 
 const currentStatus = computed(() => {
   const lastStatus = order.statuses[order.statuses.length - 1]?.status;

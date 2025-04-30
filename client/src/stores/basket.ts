@@ -69,6 +69,13 @@ export const useBasketStore = defineStore("basket", () => {
     await updateBooks();
   }
 
+  async function clearOrderedBooks(selectedIds: string[]) {
+    for (const id of selectedIds) {
+      console.log(id);
+      await deleteBasketBook(id).catch(() => console.log("Ошибка при удалении элемента корзины"));
+    }
+  }
+
   useAuthentication(async (auth) => {
     if (auth) {
       await addBasketBooks(localBooks.value.map((book) => book.id));
@@ -84,5 +91,6 @@ export const useBasketStore = defineStore("basket", () => {
     addBook,
     removeBook,
     clearBooks,
+    clearOrderedBooks,
   };
 });
