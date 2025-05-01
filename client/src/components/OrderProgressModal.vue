@@ -125,9 +125,9 @@ type ModalState = {
 
 const open = defineModel<boolean>({ required: true });
 const animationStep = ref(0);
-const isLastStep = computed(()=> {
+const isLastStep = computed(() => {
   return animationStep.value == 5;
-})
+});
 const props = defineProps({
   state: {
     type: Object as () => ModalState,
@@ -141,14 +141,12 @@ setInterval(async () => {
   }
 }, 800);
 
-
 const handleCLoseClick = () => {
   open.value = false;
-  if(props.state.isSuccess) {
-    router.push('/');
+  if (props.state.isSuccess) {
+    router.push("/");
   }
-
-}
+};
 </script>
 
 <style lang="scss" scoped>

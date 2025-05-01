@@ -2,8 +2,10 @@
   <div v-if="selectedOrder" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Детали заказа #{{ selectedOrder.id }}</h2>          
-        <button v-if="nextStatus" :disabled="!hasNextStatus" @click="openPrintModal=true"> Печать </button>
+        <h2>Детали заказа #{{ selectedOrder.id }}</h2>
+        <button v-if="nextStatus" :disabled="!hasNextStatus" @click="openPrintModal = true">
+          Печать
+        </button>
         <button class="close-button" @click="closeModal">×</button>
       </div>
 
@@ -34,10 +36,13 @@
           <h3>Книги ({{ selectedOrder.books.length }})</h3>
           <div class="books-container">
             <template v-for="orderBook in selectedOrder.books" :key="orderBook.id">
-              <div class="book-card" :class="{
-                    error: isCheckFailed && orderBook.id !== selectedOrder.books[0].id,
-                    succes: isCheckFailed && orderBook.id === selectedOrder.books[0].id
-                  }">
+              <div
+                class="book-card"
+                :class="{
+                  error: isCheckFailed && orderBook.id !== selectedOrder.books[0].id,
+                  succes: isCheckFailed && orderBook.id === selectedOrder.books[0].id,
+                }"
+              >
                 <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed" />
                 <!-- <div class="extend-info">
                   <div class="book-number">
@@ -77,7 +82,7 @@
                 <div>
                   <label>Причина:</label>
                   <select
-                    v-model="unavailableBookReason" 
+                    v-model="unavailableBookReason"
                     class="form-select"
                     aria-label="Причина, почему книга не найдена"
                   >
@@ -92,7 +97,10 @@
                 </div>
                 <div class="comment-card">
                   <label>Комментарий:</label>
-                  <textarea v-model="unavailableBookComment" placeholder="Введите комментарий..."></textarea>
+                  <textarea
+                    v-model="unavailableBookComment"
+                    placeholder="Введите комментарий..."
+                  ></textarea>
                 </div>
                 <div class="" v-if="unavailableBookReason === 'analog'">
                   <label>Аналог:</label>
@@ -101,61 +109,66 @@
                     class="form-select"
                     aria-label="Возможные аналоги"
                   >
-                    <option 
-                      v-for="analog in availableAnalogs" 
-                      :key="analog.id" 
-                      :value="analog.id"
-                    >
+                    <option v-for="analog in availableAnalogs" :key="analog.id" :value="analog.id">
                       {{ analog.title }} ({{ analog.author }})
                     </option>
                   </select>
                 </div>
               </div>
-              <div v-else-if="isCheckFailed && orderBook.id === selectedOrder.books[0].id">
-              </div>
+              <div v-else-if="isCheckFailed && orderBook.id === selectedOrder.books[0].id"></div>
             </template>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <StyledButton v-if="prevStatus" :disabled="!hasPrevStatus" @click="changeToPrevStatus" theme="accent">
+        <StyledButton
+          v-if="prevStatus"
+          :disabled="!hasPrevStatus"
+          @click="changeToPrevStatus"
+          theme="accent"
+        >
           {{ prevStatusButtonText }}
         </StyledButton>
-        <StyledButton v-if="nextStatus" :disabled="!hasNextStatus" @click="changeToNextStatus" theme="secondary">{{
-          nextStatusButtonText }}</StyledButton>
+        <StyledButton
+          v-if="nextStatus"
+          :disabled="!hasNextStatus"
+          @click="changeToNextStatus"
+          theme="secondary"
+          >{{ nextStatusButtonText }}</StyledButton
+        >
       </div>
       <button @click="isCheckFailed = !isCheckFailed">
         Перестраиваем вид для неудачной проверки
       </button>
     </div>
   </div>
-  <PrintModal v-model="openPrintModal" :order="selectedOrder"/>
+  <PrintModal v-model="openPrintModal" :order="selectedOrder" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import ShortBookCard from "@/components/ShortBookCard.vue";
 import StyledButton from "@/components/StyledButton.vue";
-import PrintModal from "@/components/PrintModal.vue"; 
+import PrintModal from "@/components/PrintModal.vue";
 import type { Order, OrderCheckingInfo } from "@/api/types";
 import type { OrderStatusEnum } from "@/api/types";
 import { orderStatuses } from "@/api/types";
 
 const unavailableReasons = ref([
-  { value: 'analog', label: 'Аналог' },
-  { value: 'noAvailableCopies', label: 'Нет доступных экземпляров' },
-  { value: 'damaged', label: 'Книга испорчена' }
+  { value: "analog", label: "Аналог" },
+  { value: "noAvailableCopies", label: "Нет доступных экземпляров" },
+  { value: "damaged", label: "Книга испорчена" },
 ]);
 
-const unavailableBookReason = ref('');
-const unavailableBookComment = ref('');
+const unavailableBookReason = ref("");
+const unavailableBookComment = ref("");
 const selectedAnalogBookId = ref(null);
 const openPrintModal = ref(false);
 
 const availableAnalogs = ref([
-  { id: 1, title: 'Война и мир', author: 'Л.Н. Толстой' },
-  { id: 2, title: 'Преступление и наказание', author: 'Ф.М. Достоевский' }
+  { id: 1, title: "Война и мир", author: "Л.Н. Толстой" },
+  { id: 2, title: "Преступление и наказание", author: "Ф.М. Достоевский" },
 ]);
 
 const props = defineProps<{
@@ -226,13 +239,13 @@ function closeModal() {
   emit("close");
 }
 
-function printSearchList() {
-  const options = {
-    name: "searchList",
-    specs: ["fullscreen=yes", "titlebar=yes", "scrollbars=yes"],
-    styles: [],
-  };
-}
+// function printSearchList() {
+//   const options = {
+//     name: "searchList",
+//     specs: ["fullscreen=yes", "titlebar=yes", "scrollbars=yes"],
+//     styles: [],
+//   };
+// }
 
 const currentStatus = computed(() => {
   return props.order.statuses[props.order.statuses.length - 1].status;

@@ -2,33 +2,54 @@
   <div class="tabs-container">
     <ul class="tabs">
       <li class="tab-item">
-        <a class="tab-link" :class="{ active: currentTab === tabsNumbers.new }" @click="currentTab = tabsNumbers.new"
-          href="#">
+        <a
+          class="tab-link"
+          :class="{ active: currentTab === tabsNumbers.new }"
+          @click="currentTab = tabsNumbers.new"
+          href="#"
+        >
           Новые <span class="badge">{{ newOrdersCount }}</span>
         </a>
       </li>
       <li class="tab-item">
-        <a class="tab-link" :class="{ active: currentTab === tabsNumbers.processing }"
-          @click="currentTab = tabsNumbers.processing" href="#">
+        <a
+          class="tab-link"
+          :class="{ active: currentTab === tabsNumbers.processing }"
+          @click="currentTab = tabsNumbers.processing"
+          href="#"
+        >
           В работе <span class="badge">{{ processingOrdersCount }}</span>
         </a>
       </li>
       <li class="tab-item">
-        <a class="tab-link" :class="{ active: currentTab === tabsNumbers.ready }"
-          @click="currentTab = tabsNumbers.ready" href="#">
+        <a
+          class="tab-link"
+          :class="{ active: currentTab === tabsNumbers.ready }"
+          @click="currentTab = tabsNumbers.ready"
+          href="#"
+        >
           Готовые к выдаче <span class="badge">{{ readyOrdersCount }}</span>
         </a>
       </li>
       <li class="tab-item">
-        <a class="tab-link" :class="{ active: currentTab === tabsNumbers.archive }"
-          @click="currentTab = tabsNumbers.archive" href="#">
+        <a
+          class="tab-link"
+          :class="{ active: currentTab === tabsNumbers.archive }"
+          @click="currentTab = tabsNumbers.archive"
+          href="#"
+        >
           Архив <span class="badge">{{ archiveOrdersCount }}</span>
         </a>
       </li>
     </ul>
     <OrderList @get-order="fetchOrder" :orders="currentData" />
-    <ModalOrderDetails v-if="selectedOrder" :order="selectedOrder" @close="selectedOrder = null"
-      @next-order-status="handleUpdateOrderStatus" @check-order="handleCheckOrder" />
+    <ModalOrderDetails
+      v-if="selectedOrder"
+      :order="selectedOrder"
+      @close="selectedOrder = null"
+      @next-order-status="handleUpdateOrderStatus"
+      @check-order="handleCheckOrder"
+    />
     <LoadingModal v-model="isLoading" />
   </div>
 </template>
@@ -49,7 +70,7 @@ import {
 import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@/api/types";
 import { getOrderStaff, updateOrderStatus, checkOrder } from "@/api/order";
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
 const isLoading = ref(false);
 interface TabConfig {
@@ -122,18 +143,18 @@ const startAllIntervals = () => {
 const fetchUserOrders = async (tab: TabConfig): Promise<UserOrder[]> => {
   let data = await tab.fetchFn();
   if (tab.label === "В работе") {
-    data = data.filter(order => {
+    data = data.filter((order) => {
       let name = "";
       order.statuses.forEach((status) => {
-        if (status.status === 'processing') {
+        if (status.status === "processing") {
           name = status.staff.username;
         }
-      })
+      });
       return name === authStore.currentUser?.username;
-    })
+    });
   }
   return data;
-}
+};
 
 const clearAllIntervals = () => {
   tabs.value.forEach((tab) => {

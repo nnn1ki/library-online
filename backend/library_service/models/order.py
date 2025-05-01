@@ -57,7 +57,7 @@ class OrderItem(models.Model):
     handed_date = models.DateField(null=True, blank=True)
     to_return_date = models.DateField(null=True, blank=True)
     returned_date = models.DateField(null=True, blank=True)
-    analogous_order_item = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
+    analogous_order_item = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = "Элемент заказа"

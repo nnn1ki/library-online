@@ -7,13 +7,13 @@
       </div>
       <div class="main-content">
         <div class="qr-container">
-          <QrcodeVue :value='props.order.user.library_card?.toString()' :size="qrSize" />
+          <QrcodeVue :value="props.order.user.library_card?.toString()" :size="qrSize" />
         </div>
         <div class="books-section">
           <h3>Книги ({{ props.order.books.length }})</h3>
           <div class="books-list">
             <div v-for="book in props.order.books" :key="book.id" class="book">
-              <ShortBookCard :book="book.book" :truncate="true"/>
+              <ShortBookCard :book="book.book" :truncate="true" />
             </div>
           </div>
         </div>
@@ -24,11 +24,10 @@
 
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
-import QrcodeVue from 'qrcode.vue';
+import QrcodeVue from "qrcode.vue";
 import type { Order } from "@/api/types";
 import ShortBookCard from "./ShortBookCard.vue";
-import VueHtmlToPaper from "vue-html-to-paper";
-
+// import VueHtmlToPaper from "vue-html-to-paper";
 
 const qrSize = computed(() => {
   const minSize = 300;
@@ -40,8 +39,7 @@ const props = defineProps<{
   order: Order;
 }>();
 
-const open = defineModel<boolean>()
-
+const open = defineModel<boolean>();
 </script>
 
 <style lang="scss" scoped>
@@ -104,22 +102,21 @@ const open = defineModel<boolean>()
   border: 1px solid #eee;
 }
 
-
 .main-content {
   padding: 2rem;
   display: flex;
-  gap: 2rem; 
+  gap: 2rem;
   .books-section {
-    flex: 1; 
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    
+
     .books-list {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      
+
       .book {
         padding: 1rem;
         background-color: var(--color-background-100);
@@ -128,5 +125,4 @@ const open = defineModel<boolean>()
     }
   }
 }
-
 </style>
