@@ -5,7 +5,7 @@ import type {
   UserOrder,
   OrderStatusEnum,
   OrderCheckingInfo,
-} from "@/api/types";
+} from "./types";
 
 export async function updateOrderStatus(
   orderId: number,

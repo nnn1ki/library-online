@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Book } from "@/api/types";
+import type { Book } from "@lib/shared/api/types";
 
 const { book } = defineProps<{
   book: Book;
@@ -24,7 +24,7 @@ const { book } = defineProps<{
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/colors.scss" as *;
+@use "@lib/shared/styles/colors.scss" as *;
 
 img {
   width: 100%;

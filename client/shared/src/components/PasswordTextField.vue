@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import TextField from "@/components/TextField.vue";
+import TextField from "./TextField.vue";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/outline";
 import { ref } from "vue";
 

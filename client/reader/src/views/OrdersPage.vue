@@ -20,15 +20,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 
-import { ordersList } from "@/api/order";
-import { type Order } from "@/api/types";
+import { ordersList } from "@lib/shared/api/order";
+import { type Order } from "@lib/shared/api/types";
 import { useOrderStore } from "@/stores/orderStore";
 import { useAuthStore } from "@/stores/auth";
 import OrderCard from "@/layouts/OrderCard.vue";
-import LoadingModal from "@/components/LoadingModal.vue";
+import LoadingModal from "@lib/shared/components/LoadingModal.vue";
 import CurrentOrderCard from "@/layouts/CurrentOrderCard.vue";
 import NotAllowedBanner from "@/layouts/NotAllowedBanner.vue";
-import ConfirmationModal from "@/components/ConfirmationModal.vue";
+import ConfirmationModal from "@lib/shared/components/ConfirmationModal.vue";
 import { useAuthentication } from "@/composables/auth";
 import { useRouter } from "vue-router";
 

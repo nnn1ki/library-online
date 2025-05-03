@@ -7,7 +7,7 @@
 <script setup lang="ts"></script>
 
 <style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
+@use "@lib/shared/styles/breakpoints.scss" as *;
 
 .surface {
   background-color: var(--color-background-100);

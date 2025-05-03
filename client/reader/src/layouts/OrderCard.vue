@@ -34,11 +34,11 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { OrderStatusEnum, Order, Book } from "@/api/types";
-import { orderStatuses } from "@/api/types";
+import type { OrderStatusEnum, Order, Book } from "@lib/shared/api/types";
+import { orderStatuses } from "@lib/shared/api/types";
 import { useOrderStore } from "@/stores/orderStore";
-import ShortBookCard from "@/components/ShortBookCard.vue";
-import StyledButton from "@/components/StyledButton.vue";
+import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import SurfaceCard from "@/components/SurfaceCard.vue";
 import { useFormattedDate } from "@/composables/useFormattedDate";
 
@@ -63,7 +63,7 @@ const canReorder = computed(() => !notAllowedToReOrderBoookStatuses.includes(cur
 const showOrderActions = computed(() => canCancelOrder.value);
 
 const orderedDate = formatDate(order.statuses[0].date);
-const lastStatusDate = formatDate(order.statuses[1].date);
+const lastStatusDate = formatDate(order.statuses[order.statuses.length - 1].date);
 
 const currentStatus = computed(() => {
   const lastStatus = order.statuses[order.statuses.length - 1]?.status;

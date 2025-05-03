@@ -68,12 +68,12 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type { Book } from "@/api/types";
+import type { Book } from "@lib/shared/api/types";
 import { ShoppingCartIcon, Bars3Icon, BookOpenIcon, TrashIcon } from "@heroicons/vue/24/outline";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
-import StyledButton from "@/components/StyledButton.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import BookImage from "@/components/BookImage.vue";
 
 const {
@@ -130,7 +130,7 @@ const bookHint = computed(() => {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
+@use "@lib/shared/styles/breakpoints.scss" as *;
 
 @mixin vertical-layout {
   &.announcement {

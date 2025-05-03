@@ -6,8 +6,6 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "reader/**/*",  
-    "src/**/*"    
 ],
   "compilerOptions": {
     "composite": true,

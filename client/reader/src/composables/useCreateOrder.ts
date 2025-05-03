@@ -4,9 +4,9 @@ import { useOrderStore } from "@/stores/orderStore";
 import { useBasketStore } from "@/stores/basket";
 import { useOrderProgress } from "./useOrderProgress";
 import { storeToRefs } from "pinia";
-import { ordersList, createOrder } from "@/api/order";
-import { getBook } from "@/api/books";
-import type { Order, OrderStatusEnum } from "@/api/types";
+import { ordersList, createOrder } from "@lib/shared/api/order";
+import { getBook } from "@lib/shared/api/books";
+import type { Order, OrderStatusEnum } from "@lib/shared/api/types";
 
 export const useCreateOrder = () => {
   const authStore = useAuthStore();

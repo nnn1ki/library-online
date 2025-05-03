@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import LoadingSpinner from "./LoadingSpinner.vue";
 import ModalDialog from "./ModalDialog.vue";
 const loading = defineModel<boolean>({ required: true });
 </script>

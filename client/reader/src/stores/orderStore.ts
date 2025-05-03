@@ -2,8 +2,8 @@ import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
-import { deleteOrder, borrowedList } from "@/api/order";
-import type { Book, Order, BorrowedBook } from "@/api/types";
+import { deleteOrder, borrowedList } from "@lib/shared/api/order";
+import type { Book, Order, BorrowedBook } from "@lib/shared/api/types";
 
 export const useOrderStore = defineStore("orderStore", () => {
   const selectedBooks = useLocalStorage<Book[]>("selectedBooksToOrder", []);

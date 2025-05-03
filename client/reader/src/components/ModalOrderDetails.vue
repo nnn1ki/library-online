@@ -148,12 +148,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import ShortBookCard from "@/components/ShortBookCard.vue";
-import StyledButton from "@/components/StyledButton.vue";
+import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import PrintModal from "@/components/PrintModal.vue";
-import type { Order, OrderCheckingInfo } from "@/api/types";
-import type { OrderStatusEnum } from "@/api/types";
-import { orderStatuses } from "@/api/types";
+
+import type { Order, OrderCheckingInfo } from "@lib/shared/api/types";
+import type { OrderStatusEnum } from "@lib/shared/api/types";
+import { orderStatuses } from "@lib/shared/api/types";
 
 const unavailableReasons = ref([
   { value: "analog", label: "Аналог" },

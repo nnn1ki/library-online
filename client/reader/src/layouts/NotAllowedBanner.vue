@@ -18,8 +18,8 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { InformationCircleIcon } from "@heroicons/vue/24/outline";
-import StyledButton from "@/components/StyledButton.vue";
-import ModalDialog from "@/components/ModalDialog.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
+import ModalDialog from "@lib/shared/components/ModalDialog.vue";
 
 const router = useRouter();
 const open = defineModel<boolean>({ required: true });

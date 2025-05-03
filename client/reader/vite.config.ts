@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      '@lib/shared': fileURLToPath(new URL('../shared/src', import.meta.url)),
     },
   },
   css: {

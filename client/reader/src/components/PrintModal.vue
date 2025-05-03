@@ -25,8 +25,8 @@
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
 import QrcodeVue from "qrcode.vue";
-import type { Order } from "@/api/types";
-import ShortBookCard from "./ShortBookCard.vue";
+import type { Order } from "@lib/shared/api/types";
+import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
 // import VueHtmlToPaper from "vue-html-to-paper";
 
 const qrSize = computed(() => {

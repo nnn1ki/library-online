@@ -14,8 +14,8 @@
 </template>
 
 <script setup lang="ts">
-import StyledButton from "@/components/StyledButton.vue";
-import ModalDialog from "@/components/ModalDialog.vue";
+import StyledButton from "./StyledButton.vue";
+import ModalDialog from "./ModalDialog.vue";
 const { title, text } = defineProps<{
   title: string;
   text: string;

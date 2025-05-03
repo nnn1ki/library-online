@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Library } from "@/api/types";
+import type { Library } from "./types";
 
 export async function librariesList(): Promise<Library[]> {
   try {

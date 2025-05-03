@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Book } from "@/api/types";
-import ShortBookCard from "@/components/ShortBookCard.vue";
-import StyledButton from "@/components/StyledButton.vue";
+import type { Book } from "@lib/shared/api/types";
+import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import SurfaceCard from "@/components/SurfaceCard.vue";
 const { order } = defineProps<{
   order: Book[];

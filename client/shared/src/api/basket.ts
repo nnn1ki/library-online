@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Book } from "@/api/types";
+import type { Book } from "./types";
 
 export async function basketBooksList(): Promise<Book[]> {
   try {

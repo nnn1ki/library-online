@@ -76,13 +76,13 @@
 import { ref, onBeforeMount, computed } from "vue";
 import { BookOpenIcon } from "@heroicons/vue/24/outline";
 import BorrowedBooks from "@/layouts/BorrowedBooks.vue";
-import ShortBookCard from "@/components/ShortBookCard.vue";
-import StyledButton from "@/components/StyledButton.vue";
+import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import { useOrderStore } from "@/stores/orderStore";
 import { useCreateOrder } from "@/composables/useCreateOrder";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import TextField from "@/components/TextField.vue";
-import StyledCheckbox from "@/components/StyledCheckbox.vue";
+import LoadingSpinner from "@lib/shared/components/LoadingSpinner.vue";
+import TextField from "@lib/shared/components/TextField.vue";
+import StyledCheckbox from "@lib/shared/components/StyledCheckbox.vue";
 import OrderProgressModal from "@/components/OrderProgressModal.vue";
 
 const orderStore = useOrderStore();

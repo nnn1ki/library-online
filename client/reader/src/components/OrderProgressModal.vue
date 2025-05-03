@@ -106,8 +106,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { motion } from "motion-v";
-import ModalDialog from "@/components/ModalDialog.vue";
-import StyledButton from "./StyledButton.vue";
+import ModalDialog from "@lib/shared/components/ModalDialog.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import router from "@/router";
 type ModalStep = {
   title: string;

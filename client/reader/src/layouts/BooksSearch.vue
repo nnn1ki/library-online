@@ -107,16 +107,16 @@
 import { nextTick, onBeforeMount, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { PlusIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/outline";
-import { searchBooks } from "@/api/books";
-import { scenariosList } from "@/api/scenarios";
-import type { Book, Library, Scenario } from "@/api/types";
-import { librariesList } from "@/api/libraries";
+import { searchBooks } from "@lib/shared/api/books";
+import { scenariosList } from "@lib/shared/api/scenarios";
+import type { Book, Library, Scenario } from "@lib/shared/api/types";
+import { librariesList } from "@lib/shared/api/libraries";
 import SurfaceCard from "@/components/SurfaceCard.vue";
 import BookCard from "@/components/BookCard.vue";
 import SelectList from "@/components/SelectList.vue";
-import StyledButton from "@/components/StyledButton.vue";
-import TextField from "@/components/TextField.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
+import TextField from "@lib/shared/components/TextField.vue";
+import LoadingSpinner from "@lib/shared/components/LoadingSpinner.vue";
 
 // Состояния
 const router = useRouter();
@@ -268,8 +268,8 @@ onBeforeMount(async () => {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
-@use "@/styles/colors.scss" as *;
+@use "@lib/shared/styles/breakpoints.scss" as *;
+@use "@lib/shared/styles/colors.scss" as *;
 
 .filter-condition {
   padding-top: 1rem;

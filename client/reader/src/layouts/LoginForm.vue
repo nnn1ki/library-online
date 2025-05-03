@@ -26,10 +26,10 @@
 </template>
 
 <script setup lang="ts">
-import PasswordTextField from "@/components/PasswordTextField.vue";
-import StyledButton from "@/components/StyledButton.vue";
+import PasswordTextField from "@lib/shared/components/PasswordTextField.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import SurfaceCard from "@/components/SurfaceCard.vue";
-import TextField from "@/components/TextField.vue";
+import TextField from "@lib/shared/components/TextField.vue";
 import { useAuthStore } from "@/stores/auth";
 import { ref } from "vue";
 
@@ -47,7 +47,7 @@ async function login() {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
+@use "@lib/shared/styles/breakpoints.scss" as *;
 
 .surface {
   margin-top: 20px;

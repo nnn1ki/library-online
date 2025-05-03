@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
-import { groups } from "@/api/types";
-import StyledButton from "@/components/StyledButton.vue";
+import { groups } from "@lib/shared/api/types";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import LoginForm from "@/layouts/LoginForm.vue";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";

@@ -78,7 +78,7 @@ const mobileMenuOpen = ref(false);
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
+@use "@lib/shared/styles/breakpoints.scss" as *;
 
 header {
   padding-top: 1.25rem;

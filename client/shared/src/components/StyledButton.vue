@@ -21,7 +21,7 @@ const {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/colors.scss" as *;
+@use "../styles/colors.scss" as *;
 
 button {
   border-radius: 0.5rem;

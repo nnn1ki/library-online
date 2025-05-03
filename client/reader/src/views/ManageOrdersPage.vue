@@ -59,16 +59,16 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import OrderList from "@/components/OrderList.vue";
 import ModalOrderDetails from "@/components/ModalOrderDetails.vue";
-import LoadingModal from "@/components/LoadingModal.vue";
+import LoadingModal from "@lib/shared/components/LoadingModal.vue";
 
 import {
   fetchNewOrders,
   fetchProcessingOrders,
   fetchReadyOrders,
   fetchArchiveOrders,
-} from "@/api/order";
-import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@/api/types";
-import { getOrderStaff, updateOrderStatus, checkOrder } from "@/api/order";
+} from "@lib/shared/api/order";
+import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@lib/shared/api/types";
+import { getOrderStaff, updateOrderStatus, checkOrder } from "@lib/shared/api/order";
 
 const authStore = useAuthStore();
 

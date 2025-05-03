@@ -25,8 +25,8 @@
 
 <script setup lang="ts">
 import { useOrderStore } from "@/stores/orderStore";
-import ShortBookCard from "@/components/ShortBookCard.vue";
-import StyledCheckbox from "@/components/StyledCheckbox.vue";
+import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
+import StyledCheckbox from "@lib/shared/components/StyledCheckbox.vue";
 const orderStore = useOrderStore();
 
 const inDebt = (bookOnReturnDate: string): boolean => {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { ProfileInfo } from "@/api/types";
+import type { ProfileInfo } from "./types";
 
 export async function profileInfo(): Promise<ProfileInfo> {
   try {

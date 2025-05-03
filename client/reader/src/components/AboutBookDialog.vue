@@ -47,14 +47,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Book } from "@/api/types";
+import type { Book } from "@lib/shared/api/types";
 import { useBasketStore } from "@/stores/basket";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { ShoppingCartIcon } from "@heroicons/vue/24/outline";
-import StyledButton from "@/components/StyledButton.vue";
-import BookImage from "./BookImage.vue";
-import ModalDialog from "./ModalDialog.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
+import BookImage from "@/components/BookImage.vue";
+import ModalDialog from "@lib/shared/components/ModalDialog.vue";
 
 const { book } = defineProps<{
   book: Book;
@@ -69,7 +69,7 @@ const visible = defineModel<boolean>({ required: true });
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
+@use "@lib/shared/styles/breakpoints.scss" as *;
 
 .dialog {
   width: 90vw;

@@ -14,8 +14,8 @@
 import { ref, onMounted } from "vue";
 import BookCard from "@/components/BookCard.vue";
 import BooksSearch from "@/layouts/BooksSearch.vue";
-import type { Book } from "@/api/types";
-import { announcesList } from "@/api/announces";
+import type { Book } from "@lib/shared/api/types";
+import { announcesList } from "@lib/shared/api/announces";
 const announces = ref<Book[]>([]);
 
 onMounted(async () => {
@@ -24,7 +24,7 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
+@use "@lib/shared/styles/breakpoints.scss" as *;
 
 .container {
   padding-top: 20px;

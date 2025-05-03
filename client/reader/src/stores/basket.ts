@@ -4,8 +4,8 @@ import {
   deleteBasketBook,
   basketBooksList,
   replaceBasketBooks,
-} from "@/api/basket";
-import type { Book } from "@/api/types";
+} from "@lib/shared/api/basket";
+import type { Book } from "@lib/shared/api/types";
 import { useAuthentication } from "@/composables/auth";
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";

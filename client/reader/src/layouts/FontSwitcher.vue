@@ -24,7 +24,7 @@ const themeStore = useThemeStore();
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/colors.scss" as *;
+@use "@lib/shared/styles/colors.scss" as *;
 
 .switcher {
   width: fit-content;

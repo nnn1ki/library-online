@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { defineProps, ref, computed } from "vue";
-import type { UserOrder } from "@/api/types";
+import type { UserOrder } from "@lib/shared/api/types";
 
 const props = defineProps<{
   orders: UserOrder[];

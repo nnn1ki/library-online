@@ -3,8 +3,8 @@ import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { computed, onBeforeMount, ref } from "vue";
-import type { ProfileInfo } from "@/api/types";
-import { profileInfo } from "@/api/profile";
+import type { ProfileInfo } from "@lib/shared/api/types";
+import { profileInfo } from "@lib/shared/api/profile";
 
 export const useAuthStore = defineStore("auth", () => {
   type Token = string | undefined;

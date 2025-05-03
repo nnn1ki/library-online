@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Book } from "@/api/types";
+import type { Book } from "@lib/shared/api/types";
 import AboutBookDialog from "@/components/AboutBookDialog.vue";
 import NotAllowedBanner from "@/layouts/NotAllowedBanner.vue";
 import { useBasketStore } from "@/stores/basket";
@@ -101,11 +101,11 @@ import { useOrderStore } from "@/stores/orderStore";
 import { computed, ref, watch } from "vue";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { useRouter } from "vue-router";
-import ModalDialog from "@/components/ModalDialog.vue";
+import ModalDialog from "@lib/shared/components/ModalDialog.vue";
 import SurfaceCard from "@/components/SurfaceCard.vue";
-import StyledButton from "@/components/StyledButton.vue";
+import StyledButton from "@lib/shared/components/StyledButton.vue";
 import BookCard from "@/components/BookCard.vue";
-import StyledCheckbox from "@/components/StyledCheckbox.vue";
+import StyledCheckbox from "@lib/shared/components/StyledCheckbox.vue";
 import { jsPDF } from "jspdf";
 
 const router = useRouter();
@@ -360,7 +360,7 @@ async function onCreateOrderClick() {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/breakpoints.scss" as *;
+@use "@lib/shared/styles/breakpoints.scss" as *;
 
 .container {
   padding-top: 20px;
