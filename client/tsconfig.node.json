@@ -5,8 +5,10 @@
     "vitest.config.*",
     "cypress.config.*",
     "nightwatch.conf.*",
-    "playwright.config.*"
-  ],
+    "playwright.config.*",
+    "reader/**/*",  
+    "src/**/*"    
+],
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
