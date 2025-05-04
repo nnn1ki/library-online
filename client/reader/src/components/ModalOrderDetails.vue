@@ -73,16 +73,12 @@
                     <span class="date-value">{{ formatDate(orderBook.returned_date) }}</span>
                   </div>
                 </div> -->
-                <!-- <template v-if="isCheckFailed">
-                  <div class="some-info">Пока</div>
-                  <div class="some-info">все</div>
-                </template> -->
               </div>
-              <div v-if="isCheckFailed && orderBook.id !== 51">
+              <div v-if="isCheckFailed">
                 <div>
                   <label>Причина:</label>
                   <select
-                    v-model="unavailableBookReason"
+                    v-model="unavailableBookReason[orderBook.id]"
                     class="form-select"
                     aria-label="Причина, почему книга не найдена"
                   >
@@ -98,14 +94,14 @@
                 <div class="comment-card">
                   <label>Комментарий:</label>
                   <textarea
-                    v-model="unavailableBookComment"
+                    v-model="unavailableBookComment[orderBook.id]"
                     placeholder="Введите комментарий..."
                   ></textarea>
                 </div>
-                <div class="" v-if="unavailableBookReason === 'analog'">
+                <div class="" v-if="unavailableBookReason[orderBook.id] === 'analog'">
                   <label>Аналог:</label>
                   <select
-                    v-model="selectedAnalogBookId"
+                    v-model="selectedAnalogBookId[orderBook.id]"
                     class="form-select"
                     aria-label="Возможные аналоги"
                   >
@@ -162,9 +158,11 @@ const unavailableReasons = ref([
   { value: "damaged", label: "Книга испорчена" },
 ]);
 
-const unavailableBookReason = ref("");
-const unavailableBookComment = ref("");
-const selectedAnalogBookId = ref(null);
+// Нужно будет привязать комментарии и аналоги к книгам из заказа
+const unavailableBookReason = ref<Record<number, string>>({});
+const unavailableBookComment = ref<Record<number, string>>({});
+const selectedAnalogBookId = ref<Record<number, number | null>>({});
+
 const openPrintModal = ref(false);
 
 const availableAnalogs = ref([
