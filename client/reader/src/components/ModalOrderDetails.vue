@@ -74,7 +74,13 @@
                   </div>
                 </div> -->
               </div>
-              <div v-if="isCheckFailed">
+              <div
+                class="book-card"
+                :class="{
+                  error: isCheckFailed && orderBook.id !== selectedOrder.books[0].id,
+                  succes: isCheckFailed && orderBook.id === selectedOrder.books[0].id,
+                }"
+                v-if="isCheckFailed">
                 <div>
                   <label>Причина:</label>
                   <select
@@ -152,6 +158,10 @@ import type { Order, OrderCheckingInfo } from "@lib/shared/api/types";
 import type { OrderStatusEnum } from "@lib/shared/api/types";
 import { orderStatuses } from "@lib/shared/api/types";
 
+const openPrintModal = ref(false);
+
+// Составить список возможных причин отсутствия книг
+// В последствии перейдут в модуль администратора
 const unavailableReasons = ref([
   { value: "analog", label: "Аналог" },
   { value: "noAvailableCopies", label: "Нет доступных экземпляров" },
@@ -163,8 +173,8 @@ const unavailableBookReason = ref<Record<number, string>>({});
 const unavailableBookComment = ref<Record<number, string>>({});
 const selectedAnalogBookId = ref<Record<number, number | null>>({});
 
-const openPrintModal = ref(false);
-
+// Пока взяты для примера аналогов
+// Нужно будет заменить на книги из возможных аналогов
 const availableAnalogs = ref([
   { id: 1, title: "Война и мир", author: "Л.Н. Толстой" },
   { id: 2, title: "Преступление и наказание", author: "Ф.М. Достоевский" },
@@ -227,6 +237,7 @@ const emit = defineEmits<{
 
 const selectedOrder = ref<Order>(props.order);
 
+// Реализовать логику проверки нахождения книги в читательском билете
 const isCheckFailed = ref(false);
 
 function formatDate(dateString: string): string {

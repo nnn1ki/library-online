@@ -166,7 +166,6 @@ const onAddToOrderClick = (bookToOrder: Book) => {
 .book-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .book-info {

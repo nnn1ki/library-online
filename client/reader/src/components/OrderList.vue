@@ -140,6 +140,9 @@ td {
   color: var(--color-text-800);
   background-color: var(--color-background-100);
 }
+tr {
+  border-bottom: 1px solid var(--color-text-200);
+}
 
 th {
   cursor: pointer;
