@@ -29,7 +29,7 @@
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "modern-normalize": "^3.0.1",
-    "motion-v": "^1.0.0-beta.2",
+    "motion-v": "^1.0.1",
     "pinia": "^2.2.4",
     "qrcode": "^1.5.4",
     "qrcode.vue": "^3.6.0",
