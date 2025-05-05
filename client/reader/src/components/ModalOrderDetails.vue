@@ -143,9 +143,13 @@
       <button @click="isCheckFailed = !isCheckFailed">
         Перестраиваем вид для неудачной проверки
       </button>
+      <button v-if="nextStatus = 'processing'" @click="openPrintStickerModal = true">
+          Печать этикетки
+      </button>
     </div>
   </div>
   <PrintModal v-model="openPrintModal" :order="selectedOrder" />
+  <PrintStickerModal v-model="openPrintStickerModal" :order="selectedOrder" />
 </template>
 
 <script setup lang="ts">
@@ -153,12 +157,15 @@ import { ref, computed } from "vue";
 import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
 import StyledButton from "@lib/shared/components/StyledButton.vue";
 import PrintModal from "@/components/PrintModal.vue";
+import PrintStickerModal from "@/components/PrintStickerModal.vue";
 
 import type { Order, OrderCheckingInfo } from "@lib/shared/api/types";
 import type { OrderStatusEnum } from "@lib/shared/api/types";
 import { orderStatuses } from "@lib/shared/api/types";
 
 const openPrintModal = ref(false);
+
+const openPrintStickerModal = ref(false);
 
 // Составить список возможных причин отсутствия книг
 // В последствии перейдут в модуль администратора
