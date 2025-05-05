@@ -91,7 +91,7 @@ export async function fetchArchiveOrders(): Promise<UserOrder[]> {
 
 export async function getOrder(orderId: number): Promise<Order> {
   try {
-    const { data } = await axios.get(`/api/order/${orderId}/`);
+    const { data } = await axios.get(`/api/staff/order/${orderId}/`);
     console.log(`/api/order/${orderId}`, data);
     return data;
   } catch (error) {

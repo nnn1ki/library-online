@@ -100,9 +100,14 @@ class OrderBookSerializer(aserializers.Serializer):
     description = serializers.CharField()
     analogous = serializers.CharField()
 
+class UpdateOrderStatusSerializer(aserializers.ModelSerializer):
+
+    class Meta:
+        model = OrderHistory
+        fields = ["description", "status", "date"]
 
 class UpdateOrderSerializer(aserializers.Serializer):
-    status = OrderStatusSerializer()
+    status = UpdateOrderStatusSerializer()
     books = OrderBookSerializer(many=True)
 
     async def aupdate(self, instance: Order, validated_data):
