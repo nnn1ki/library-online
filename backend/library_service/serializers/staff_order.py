@@ -94,12 +94,11 @@ class UserOrderSerializer(aserializers.ModelSerializer):
 # pylint: enable=duplicate-code
 
 
-class OrderBookSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = OrderItem
-        fields = ["id", "exemplar_id", "status", "description", "analogous_order_item_id"]
-        list_serializer_class = ParallelListSerializer
+class OrderBookSerializer(aserializers.Serializer):
+    book_id = serializers.CharField()
+    status = serializers.CharField()
+    description = serializers.CharField()
+    analogous = serializers.CharField()
 
 
 class UpdateOrderSerializer(aserializers.Serializer):
