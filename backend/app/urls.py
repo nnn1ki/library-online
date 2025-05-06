@@ -36,6 +36,7 @@ from library_service.views.order import BorrowedViewset, OrderViewset
 from library_service.views.profile import ProfileViewset
 from library_service.views.staff_order import StaffOrderViewset, StaffOrderGetUpdateViewset, StaffBorrowedViewset
 from library_service.views.comments import OrderCommentViewset, OrderItemCommentViewset
+from library_service.views.auth import AuthViewset
 
 router = AsyncDefaultRouter()
 router.register("book", BookViewset, basename="book")
@@ -52,12 +53,12 @@ router.register("staff/order/borrowed", StaffBorrowedViewset, basename="staff/or
 router.register("reasons/cancel", OrderCommentViewset, basename="reasons/cancel")
 router.register("reasons/notfound", OrderItemCommentViewset, basename="reasons/notfound")
 
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/login/", TokenObtainPairView.as_view()),
     path("api/auth/bitrix-login/", BitrixAuthView.as_view()),
     path("api/auth/refresh/", TokenRefreshView.as_view()),
     path("api/auth/logout/", TokenBlacklistView.as_view()),
+    path("api/test-login/", AuthViewset.as_view()), #Временно для тестов, потом удалим
     path("api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
