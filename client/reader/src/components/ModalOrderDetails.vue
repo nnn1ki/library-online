@@ -3,12 +3,6 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Детали заказа #{{ selectedOrder.id }}</h2>
-        <button
-          v-if="currentStatus == 'processing'"
-          @click="openPrintModal = true"
-        >
-          Печать
-        </button>
         <button class="close-button" @click="closeModal">×</button>
       </div>
 
@@ -100,7 +94,14 @@
       <div class="modal-footer">
         <StyledButton
           v-if="currentStatus == 'processing'"
-          @click="changeToPrevStatus"
+          @click="openPrintModal = true"
+          theme="primary"
+        >
+          Печать
+        </StyledButton>
+        <StyledButton
+          v-if="currentStatus == 'processing'"
+          @click="openRejectModal = true"
           theme="accent"
         >
           Вернуть в новые
@@ -134,6 +135,10 @@
       </button>
     </div>
   </div>
+  <OrderRejectModal
+    v-model="openRejectModal"
+    @confirm="handleRejectOrder"
+  />
   <PrintModal v-model="openPrintModal" :order="selectedOrder" />
   <PrintStickerModal v-model="openPrintStickerModal" :order="selectedOrder" />
 </template>
@@ -144,6 +149,7 @@ import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
 import StyledButton from "@lib/shared/components/StyledButton.vue";
 import PrintModal from "@/components/PrintModal.vue";
 import PrintStickerModal from "@/components/PrintStickerModal.vue";
+import OrderRejectModal from "@/components/OrderRejectModal.vue";
 
 import type { Order, OrderCheckingInfo } from "@lib/shared/api/types";
 import type { OrderStatusEnum } from "@lib/shared/api/types";
@@ -240,10 +246,6 @@ const currentStatus = computed(() => {
   return props.order.statuses[props.order.statuses.length - 1].status;
 });
 
-const hasNextStatus = computed(() => {
-  return !!statusTransitions[currentStatus.value].next;
-});
-
 const nextStatus = computed(() => {
   return statusTransitions[currentStatus.value].next;
 });
@@ -257,9 +259,12 @@ const changeToCancelledStatus = () => {
   emit("close");
 };
 
-const changeToPrevStatus = () => {
+const openRejectModal = ref(false);
+const handleRejectOrder = (rejectReason: string) => {
+  console.log(rejectReason);
   emit("nextOrderStatus", selectedOrder.value.id, "new");
   emit("close");
+  openRejectModal.value = false;
 };
 
 const changeToNextStatus = () => {

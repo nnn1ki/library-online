@@ -71,8 +71,8 @@ import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@lib/
 import { getOrderStaff, updateOrderStatus, checkOrder } from "@lib/shared/api/order";
 
 const authStore = useAuthStore();
-
 const isLoading = ref(false);
+
 interface TabConfig {
   label: string;
   fetchFn: () => Promise<UserOrder[]>;
