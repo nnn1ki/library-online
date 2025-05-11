@@ -3,7 +3,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Детали заказа #{{ selectedOrder.id }}</h2>
-        <button v-if="nextStatus" :disabled="!hasNextStatus" @click="openPrintModal = true">
+        <button
+          v-if="currentStatus == 'processing'"
+          @click="openPrintModal = true"
+        >
           Печать
         </button>
         <button class="close-button" @click="closeModal">×</button>
@@ -44,35 +47,6 @@
                 }"
               >
                 <ShortBookCard :book="orderBook.book" :truncate="isCheckFailed" />
-                <!-- <div class="extend-info">
-                  <div class="book-number">
-                    <span class="status-label">Инвентраный номер книги: </span>
-                    <span class="status-value" :class="'status-' + orderBook.status">
-                      {{ orderBook.book.id }}
-                    </span>
-                  </div>
-                  <div class="book-status">
-                    <span class="status-label">Статус:</span>
-                    <span class="status-value" :class="'status-' + orderBook.status">
-                      {{ orderBookStatuses[orderBook.status] }}
-                    </span>
-                  </div>
-
-                  <div v-if="orderBook.handed_date" class="book-date">
-                    <span class="date-label">Выдана:</span>
-                    <span class="date-value">{{ formatDate(orderBook.handed_date) }}</span>
-                  </div>
-
-                  <div v-if="orderBook.to_return_date" class="book-date">
-                    <span class="date-label">Вернуть до:</span>
-                    <span class="date-value">{{ formatDate(orderBook.to_return_date) }}</span>
-                  </div>
-
-                  <div v-if="orderBook.returned_date" class="book-date">
-                    <span class="date-label">Возвращена:</span>
-                    <span class="date-value">{{ formatDate(orderBook.returned_date) }}</span>
-                  </div>
-                </div> -->
               </div>
               <div
                 class="book-card"
@@ -125,26 +99,38 @@
 
       <div class="modal-footer">
         <StyledButton
-          v-if="prevStatus"
-          :disabled="!hasPrevStatus"
+          v-if="currentStatus == 'processing'"
           @click="changeToPrevStatus"
           theme="accent"
         >
-          {{ prevStatusButtonText }}
+          Вернуть в новые
+        </StyledButton>
+        <StyledButton
+          v-if="currentStatus == 'ready'"
+          @click="changeToCancelledStatus"
+          theme="accent"
+        >
+          Отменить заказ
         </StyledButton>
         <StyledButton
           v-if="nextStatus"
-          :disabled="!hasNextStatus"
           @click="changeToNextStatus"
           theme="secondary"
-          >{{ nextStatusButtonText }}</StyledButton
         >
+          {{ nextStatusButtonText }}
+          </StyledButton>
       </div>
-      <button @click="isCheckFailed = !isCheckFailed">
+      <button
+        v-if="currentStatus == 'processing'"
+        @click="isCheckFailed = !isCheckFailed"
+      >
         Перестраиваем вид для неудачной проверки
       </button>
-      <button v-if="nextStatus = 'processing'" @click="openPrintStickerModal = true">
-          Печать этикетки
+      <button
+        v-if="currentStatus == 'processing'"
+        @click="openPrintStickerModal = true"
+      >
+        Печать этикетки
       </button>
     </div>
   </div>
@@ -194,45 +180,31 @@ const props = defineProps<{
 const statusTransitions = {
   new: {
     next: "processing",
-    prev: null,
     nextButtonText: "Взять в работу",
-    prevButtonText: "",
   },
   processing: {
     next: "ready",
-    prev: "new",
     nextButtonText: "Проверить готовность",
-    prevButtonText: "Вернуть в новые",
   },
   ready: {
     next: "done",
-    prev: "processing",
     nextButtonText: "Выдать заказ",
-    prevButtonText: "Вернуть в сборку",
   },
   done: {
-    next: "archived",
-    prev: "ready",
-    nextButtonText: "В архив",
-    prevButtonText: "Вернуть к выдаче",
+    next: null,
+    nextButtonText: "",
   },
   archived: {
     next: null,
-    prev: "done",
     nextButtonText: "",
-    prevButtonText: "Вернуть из архива",
   },
   cancelled: {
     next: null,
-    prev: null,
     nextButtonText: "",
-    prevButtonText: "",
   },
   error: {
     next: null,
-    prev: null,
     nextButtonText: "",
-    prevButtonText: "",
   },
 } as const;
 
@@ -268,35 +240,26 @@ const currentStatus = computed(() => {
   return props.order.statuses[props.order.statuses.length - 1].status;
 });
 
-const hasPrevStatus = computed(() => {
-  return !!statusTransitions[currentStatus.value].prev;
-});
-
 const hasNextStatus = computed(() => {
   return !!statusTransitions[currentStatus.value].next;
-});
-
-const prevStatus = computed(() => {
-  return statusTransitions[currentStatus.value].prev;
 });
 
 const nextStatus = computed(() => {
   return statusTransitions[currentStatus.value].next;
 });
 
-const prevStatusButtonText = computed(() => {
-  return statusTransitions[currentStatus.value].prevButtonText;
-});
-
 const nextStatusButtonText = computed(() => {
   return statusTransitions[currentStatus.value].nextButtonText;
 });
 
+const changeToCancelledStatus = () => {
+  emit("nextOrderStatus", selectedOrder.value.id, "cancelled");
+  emit("close");
+};
+
 const changeToPrevStatus = () => {
-  if (prevStatus.value) {
-    emit("nextOrderStatus", selectedOrder.value.id, prevStatus.value);
-    emit("close");
-  }
+  emit("nextOrderStatus", selectedOrder.value.id, "new");
+  emit("close");
 };
 
 const changeToNextStatus = () => {
