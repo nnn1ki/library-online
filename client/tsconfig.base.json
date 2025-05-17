@@ -1,16 +1,13 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "strict": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "reader/src/*",
-        "staff-panel/src/*"
-      ],
-      "@lib/shared/*": ["shared/src/*"]
+    "compilerOptions": {
+      "composite": true,
+      "strict": true,
+      "baseUrl": ".",
+      "paths": {
+        "@reader/*": ["reader/src/*"],
+        "@staff/*": ["staff-panel/src/*"],
+        "@lib/shared/*": ["shared/src/*"]
+      }
     }
-  }
 }
-
   

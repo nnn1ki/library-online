@@ -138,7 +138,6 @@ import StyledButton from "@lib/shared/components/StyledButton.vue";
 import PrintModal from "@/components/PrintModal.vue";
 import PrintStickerModal from "@/components/PrintStickerModal.vue";
 import OrderRejectModal from "@/components/OrderRejectModal.vue";
-
 import type { Order, OrderCheckingInfo } from "@lib/shared/api/types";
 import type { OrderStatusEnum } from "@lib/shared/api/types";
 import { orderStatuses } from "@lib/shared/api/types";

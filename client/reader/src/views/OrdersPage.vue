@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-
 import { ordersList } from "@lib/shared/api/order";
 import { type Order } from "@lib/shared/api/types";
 import { useOrderStore } from "@/stores/orderStore";

@@ -28,8 +28,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import type { Book } from "./types";
-
+import type { Book } from "../api/types";
 const { book, truncate = false } = defineProps<{
   book: Book;
   truncate?: boolean;

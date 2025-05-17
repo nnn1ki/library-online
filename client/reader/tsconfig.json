@@ -1,8 +1,14 @@
 {
-  "files": [],
+  "extends": "../tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../node_modules/.tmp/reader.tsbuildinfo",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@lib/shared/*": ["../shared/src/*"]
+    }
+  },
   "references": [
-    { "path": "../tsconfig.app.json" },
-    { "path": "../tsconfig.node.json" },
-    { "path": "../shared" }
+    { "path": "../shared" },
   ]
 }
