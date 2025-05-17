@@ -2,3 +2,4 @@ from app.settings import *  # pylint: disable=wildcard-import,unused-wildcard-im
 from library_service.tests import opac_mock
 
 OPAC_HOSTNAME = f"http://localhost:{opac_mock.PORT}"
+OPAC_INTERNAL_TOKEN = "internal-token"

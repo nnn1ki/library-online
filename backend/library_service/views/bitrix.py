@@ -1,4 +1,4 @@
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponseError
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -11,6 +11,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from adrf.views import APIView as AsyncAPIView
 
+from library_service.opac.api.ticket import opac_reader_info_by_mira, OpacReader
 
 User = get_user_model()
 
@@ -81,6 +82,13 @@ class BitrixAuthView(AsyncAPIView):
             mira_id = int(result["mira_id"][0] if result["mira_id"] else 0)
             if mira_id > 2:
                 user.profile.mira_id = mira_id
+
+            try:
+                if user.profile.library_card is None:
+                    user_info: OpacReader = await opac_reader_info_by_mira(client, user.profile.mira_id)
+                    user.profile.library_card = user_info.ticket
+            except ClientResponseError as error:
+                pass #Если не нашли аккаунт с данным mira_id, есть смысл авторизовать читателя?
 
             await user.profile.asave()
 

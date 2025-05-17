@@ -2,10 +2,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
-from asgiref.sync import sync_to_async
-from django.db.models import OuterRef, Subquery
 
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 
@@ -19,17 +15,13 @@ from library_service.mixins import (
 
 from library_service.models.order import Order, OrderHistory, OrderItem
 
-from library_service.serializers.order import (
-    BorrowedBookSerializer,
-    CreateUpdateOrderSerializer,
-    OrderSerializer
-)
+from library_service.serializers.order import BorrowedBookSerializer, CreateUpdateOrderSerializer, OrderSerializer
 
 ACCEPTABLE_STATUSES = [
     OrderHistory.Status.NEW,
     OrderHistory.Status.PROCESSING,
     OrderHistory.Status.READY,
-    OrderHistory.Status.DONE
+    OrderHistory.Status.DONE,
 ]
 
 

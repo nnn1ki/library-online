@@ -3,14 +3,21 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "reader",
+    "shared",
+    "staff-panel"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
-    "build-only": "vite build",
+    "lint": "eslint reader/ shared/ staff-panel/ --fix --ignore-pattern .gitignore",
+    "format": "prettier --write reader/ shared/ staff-panel/",
+    "build-only": "vite build --config reader/vite.config.ts",
     "type-check": "vue-tsc --build --force",
-    "lint": "eslint src/ --fix --ignore-pattern .gitignore",
-    "format": "prettier --write src/"
+    "dev:reader": "npm run dev --workspace reader",
+    "dev:staff": "npm run dev --workspace staff-panel",
+    "dev": "echo Please use: npm run dev --workspace <reader|staff-panel> or npm run <dev:reader|dev:staff>",
+    "preview": "echo Please use: npm run preview --workspace <reader|staff-panel>",
+    "build": "echo Please use: npm run build --workspace <reader|staff-panel>"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
@@ -25,7 +32,7 @@
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "modern-normalize": "^3.0.1",
-    "motion-v": "^1.0.0-beta.2",
+    "motion-v": "^1.0.1",
     "pinia": "^2.2.4",
     "qrcode": "^1.5.4",
     "qrcode.vue": "^3.6.0",
