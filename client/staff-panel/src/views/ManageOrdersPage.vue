@@ -58,7 +58,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import OrderList from "@/components/OrderList.vue";
-import ModalOrderDetails from "@/components/ModalOrderDetails.vue";
+import ModalOrderDetails from "@/layouts/ModalOrderDetails.vue";
 import LoadingModal from "@lib/shared/components/LoadingModal.vue";
 
 import {

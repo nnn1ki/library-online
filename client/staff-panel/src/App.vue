@@ -9,14 +9,14 @@
 </template>
 
 <script setup lang="ts">
-
+import { RouterView } from "vue-router";
 </script>
 
 <style scoped lang="scss">
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Обеспечивает, чтобы футер всегда был внизу страницы */
+  min-height: 100vh;
 }
 
 main {

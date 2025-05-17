@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 import "bootstrap/dist/js/bootstrap";
 import "modern-normalize/modern-normalize.css";
-import "@/style.scss";
+import "@lib/shared/style.scss";
 
 import App from "@/App.vue";
 import router from "@/router";
