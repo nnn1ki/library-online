@@ -48,7 +48,8 @@
                   error: isCheckFailed && orderBook.id !== selectedOrder.books[0].id,
                   succes: isCheckFailed && orderBook.id === selectedOrder.books[0].id,
                 }"
-                v-if="isCheckFailed">
+                v-if="isCheckFailed"
+              >
                 <div>
                   <label>Причина:</label>
                   <select
@@ -113,32 +114,19 @@
         >
           Отменить заказ
         </StyledButton>
-        <StyledButton
-          v-if="nextStatus"
-          @click="changeToNextStatus"
-          theme="secondary"
-        >
+        <StyledButton v-if="nextStatus" @click="changeToNextStatus" theme="secondary">
           {{ nextStatusButtonText }}
-          </StyledButton>
+        </StyledButton>
       </div>
-      <button
-        v-if="currentStatus == 'processing'"
-        @click="isCheckFailed = !isCheckFailed"
-      >
+      <button v-if="currentStatus == 'processing'" @click="isCheckFailed = !isCheckFailed">
         Перестраиваем вид для неудачной проверки
       </button>
-      <button
-        v-if="currentStatus == 'processing'"
-        @click="openPrintStickerModal = true"
-      >
+      <button v-if="currentStatus == 'processing'" @click="openPrintStickerModal = true">
         Печать этикетки
       </button>
     </div>
   </div>
-  <OrderRejectModal
-    v-model="openRejectModal"
-    @confirm="handleRejectOrder"
-  />
+  <OrderRejectModal v-model="openRejectModal" @confirm="handleRejectOrder" />
   <PrintModal v-model="openPrintModal" :order="selectedOrder" />
   <PrintStickerModal v-model="openPrintStickerModal" :order="selectedOrder" />
 </template>

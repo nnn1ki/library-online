@@ -8,11 +8,7 @@
 
       <div class="modal-body">
         <div class="comment-card">
-          <textarea
-            v-model="rejectReason"
-            placeholder="Введите причину отката..."
-            rows="4"
-          >
+          <textarea v-model="rejectReason" placeholder="Введите причину отката..." rows="4">
           </textarea>
         </div>
       </div>

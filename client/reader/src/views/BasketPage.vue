@@ -107,7 +107,6 @@ import StyledButton from "@lib/shared/components/StyledButton.vue";
 import BookCard from "@/components/BookCard.vue";
 import StyledCheckbox from "@lib/shared/components/StyledCheckbox.vue";
 import { jsPDF } from "jspdf";
-
 const router = useRouter();
 const basketStore = useBasketStore();
 const orderStore = useOrderStore();

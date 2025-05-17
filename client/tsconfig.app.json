@@ -1,0 +1,18 @@
+{
+    "extends": ["@vue/tsconfig/tsconfig.dom.json", "./tsconfig.base.json"],
+    "compilerOptions": {
+      "tsBuildInfoFile": "./node_modules/.tmp/client.tsbuildinfo"
+    },
+    "include": [
+      "env.d.ts",
+      "reader/src/**/*",
+      "reader/src/**/*.vue",
+      "staff-panel/src/**/*",
+      "shared/src/**/*"
+    ],
+    "exclude": ["**/__tests__/*"],
+    "references": [
+      { "path": "./shared" }
+    ]
+  }
+  

@@ -1,11 +1,5 @@
 import axios from "axios";
-import type {
-  BorrowedBook,
-  Order,
-  UserOrder,
-  OrderStatusEnum,
-  OrderCheckingInfo,
-} from "./types";
+import type { BorrowedBook, Order, UserOrder, OrderStatusEnum, OrderCheckingInfo } from "./types";
 
 export async function updateOrderStatus(
   orderId: number,

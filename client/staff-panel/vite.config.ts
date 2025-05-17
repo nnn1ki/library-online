@@ -2,7 +2,6 @@ import { fileURLToPath, URL } from "node:url";
 import { baseConfig } from "../vite.base.config";
 import { defineConfig } from "vite";
 
-// https://vite.dev/config/
 export default defineConfig({
   ...baseConfig,
   resolve: {

@@ -5,14 +5,17 @@
   "type": "module",
   "workspaces": [
     "reader",
-    "shared"
+    "shared",
+    "staff-panel"
   ],
   "scripts": {
-    "lint": "eslint reader/ shared/ staff/ --fix --ignore-pattern .gitignore",
-    "format": "prettier --write reader/ shared/ staff/",
+    "lint": "eslint reader/ shared/ staff-panel/ --fix --ignore-pattern .gitignore",
+    "format": "prettier --write reader/ shared/ staff-panel/",
     "build-only": "vite build --config reader/vite.config.ts",
     "type-check": "vue-tsc --build --force",
-    "dev": "echo Please use: npm run dev --workspace <reader|staff-panel>",
+    "dev:reader": "npm run dev --workspace reader",
+    "dev:staff": "npm run dev --workspace staff-panel",
+    "dev": "echo Please use: npm run dev --workspace <reader|staff-panel> or npm run <dev:reader|dev:staff>",
     "preview": "echo Please use: npm run preview --workspace <reader|staff-panel>",
     "build": "echo Please use: npm run build --workspace <reader|staff-panel>"
   },

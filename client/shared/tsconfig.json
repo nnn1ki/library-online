@@ -1,11 +1,10 @@
 {
-    "compilerOptions": {
-      "composite": true,
-      "baseUrl": ".",
-      "paths": {
-        "@/*": ["./src/*"]
-      }
-    },
-    "include": ["src"]
-  }
-  
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}
