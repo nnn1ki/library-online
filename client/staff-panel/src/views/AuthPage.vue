@@ -32,6 +32,7 @@ import SurfaceCard from "@lib/shared/components/SurfaceCard.vue";
 import TextField from "@lib/shared/components/TextField.vue";
 import { useAuthStore } from "@/stores/auth";
 import { ref } from "vue";
+import router from "@/router";
 
 const OAUTH_CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID;
 
@@ -43,6 +44,7 @@ const password = ref("");
 async function login() {
   // TODO: предупреждать пользователя об ошибках
   await authStore.login(username.value, password.value);
+  router.push("/");
 }
 </script>
 

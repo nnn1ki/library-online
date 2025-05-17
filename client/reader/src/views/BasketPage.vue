@@ -102,7 +102,7 @@ import { computed, ref, watch } from "vue";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { useRouter } from "vue-router";
 import ModalDialog from "@lib/shared/components/ModalDialog.vue";
-import SurfaceCard from "@/components/SurfaceCard.vue";
+import SurfaceCard from "@lib/shared/components/SurfaceCard.vue";
 import StyledButton from "@lib/shared/components/StyledButton.vue";
 import BookCard from "@/components/BookCard.vue";
 import StyledCheckbox from "@lib/shared/components/StyledCheckbox.vue";

@@ -21,7 +21,7 @@
 import type { Book } from "@lib/shared/api/types";
 import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
 import StyledButton from "@lib/shared/components/StyledButton.vue";
-import SurfaceCard from "@/components/SurfaceCard.vue";
+import SurfaceCard from "@lib/shared/components/SurfaceCard.vue";
 const { order } = defineProps<{
   order: Book[];
 }>();

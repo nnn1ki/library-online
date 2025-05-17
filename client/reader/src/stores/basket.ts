@@ -6,7 +6,7 @@ import {
   replaceBasketBooks,
 } from "@lib/shared/api/basket";
 import type { Book } from "@lib/shared/api/types";
-import { useAuthentication } from "@/composables/auth";
+import { useAuthentication } from "../../../staff-panel/src/composables/auth";
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
 import { ref } from "vue";

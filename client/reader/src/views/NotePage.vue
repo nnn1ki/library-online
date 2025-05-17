@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import SurfaceCard from "@/components/SurfaceCard.vue";
+import SurfaceCard from "@lib/shared/components/SurfaceCard.vue";
 
 const steps = [
   {

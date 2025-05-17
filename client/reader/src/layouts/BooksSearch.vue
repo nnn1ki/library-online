@@ -111,7 +111,7 @@ import { searchBooks } from "@lib/shared/api/books";
 import { scenariosList } from "@lib/shared/api/scenarios";
 import type { Book, Library, Scenario } from "@lib/shared/api/types";
 import { librariesList } from "@lib/shared/api/libraries";
-import SurfaceCard from "@/components/SurfaceCard.vue";
+import SurfaceCard from "@lib/shared/components/SurfaceCard.vue";
 import BookCard from "@/components/BookCard.vue";
 import SelectList from "@/components/SelectList.vue";
 import StyledButton from "@lib/shared/components/StyledButton.vue";

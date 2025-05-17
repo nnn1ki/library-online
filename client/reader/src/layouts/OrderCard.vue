@@ -39,7 +39,7 @@ import { orderStatuses } from "@lib/shared/api/types";
 import { useOrderStore } from "@/stores/orderStore";
 import ShortBookCard from "@lib/shared/components/ShortBookCard.vue";
 import StyledButton from "@lib/shared/components/StyledButton.vue";
-import SurfaceCard from "@/components/SurfaceCard.vue";
+import SurfaceCard from "@lib/shared/components/SurfaceCard.vue";
 import { useFormattedDate } from "@/composables/useFormattedDate";
 
 const allowedCancelStatuses: OrderStatusEnum[] = ["new", "processing", "ready"];
