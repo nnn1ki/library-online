@@ -58,7 +58,7 @@ async function login() {
 .login-form {
   display: flex;
   flex-direction: column;
-
+  max-width: 500px;
   margin: auto;
   min-width: 24rem;
 }

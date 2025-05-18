@@ -10,28 +10,27 @@ const router = createRouter({
       path: "/",
       name: "orders",
       component: ManageOrdersPage,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
-      path:"/auth",
+      path: "/auth",
       name: "auth",
-      component:AuthPage,
-      meta: { requiresAuth: false }
-    }
+      component: AuthPage,
+      meta: { requiresAuth: false },
+    },
   ],
 });
 
 router.beforeEach(async (to, from) => {
   const authStore = useAuthStore();
   const isAuthenticated = authStore.isAuthenticated;
-  
-  if(!isAuthenticated && to.meta.requiresAuth) {
-    return { 
-      name: 'auth',
-      query: { redirect: to.fullPath }
+
+  if (!isAuthenticated && to.meta.requiresAuth) {
+    return {
+      name: "auth",
+      query: { redirect: to.fullPath },
     };
   }
-  
 });
 
 export default router;

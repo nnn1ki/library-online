@@ -1,5 +1,6 @@
 <template>
   <div class="app">
+    <PageHeader />
     <main>
       <div>
         <RouterView />
@@ -10,6 +11,7 @@
 
 <script setup lang="ts">
 import { RouterView } from "vue-router";
+import PageHeader from "@/layouts/PageHeader.vue";
 </script>
 
 <style scoped lang="scss">
