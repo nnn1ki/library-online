@@ -1,11 +1,15 @@
 from aiohttp import ClientSession, ClientResponseError
 from django.http import Http404
+from asgiref.sync import sync_to_async
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from adrf.views import APIView as AsyncAPIView
+
+from rest_framework.response import Response
 
 from library_service.opac.api.login import login_reader, login_librarian, login_admin, get_login_info, AuthResponse, UserInfo
 
@@ -20,13 +24,13 @@ class AuthViewset(AsyncAPIView):
         serializer = self.Serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = await User.objects.filter(username = serializer.validated_data["username"]).afirst()
+        #user = await User.objects.filter(username = serializer.validated_data["username"]).afirst()
 
         #TODO проверка существования пользователя с данным username
 
         async with ClientSession() as client:
             error = ""
-            response: AuthResponse = None
+            response: AuthResponse | None = None
             is_reader = False
             is_admin = False
             is_librarian = False
@@ -52,9 +56,28 @@ class AuthViewset(AsyncAPIView):
 
             if not is_reader and not is_admin and not is_librarian:
                 raise Http404("user not found")
+            
             elif is_reader:
-                info: UserInfo = await get_login_info(client, response.access_token)
-                user_profile = await User.objects.prefetch_related("profile").acreate(
-                    username = info.mail,
-                    
+                info: UserInfo = await get_login_info(client, response.accessToken)
+                user, created = await User.objects.prefetch_related("profile").aget_or_create(
+                    profile__library_card=info.ticket,
+                    defaults={
+                        "username": info.mail,
+                        "email": info.mail,
+                    },
+                )
+
+                if created:
+                    await user.groups.aadd(await Group.objects.aget(name="Reader"))
+
+                user.profile.library_card = info.ticket
+                user.profile.fullname = info.name
+                user.profile.department = info.department
+                user.profile.mira_id = info.mira
+                await user.profile.asave()
+
+                tokens = await sync_to_async(TokenObtainPairSerializer.get_token)(user)
+                return Response(
+                    status=200,
+                    data={"refresh": str(tokens), "access": str(tokens.access_token)},
                 )

@@ -6,9 +6,9 @@ from django.conf import settings
 
 @dataclass
 class AuthResponse(DataClassJsonMixin):
-    dataclass_json_config = config(undefined=Undefined.EXCLUDE, letter_case=LetterCase.CAMEL)["dataclasses_json"]
-    access_token = str
-    refresh_token = str
+    dataclass_json_config = config(undefined=Undefined.EXCLUDE)["dataclasses_json"]
+    accessToken: str
+    refreshToken: str
 
 
 @dataclass
@@ -21,8 +21,9 @@ class UserInfo(DataClassJsonMixin):
     gone: bool
     academ: bool
     everlasting: bool
+    mira: str | None = None
     category: str | None = None
-    departemnt: str | None = None
+    department: str | None = None
     mail: str | None = None
 
 

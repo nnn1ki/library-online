@@ -19,7 +19,7 @@ class OpacReader(DataClassJsonMixin):
     academ: bool
     everlasting: bool
     category: str | None = None
-    departemnt: str | None = None
+    department: str | None = None
     mail: str | None = None
 # pylint: enable=duplicate-code
 

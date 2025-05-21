@@ -84,9 +84,10 @@ class BitrixAuthView(AsyncAPIView):
                 user.profile.mira_id = mira_id
 
             try:
-                if user.profile.library_card is None:
-                    user_info: OpacReader = await opac_reader_info_by_mira(client, user.profile.mira_id)
-                    user.profile.library_card = user_info.ticket
+                user_info: OpacReader = await opac_reader_info_by_mira(client, user.profile.mira_id)
+                user.profile.library_card = user_info.ticket
+                user.profile.fullname = user_info.name
+                user.profile.department = user_info.department
             except ClientResponseError as error:
                 pass #Если не нашли аккаунт с данным mira_id, есть смысл авторизовать читателя?
 

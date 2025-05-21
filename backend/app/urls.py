@@ -55,10 +55,9 @@ router.register("reasons/notfound", OrderItemCommentViewset, basename="reasons/n
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/auth/login/", TokenObtainPairView.as_view()),
+    path("api/auth/login/", AuthViewset.as_view()),
     path("api/auth/bitrix-login/", BitrixAuthView.as_view()),
     path("api/auth/refresh/", TokenRefreshView.as_view()),
     path("api/auth/logout/", TokenBlacklistView.as_view()),
-    path("api/test-login/", AuthViewset.as_view()), #Временно для тестов, потом удалим
     path("api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
