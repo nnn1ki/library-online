@@ -11,10 +11,12 @@ class ProfileSerializer(aserializers.ModelSerializer):
     first_name = serializers.SerializerMethodField()
     last_name = serializers.SerializerMethodField()
     groups = afields.SerializerMethodField()
+    fullname = serializers.CharField()
+    department = serializers.CharField()
 
     class Meta:
         model = UserProfile
-        fields = ["username", "groups", "first_name", "last_name"]
+        fields = ["username", "groups", "first_name", "last_name", "fullname", "department"]
 
     def get_username(self, obj: UserProfile):
         return obj.user.username

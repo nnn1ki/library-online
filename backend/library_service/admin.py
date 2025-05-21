@@ -13,6 +13,8 @@ class UserProfileAdmin(admin.ModelAdmin):
         "library_card",
         "campus_id",
         "mira_id",
+        "fullname",
+        "department",
     ]
 
 

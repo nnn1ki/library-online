@@ -9,6 +9,8 @@ export type ProfileInfo = {
   first_name: string;
   last_name: string;
   groups: Group[];
+  fullname: string;
+  department: string;
 };
 
 export type Library = {
@@ -116,6 +118,8 @@ export type UserInfo = {
   library_card: string | null;
   campus_id: string | null;
   mira_id: string | null;
+  fullname: string;
+  department: string;
 };
 
 export type PaginatedOrders = {
