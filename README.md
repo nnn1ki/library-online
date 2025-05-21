@@ -223,6 +223,7 @@ python manage.py runserver --settings local_settings
 - `SERVICE_HOSTNAME` (адрес сервиса, например: http://localhost:8000)
 - `OAUTH_CLIENT_ID` (публичная часть oauth ключа для int.istu.edu)
 - `OAUTH_CLIENT_SECRET` (приватная часть oauth ключа для int.istu.edu)
+- `OPAC_INTERNAL_TOKEN` (супер-токен)
 
 Пароль для БД рекомендуется генерировать случайно:
 
