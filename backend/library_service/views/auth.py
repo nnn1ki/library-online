@@ -118,4 +118,4 @@ class AuthThirdPartyViewset(AsyncAPIView):
                 )                
 
             except ClientResponseError as e:
-                pass
+                return Response(status=400, data="Bad request")

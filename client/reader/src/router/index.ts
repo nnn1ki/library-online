@@ -53,7 +53,7 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   const auth = useAuthStore();
 
-  if (to.name === 'ProfilePage' && to.query.token !== null){
+  if (to.query.token){
     auth.thirdPartyLogin(to.query.token.toString())
   }
 
