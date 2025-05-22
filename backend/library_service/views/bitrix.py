@@ -59,7 +59,7 @@ class BitrixAuthView(AsyncAPIView):
             campus_id = result["id"]
             email = result["email"]
             user, created = await User.objects.prefetch_related("profile").aget_or_create(
-                profile__campus_id=campus_id,
+                username=email,
                 defaults={
                     "username": email,
                     "email": email,
@@ -68,9 +68,10 @@ class BitrixAuthView(AsyncAPIView):
                 },
             )
 
+            user.profile.campus_id = campus_id
+
             if created:
                 await user.groups.aadd(await Group.objects.aget(name="Reader"))
-                user.profile.campus_id = campus_id
                 await user.asave()
 
             # user.profile.is_teacher = bool(result["is_teacher"])
