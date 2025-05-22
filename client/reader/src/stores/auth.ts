@@ -83,6 +83,21 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function thirdPartyLogin(externalToken: string): Promise<boolean> {
+    try {
+      const simpleAxios = axios.create();
+      const { data } = await simpleAxios.post<Tokens>("/api/auth/third-party/", {
+        token: externalToken
+      });
+      refresh.value = data.refresh;
+      access.value = data.access;
+      updateProfileInfo();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async function bitrixLogin(code: string): Promise<boolean> {
     try {
       const simpleAxios = axios.create();
@@ -123,5 +138,6 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     bitrixLogin,
     logout,
+    thirdPartyLogin,
   };
 });

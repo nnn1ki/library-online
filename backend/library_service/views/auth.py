@@ -81,3 +81,41 @@ class AuthViewset(AsyncAPIView):
                     status=200,
                     data={"refresh": str(tokens), "access": str(tokens.access_token)},
                 )
+            
+class AuthThirdPartyViewset(AsyncAPIView):
+    class Serializer(serializers.Serializer):
+        token = serializers.CharField()
+
+    async def post(self, request, *args, **kwargs):
+        serializer = self.Serializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+
+        async with ClientSession() as client:
+
+            try:
+                info: UserInfo = await get_login_info(client, serializer.validated_data["token"])
+                user, created = await User.objects.prefetch_related("profile").aget_or_create(
+                    username = info.mail,
+                    defaults={
+                        "username": info.mail,
+                        "email": info.mail,
+                    },
+                )
+
+                if created:
+                    await user.groups.aadd(await Group.objects.aget(name="Reader"))
+
+                user.profile.library_card = info.ticket
+                user.profile.fullname = info.name
+                user.profile.department = info.department
+                user.profile.mira_id = info.mira
+                await user.profile.asave()
+
+                tokens = await sync_to_async(TokenObtainPairSerializer.get_token)(user)
+                return Response(
+                    status=200,
+                    data={"refresh": str(tokens), "access": str(tokens.access_token)},
+                )                
+
+            except ClientResponseError as e:
+                pass
