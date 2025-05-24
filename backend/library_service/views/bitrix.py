@@ -1,4 +1,4 @@
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponseError
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -11,6 +11,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from adrf.views import APIView as AsyncAPIView
 
+from library_service.opac.api.ticket import opac_reader_info_by_mira, OpacReader
 
 User = get_user_model()
 
@@ -58,7 +59,7 @@ class BitrixAuthView(AsyncAPIView):
             campus_id = result["id"]
             email = result["email"]
             user, created = await User.objects.prefetch_related("profile").aget_or_create(
-                profile__campus_id=campus_id,
+                username=email,
                 defaults={
                     "username": email,
                     "email": email,
@@ -67,9 +68,10 @@ class BitrixAuthView(AsyncAPIView):
                 },
             )
 
+            user.profile.campus_id = campus_id
+
             if created:
                 await user.groups.aadd(await Group.objects.aget(name="Reader"))
-                user.profile.campus_id = campus_id
                 await user.asave()
 
             # user.profile.is_teacher = bool(result["is_teacher"])
@@ -81,6 +83,14 @@ class BitrixAuthView(AsyncAPIView):
             mira_id = int(result["mira_id"][0] if result["mira_id"] else 0)
             if mira_id > 2:
                 user.profile.mira_id = mira_id
+
+            try:
+                user_info: OpacReader = await opac_reader_info_by_mira(client, user.profile.mira_id)
+                user.profile.library_card = user_info.ticket
+                user.profile.fullname = user_info.name
+                user.profile.department = user_info.department
+            except ClientResponseError as error:
+                pass #Если не нашли аккаунт с данным mira_id, есть смысл авторизовать читателя?
 
             await user.profile.asave()
 
