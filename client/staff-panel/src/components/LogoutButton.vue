@@ -6,7 +6,7 @@
 
 <script setup>
 import router from "@/router";
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@core/store/auth";
 import { ArrowRightEndOnRectangleIcon } from "@heroicons/vue/24/solid";
 const authStore = useAuthStore();
 

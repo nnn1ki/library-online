@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import StyledButton from "@lib/shared/components/StyledButton.vue";
+import StyledButton from "@components/StyledButton.vue";
 
 const props = defineProps<{
   modelValue: boolean;

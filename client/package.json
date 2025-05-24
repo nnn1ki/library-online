@@ -3,21 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "reader",
-    "shared",
-    "staff-panel"
-  ],
   "scripts": {
-    "lint": "eslint reader/ shared/ staff-panel/ --fix --ignore-pattern .gitignore",
-    "format": "prettier --write reader/ shared/ staff-panel/",
-    "build-only": "vite build --config reader/vite.config.ts",
+    "lint": "eslint src/core/ src/modules/ --fix --ignore-pattern .gitignore",
+    "format": "prettier --write src/core/ src/modules/",
+    "build-only": "vite build", 
     "type-check": "vue-tsc --build --force",
-    "dev:reader": "npm run dev --workspace reader",
-    "dev:staff": "npm run dev --workspace staff-panel",
-    "dev": "echo Please use: npm run dev --workspace <reader|staff-panel> or npm run <dev:reader|dev:staff>",
-    "preview": "echo Please use: npm run preview --workspace <reader|staff-panel>",
-    "build": "echo Please use: npm run build --workspace <reader|staff-panel>"
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",

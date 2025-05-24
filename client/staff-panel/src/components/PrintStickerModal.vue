@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { defineProps } from "vue";
-import type { Order } from "@lib/shared/api/types";
+import type { Order } from "@api/types";
 // import VueHtmlToPaper from "vue-html-to-paper";
 
 const props = defineProps<{

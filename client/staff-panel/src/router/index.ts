@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import ManageOrdersPage from "@/views/ManageOrdersPage.vue";
 import AuthPage from "@/views/AuthPage.vue";
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@core/store/auth";
 import { useAuthentication } from "@/composables/auth";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

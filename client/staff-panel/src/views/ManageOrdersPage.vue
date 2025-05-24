@@ -56,20 +56,20 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@core/store/auth";
 import OrderList from "@/components/OrderList.vue";
 import ModalOrderDetails from "@/layouts/ModalOrderDetails.vue";
-import LoadingModal from "@lib/shared/components/LoadingModal.vue";
+import LoadingModal from "@components/LoadingModal.vue";
 
 import {
   fetchNewOrders,
   fetchProcessingOrders,
   fetchReadyOrders,
   fetchArchiveOrders,
-} from "@lib/shared/api/order";
+} from "@api/order";
 
-import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@lib/shared/api/types";
-import { getOrderStaff, updateOrderStatus, checkOrder } from "@lib/shared/api/order";
+import type { UserOrder, Order, OrderStatusEnum, OrderCheckingInfo } from "@api/types";
+import { getOrderStaff, updateOrderStatus, checkOrder } from "@api/order";
 
 const authStore = useAuthStore();
 const isLoading = ref(false);

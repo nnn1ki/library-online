@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "composite": true,
-    "baseUrl": ".",
-    "paths": {
-      "@lib/shared/*": ["./src"]
-    }
-  }
-}

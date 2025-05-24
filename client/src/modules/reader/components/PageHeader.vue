@@ -4,7 +4,7 @@
       <div class="flex flex-row items-center">
         <RouterLink to="/" class="logo-link" active-class="active">
           <span>НТБ ИРНИТУ</span>
-          <!-- <img :src="Logo" alt="НТБ ИРНИТУ" class="logo"/> -->
+          <img :src="Logo" alt="НТБ ИРНИТУ" class="logo"/>
         </RouterLink>
 
         <div class="nav-links">
@@ -20,7 +20,8 @@
       </div>
 
       <div class="nav-end">
-        <LogoutButton />
+        <FontSwitcher />
+        <ThemeSwitcher />
         <button class="expand-button" @click="mobileMenuOpen = !mobileMenuOpen">
           <Bars3Icon class="expand-icon nav-link" aria-hidden="true" />
         </button>
@@ -40,30 +41,45 @@
 </template>
 
 <script setup lang="ts">
-import LogoutButton from "@/components/LogoutButton.vue";
+import Logo from "@assets/images/ntb-logo.png";
 import { useAuthStore } from "@core/store/auth";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { Bars3Icon } from "@heroicons/vue/24/outline";
+import FontSwitcher from "@components/FontSwitcher.vue";
+import ThemeSwitcher from "@components/ThemeSwitcher.vue";
 
 const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);
 
-const links = computed(() => {
-  if (!isAuthenticated) return [];
-  return [
+const links = computed(() =>
+  [
     {
-      to: "/",
-      name: "Заказы",
+      to: "/profile",
+      name: isAuthenticated.value ? "Профиль" : "Вход",
     },
-  ];
-});
+    {
+      to: "/basket",
+      name: "Корзина",
+    },
+    {
+      to: "/orders",
+      name: "Заказы",
+      hide: !isAuthenticated.value,
+    },
+    {
+      to: "/note",
+      name: "О проекте",
+    },
+  ].filter((x) => !x.hide)
+);
 
 const mobileMenuOpen = ref(false);
 </script>
 
 <style scoped lang="scss">
 @use "@assets/styles/breakpoints.scss" as *;
+
 header {
   padding-top: 1.25rem;
   padding-bottom: 1.25rem;

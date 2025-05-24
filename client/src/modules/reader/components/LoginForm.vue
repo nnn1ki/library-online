@@ -9,13 +9,13 @@
         <label for="password">Пароль:</label>
         <PasswordTextField id="password" v-model="password" required class="field" />
 
-        <StyledButton type="submit" class="btn">Войти</StyledButton>
-        <a :href="`https://int.istu.edu/oauth/authorize?client_id=${OAUTH_CLIENT_ID}`" class="btn">
+        <StyledButton type="submit" class="auth-button">Войти</StyledButton>
+        <a :href="`https://int.istu.edu/oauth/authorize?client_id=${OAUTH_CLIENT_ID}`" class="auth-button">
           <StyledButton type="button" theme="secondary" class="w-full">
             Войти через кампус
           </StyledButton>
         </a>
-        <a href="https://library.istu.edu/for-students/zapis-v-biblioteku/" class="btn">
+        <a href="https://library.istu.edu/for-students/zapis-v-biblioteku/" class="auth-button">
           <StyledButton type="button" theme="secondary" class="w-full">
             Запись в библиотеку
           </StyledButton>
@@ -32,7 +32,6 @@ import SurfaceCard from "@components/SurfaceCard.vue";
 import TextField from "@components/TextField.vue";
 import { useAuthStore } from "@core/store/auth";
 import { ref } from "vue";
-import router from "@/router";
 
 const OAUTH_CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID;
 
@@ -44,7 +43,6 @@ const password = ref("");
 async function login() {
   // TODO: предупреждать пользователя об ошибках
   await authStore.login(username.value, password.value);
-  router.push("/");
 }
 </script>
 
@@ -58,7 +56,7 @@ async function login() {
 .login-form {
   display: flex;
   flex-direction: column;
-  max-width: 500px;
+
   margin: auto;
   min-width: 24rem;
 }
@@ -71,8 +69,8 @@ label {
   font-weight: 600;
 }
 
-.btn {
-  margin-bottom: 0.5rem;
+.auth-button {
+  margin-bottom: 1rem;
   width: 100%;
 }
 </style>

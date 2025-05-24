@@ -1,19 +1,13 @@
 {
-  "extends": ["@vue/tsconfig/tsconfig.dom.json", "./tsconfig.base.json"],
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/root.tsbuildinfo"
   },
   "include": [
+    "vite-env.d.ts",
+    "vue.d.ts",
     "env.d.ts",
-    "reader/src/**/*",
-    "reader/src/**/*.vue",
-    "staff-panel/src/**/*",
-    "shared/src/**/*"
-  ],
-  "exclude": ["**/__tests__/*"],
-  "references": [
-    { "path": "./shared/src/*" },
-    { "path": "./reader/src/*" },
-    { "path": "./staff-panel/src/*" }
+    "src/**/*.ts",
+    "src/**/*.vue",
   ]
 }
