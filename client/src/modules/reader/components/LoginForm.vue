@@ -10,7 +10,10 @@
         <PasswordTextField id="password" v-model="password" required class="field" />
 
         <StyledButton type="submit" class="auth-button">Войти</StyledButton>
-        <a :href="`https://int.istu.edu/oauth/authorize?client_id=${OAUTH_CLIENT_ID}`" class="auth-button">
+        <a
+          :href="`https://int.istu.edu/oauth/authorize?client_id=${OAUTH_CLIENT_ID}`"
+          class="auth-button"
+        >
           <StyledButton type="button" theme="secondary" class="w-full">
             Войти через кампус
           </StyledButton>
@@ -39,7 +42,6 @@ const authStore = useAuthStore();
 
 const username = ref("");
 const password = ref("");
-
 async function login() {
   // TODO: предупреждать пользователя об ошибках
   await authStore.login(username.value, password.value);

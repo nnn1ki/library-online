@@ -55,21 +55,13 @@ const { isAuthenticated } = storeToRefs(authStore);
 const links = computed(() =>
   [
     {
-      to: "/profile",
+      to: "/staff/profile",
       name: isAuthenticated.value ? "Профиль" : "Вход",
     },
     {
-      to: "/basket",
-      name: "Корзина",
-    },
-    {
-      to: "/orders",
+      to: "/staff/orders",
       name: "Заказы",
       hide: !isAuthenticated.value,
-    },
-    {
-      to: "/note",
-      name: "О проекте",
     },
   ].filter((x) => !x.hide)
 );

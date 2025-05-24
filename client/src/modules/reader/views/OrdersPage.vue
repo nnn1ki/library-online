@@ -28,7 +28,7 @@ import LoadingModal from "@components/LoadingModal.vue";
 import CurrentOrderCard from "@reader/components/CurrentOrderCard.vue";
 import NotAllowedBanner from "@reader/components/NotAllowedBanner.vue";
 import ConfirmationModal from "@components/ConfirmationModal.vue";
-import { useAuthentication } from "../../../../staff-panel/src/composables/auth";
+import { useAuthentication } from "@core/composables/auth";
 import { useRouter } from "vue-router";
 
 const orders = ref<Order[]>([]);

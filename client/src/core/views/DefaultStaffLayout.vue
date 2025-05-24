@@ -10,15 +10,15 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from "@modules/staff/components/PageHeader.vue";
 import { RouterView } from "vue-router";
-import PageHeader from "@/layouts/PageHeader.vue";
 </script>
 
 <style scoped lang="scss">
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100vh; /* Обеспечивает, чтобы футер всегда был внизу страницы */
 }
 
 main {

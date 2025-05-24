@@ -3,11 +3,12 @@ import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { computed, onBeforeMount, ref } from "vue";
-import type { ProfileInfo } from "@api/types";
+import type { ProfileInfo, Group } from "@api/types";
 import { profileInfo } from "@api/profile";
 
 export const useAuthStore = defineStore("auth", () => {
   type Token = string | undefined;
+
   type Tokens = {
     access: string;
     refresh: string;
@@ -26,6 +27,7 @@ export const useAuthStore = defineStore("auth", () => {
   const refresh = useLocalStorage<Token>("refreshToken", undefined);
   const isAuthenticated = computed(() => refresh.value !== undefined);
   const currentUser = ref<ProfileInfo>();
+  const currentUserRole = useLocalStorage<Group>("userRole", "Reader");
 
   async function refreshTokens(): Promise<boolean> {
     try {
@@ -58,6 +60,9 @@ export const useAuthStore = defineStore("auth", () => {
     if (await updateTokens()) {
       try {
         currentUser.value = await profileInfo();
+        if (currentUser.value && !currentUser.value.groups.includes(currentUserRole.value)) {
+          currentUserRole.value = "Reader";
+        }
       } catch {
         // TODO: check if the error is actually related to the tokens
         refresh.value = undefined;
@@ -76,7 +81,7 @@ export const useAuthStore = defineStore("auth", () => {
       });
       refresh.value = data.refresh;
       access.value = data.access;
-      updateProfileInfo();
+      await updateProfileInfo();
       return true;
     } catch {
       return false;
@@ -87,11 +92,11 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       const simpleAxios = axios.create();
       const { data } = await simpleAxios.post<Tokens>("/api/auth/third-party/", {
-        token: externalToken
+        token: externalToken,
       });
       refresh.value = data.refresh;
       access.value = data.access;
-      updateProfileInfo();
+      await updateProfileInfo();
       return true;
     } catch {
       return false;
@@ -106,7 +111,7 @@ export const useAuthStore = defineStore("auth", () => {
       });
       refresh.value = data.refresh;
       access.value = data.access;
-      updateProfileInfo();
+      await updateProfileInfo();
       return true;
     } catch {
       return false;
@@ -117,11 +122,16 @@ export const useAuthStore = defineStore("auth", () => {
     const refreshCopy = refresh.value;
     refresh.value = undefined;
     access.value = undefined;
+    currentUserRole.value = "Reader";
 
     const simpleAxios = axios.create();
     await simpleAxios.post("/api/auth/logout/", {
       refresh: refreshCopy,
     });
+  }
+
+  function setUserRole(role: Group) {
+    currentUserRole.value = role;
   }
 
   onBeforeMount(async () => {
@@ -139,5 +149,7 @@ export const useAuthStore = defineStore("auth", () => {
     bitrixLogin,
     logout,
     thirdPartyLogin,
+    currentUserRole,
+    setUserRole,
   };
 });
