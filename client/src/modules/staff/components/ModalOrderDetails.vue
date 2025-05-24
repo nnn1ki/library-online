@@ -135,9 +135,9 @@
 import { ref, computed } from "vue";
 import ShortBookCard from "@components/ShortBookCard.vue";
 import StyledButton from "@components/StyledButton.vue";
-import PrintModal from "@/layouts/PrintModal.vue";
-import PrintStickerModal from "@/components/PrintStickerModal.vue";
-import OrderRejectModal from "@/components/OrderRejectModal.vue";
+import PrintModal from "@staff/components/PrintModal.vue";
+import PrintStickerModal from "@staff/components/PrintStickerModal.vue";
+import OrderRejectModal from "@staff/components/OrderRejectModal.vue";
 import type { Order, OrderCheckingInfo } from "@api/types";
 import type { OrderStatusEnum } from "@api/types";
 import { orderStatuses } from "@api/types";

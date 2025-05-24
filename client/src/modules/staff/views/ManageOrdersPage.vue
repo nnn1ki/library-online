@@ -57,9 +57,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "@core/store/auth";
-import OrderList from "@/components/OrderList.vue";
-import ModalOrderDetails from "@/layouts/ModalOrderDetails.vue";
 import LoadingModal from "@components/LoadingModal.vue";
+import OrderList from "@staff/components/OrderList.vue";
+import ModalOrderDetails from "@staff/components/ModalOrderDetails.vue";
 
 import {
   fetchNewOrders,
