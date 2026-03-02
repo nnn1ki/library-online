@@ -1,10 +1,10 @@
+import asyncio
 from datetime import datetime
 
-from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.core.mail import EmailMultiAlternatives, send_mail
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
 from library_service.models.order import Order, OrderHistory
@@ -132,9 +132,15 @@ async def send_new_orders_digest_notification(
             continue
 
         try:
-            email = EmailMultiAlternatives(subject, body, settings.DEFAULT_FROM_EMAIL, [librarian.email])
-            await sync_to_async(email.attach_alternative)(html_body, "text/html")
-            await sync_to_async(email.send)(fail_silently=False)
+            await asyncio.to_thread(
+                send_mail,
+                subject,
+                body,
+                settings.DEFAULT_FROM_EMAIL,
+                [librarian.email],
+                False,
+                html_message=html_body,
+            )
             print(f"Email digest: sent to {librarian.email}")
         except Exception as exc:  # pylint: disable=broad-exception-caught
             print(f"Email digest: failed for {librarian.email}: {exc}")
@@ -191,12 +197,13 @@ async def send_order_status_update_notification(
         return
 
     try:
-        await sync_to_async(send_mail)(
+        await asyncio.to_thread(
+            send_mail,
             subject,
             plain_message,
             settings.DEFAULT_FROM_EMAIL,
             [user.email],
-            fail_silently=False,
+            False,
         )
         print(f"Status email: sent to {user.email} for order #{order.id}")
     except Exception as exc:  # pylint: disable=broad-exception-caught
