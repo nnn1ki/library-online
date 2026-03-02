@@ -210,6 +210,28 @@ python manage.py runserver --settings local_settings
 
 Это, в частности, необходимо сделать, если нужно протестировать работу oauth. Тогда в файле `local_settings.py` нужно заполнить поля `OAUTH_CLIENT_ID` и `OAUTH_CLIENT_SECRET`.
 
+### Notifications
+
+Уведомления реализованы как два независимых канала:
+- digest для библиотекарей по новым заказам (hourly job);
+- транзакционные email читателю при статусах `processing`, `ready`, `cancelled`.
+
+В Docker-конфигурации источник правды по email/notifications — `.env` (через `service_settings.py`).
+`backend/local_settings.py` используется только для локального запуска через `--settings local_settings`.
+
+Периодическая рассылка digest запускается отдельной management command:
+
+```sh
+cd backend
+python manage.py send_new_orders_digest --settings service_settings
+```
+
+Пример запуска по cron (раз в час):
+
+```sh
+0 * * * * cd /path/to/repo/backend && /path/to/python manage.py send_new_orders_digest --settings service_settings
+```
+
 Можно сгенерировать тестовые данные
 ```
 python manage.py generate_test_data

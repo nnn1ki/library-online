@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Сводка новых заказов</title>
+</head>
+<body>
+  <p>Здравствуйте!</p>
+  <p>
+    За последние {{ window_minutes }} минут поступило новых заказов: <strong>{{ total_fresh_orders }}</strong>.
+  </p>
+
+  <h3>Новые заказы за последние {{ window_minutes }} минут</h3>
+  <ul>
+    {% for order in fresh_orders %}
+      <li>
+        Заказ #{{ order.id }}, читатель: {{ order.user.email }}, библиотека: {{ order.library.description }},
+        создан: {{ order.first_new_date|date:"Y-m-d H:i:s" }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3>Старые заказы со статусом NEW</h3>
+  {% if stale_orders %}
+    <ul>
+      {% for order in stale_orders %}
+        <li>
+          Заказ #{{ order.id }}, читатель: {{ order.user.email }}, библиотека: {{ order.library.description }},
+          создан: {{ order.first_new_date|date:"Y-m-d H:i:s" }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Нет</p>
+  {% endif %}
+
+  <p>Пожалуйста, проверьте заказы в системе.</p>
+</body>
+</html>

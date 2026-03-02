@@ -22,6 +22,20 @@ OAUTH_CLIENT_SECRET = os.environ.get("OAUTH_CLIENT_SECRET", "")
 
 OPAC_INTERNAL_TOKEN = os.environ.get("OPAC_INTERNAL_TOKEN", "")
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "1").lower() in {"1", "true", "yes", "on"}
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "noreply@example.com")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+EMAIL_MODE = os.environ.get("EMAIL_MODE", "prod").lower()
+NOTIFICATION_DIGEST_WINDOW_MINUTES = int(os.environ.get("NOTIFICATION_DIGEST_WINDOW_MINUTES", "60"))
+NOTIFICATION_ACTIVE_HOURS = int(os.environ.get("NOTIFICATION_ACTIVE_HOURS", "2"))
+NOTIFICATION_TIME_ZONE = os.environ.get("NOTIFICATION_TIME_ZONE", "Asia/Irkutsk")
+
 # Если код ниже:
 
 # FORCE_SCRIPT_NAME не будет задан (останется None);
