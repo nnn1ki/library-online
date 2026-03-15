@@ -301,7 +301,7 @@ async function saveAsPdf(defaultFileName: string) {
 async function loadFont(pdf: jsPDF) {
   try {
     const fontName = "TimesNewRoman";
-    const response = await fetch(`src/modules/reader/views/${fontName}.ttf`);
+    const response = await fetch(`/${fontName}.ttf`);
     const fontData = await response.arrayBuffer();
     const uint8Array = new Uint8Array(fontData);
 
