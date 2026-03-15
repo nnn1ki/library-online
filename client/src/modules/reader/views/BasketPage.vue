@@ -419,4 +419,12 @@ hr {
   flex-direction: row;
   column-gap: 1rem;
 }
+
+:deep(.modal-dialog) {
+  width: 80%;
+
+  @include media-max-lg {
+    width: 100%;
+  }
+}
 </style>
