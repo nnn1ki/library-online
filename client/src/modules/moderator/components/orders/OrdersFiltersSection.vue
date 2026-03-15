@@ -23,7 +23,7 @@
         />
 
         <button 
-          @click="$emit('apply-filters', localFilters)" 
+          @click="$emit('apply-filters', { ...localFilters })" 
           class="apply-filters-btn"
           type="button"
           :disabled="loading || !hasFilterChanges"
@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, watch } from 'vue';
 import FilterInput from '@modules/moderator/components/FilterInput.vue';
 import DateRangeFilter from '@modules/moderator/components/DateRangeFilter.vue';
 import StatusFilter from '@modules/moderator/components/StatusFilter.vue';
@@ -111,10 +111,19 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const localFilters = computed({
-  get: () => props.filters,
-  set: (value) => emit('update:filters', value)
-});
+const localFilters = ref({ ...props.filters });
+
+watch(
+  () => props.filters,
+  (val) => { localFilters.value = { ...val }; },
+  { deep: true }
+);
+
+watch(
+  localFilters,
+  (val) => { emit('update:filters', { ...val }); },
+  { deep: true }
+);
 </script>
 
 <style scoped lang="scss">

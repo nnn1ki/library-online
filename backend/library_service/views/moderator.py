@@ -53,11 +53,9 @@ class ReadersViewset(AsyncGenericViewSet):
 
     def _apply_text_filters(self, queryset, fullname, department):
         if fullname:
-            queryset = queryset.filter(fullname__icontains=fullname)
-                    
+            queryset = queryset.filter(fullname__iregex=fullname)
         if department:
-            queryset = queryset.filter(department__icontains=department)
-                    
+            queryset = queryset.filter(department__iregex=department)
         return queryset
 
     def _apply_date_filters(self, queryset, filters):
@@ -83,15 +81,23 @@ class ReadersViewset(AsyncGenericViewSet):
         if not valid_statuses:
             return queryset
         
-        # Находим пользователей, у которых есть заказы с указанными статусами
+        # Находим пользователей, у которых есть заказы с указанным ТЕКУЩИМ статусом
+        # (последняя запись в истории статусов)
         from django.db.models import Exists, OuterRef
-        
-        orders_with_status = Order.objects.filter(
-            user=OuterRef('user'),
-            statuses__status__in=valid_statuses
+
+        latest_status_subquery = OrderHistory.objects.filter(
+            order=OuterRef('pk')
+        ).order_by('-date').values('status')[:1]
+
+        orders_with_current_status = Order.objects.filter(
+            user=OuterRef('user')
+        ).annotate(
+            current_status=Subquery(latest_status_subquery)
+        ).filter(
+            current_status__in=valid_statuses
         )
-        
-        queryset = queryset.filter(Exists(orders_with_status))
+
+        queryset = queryset.filter(Exists(orders_with_current_status))
             
         return queryset
 
@@ -110,13 +116,16 @@ class ReadersViewset(AsyncGenericViewSet):
 
     async def alist(self, request):
         filters = {
-            'fullname': request.query_params.get('fullname', '').strip(),
-            'department': request.query_params.get('department', '').strip(),
+            'fullname': request.query_params.get('fullname', '').strip().lower(),
+            'department': request.query_params.get('department', '').strip().lower(),
             'last_order_date_from': request.query_params.get('last_order_date_from'),
             'last_order_date_to': request.query_params.get('last_order_date_to'),
-            'current_order_statuses': request.query_params.getlist('current_order_statuses[]'),
+            'current_order_statuses': (
+                request.query_params.getlist('current_order_statuses[]') or
+                request.query_params.getlist('current_order_statuses')
+            ),
         }
-        
+
         sort_by = request.query_params.get('sort_by', 'id')
         sort_order = request.query_params.get('sort_order', 'asc')
         page = int(request.query_params.get('page', 1))
@@ -133,23 +142,23 @@ class ReadersViewset(AsyncGenericViewSet):
 
             start_index = (page - 1) * page_size
             end_index = start_index + page_size
-            
+
             total_count = await sync_to_async(queryset.count)()
             readers = await sync_to_async(list)(queryset[start_index:end_index])
-            
+
             serializer = self.get_serializer(readers, many=True)
             data = await serializer.adata
-            
+
             base_url = request.build_absolute_uri().split('?')[0]
             query_params = request.GET.copy()
-            
+
             next_page = None
             previous_page = None
-            
+
             if end_index < total_count:
                 query_params['page'] = page + 1
                 next_page = f"{base_url}?{query_params.urlencode()}"
-                
+
             if page > 1:
                 query_params['page'] = page - 1
                 previous_page = f"{base_url}?{query_params.urlencode()}"
@@ -298,7 +307,7 @@ class StaffViewset(AsyncGenericViewSet):
         if search_query:
             # Ищем по ФИО
             queryset = queryset.filter(
-                Q(fullname__icontains=search_query)
+                Q(fullname__iregex=search_query)
             )
         return queryset
     
@@ -531,19 +540,19 @@ class ModeratorOrderViewset(AsyncGenericViewSet):
     def _apply_filters(self, queryset, filters):
         fullname = filters.get('fullname', '').strip()
         if fullname:
-            queryset = queryset.filter(user__profile__fullname__icontains=fullname)
+            queryset = queryset.filter(user__profile__fullname__iregex=fullname)
 
         library_name = filters.get('library_name', '').strip()
         if library_name:
-            queryset = queryset.filter(library__description__icontains=library_name)
+            queryset = queryset.filter(library__description__iregex=library_name)
 
         employee_collect = filters.get('employee_collect', '').strip()
         if employee_collect:
-            queryset = queryset.filter(employee_collect__icontains=employee_collect)
+            queryset = queryset.filter(employee_collect__iregex=employee_collect)
 
         employee_issue = filters.get('employee_issue', '').strip()
         if employee_issue:
-            queryset = queryset.filter(employee_issue__icontains=employee_issue)
+            queryset = queryset.filter(employee_issue__iregex=employee_issue)
 
         date_from = filters.get('date_from')
         if date_from:
@@ -590,7 +599,10 @@ class ModeratorOrderViewset(AsyncGenericViewSet):
             'employee_issue': request.query_params.get('employee_issue', '').strip(),
             'date_from': request.query_params.get('date_from'),
             'date_to': request.query_params.get('date_to'),
-            'statuses': request.query_params.getlist('statuses[]'),
+            'statuses': (
+                request.query_params.getlist('statuses[]') or
+                request.query_params.getlist('statuses')
+            ),
         }
 
         sort_by = request.query_params.get('sort_by', 'created_date')

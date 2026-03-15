@@ -1,4 +1,5 @@
 import axios from "axios";
+
 import type { 
   ModeratorOrderStats, 
   ModeratorPaginatedOrders, 
@@ -10,11 +11,12 @@ export async function getModeratorOrders(
   filters?: ModeratorOrdersFilters
 ): Promise<ModeratorPaginatedOrders> {
   try {
+    const { statuses, ...restFilters } = filters ?? {};
     const { data } = await axios.get("/api/moderator/orders/", {
       params: {
-        ...filters,
-        ...(filters?.statuses && {
-          'statuses[]': filters.statuses
+        ...restFilters,
+        ...(statuses && statuses.length > 0 && {
+          'statuses[]': statuses
         })
       },
       paramsSerializer: {
