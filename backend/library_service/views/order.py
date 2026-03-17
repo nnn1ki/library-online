@@ -90,4 +90,4 @@ class BorrowedViewset(SessionListModelMixin, AsyncGenericViewSet):
     queryset = OrderItem.objects.all()
 
     def get_queryset(self):
-        return super().get_queryset().filter(order__user=self.request.user, status=OrderItem.Status.HANDED, to_return_date__gt=datetime.now())
+        return super().get_queryset().filter(order__user=self.request.user, status=OrderItem.Status.HANDED, to_return_date__lt=datetime.now())
