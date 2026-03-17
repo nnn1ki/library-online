@@ -2,10 +2,7 @@
 import { computed } from "vue";
 
 import { staffNotificationModeLabels } from "@core/api/types";
-import type {
-  StaffNotificationMode,
-  StaffNotificationRecipient,
-} from "@core/api/types";
+import type { StaffNotificationMode, StaffNotificationRecipient } from "@core/api/types";
 
 const props = defineProps<{
   searchQuery: string;
@@ -74,9 +71,7 @@ function formatLastSeen(value: string | null) {
         />
       </label>
 
-      <p class="toolbar-note">
-        Пустой поиск показывает всех сотрудников.
-      </p>
+      <p class="toolbar-note">Пустой поиск показывает всех сотрудников.</p>
     </div>
 
     <div v-if="loading" class="state-panel">

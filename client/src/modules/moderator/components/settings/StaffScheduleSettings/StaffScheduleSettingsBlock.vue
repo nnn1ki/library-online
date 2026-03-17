@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 
-import type { LibrarySettings, StaffDigestScheduleOverrides, StaffDigestWeekSchedule } from "@core/api/types";
+import type {
+  LibrarySettings,
+  StaffDigestScheduleOverrides,
+  StaffDigestWeekSchedule,
+} from "@core/api/types";
 import EditableSettingsSection from "../shared/EditableSettingsSection.vue";
 import StaffScheduleSettingsView from "./StaffScheduleSettingsView.vue";
 import StaffScheduleSettingsEdit from "./StaffScheduleSettingsEdit.vue";

@@ -13,7 +13,7 @@ defineProps<{
   <div class="stats-grid">
     <div class="stat-box">
       <span class="stat-name">Сводка</span>
-      <strong>{{ modelValue.staff_digest_enabled ? "Включен" : "Выключен" }}</strong>
+      <strong>{{ modelValue.staff_digest_enabled ? "Включена" : "Выключен" }}</strong>
     </div>
     <div class="stat-box">
       <span class="stat-name">Активность</span>

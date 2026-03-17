@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
 
-import {
-  getStaffNotificationRecipients,
-  updateStaffNotificationMode,
-} from "@core/api/staff";
+import { getStaffNotificationRecipients, updateStaffNotificationMode } from "@core/api/staff";
 import type { StaffNotificationMode, StaffNotificationRecipient } from "@core/api/types";
 import EditableSettingsSection from "../shared/EditableSettingsSection.vue";
 import StaffRecipientsSettingsView from "./StaffRecipientsSettingsView.vue";
@@ -69,11 +66,7 @@ async function handleModeUpdate(payload: { profileId: number; mode: StaffNotific
 </script>
 
 <template>
-  <EditableSettingsSection
-    kicker="Получатели сводки"
-    :is-editing="true"
-    :show-edit-button="false"
-  >
+  <EditableSettingsSection kicker="Получатели сводки" :is-editing="true" :show-edit-button="false">
     <template #edit>
       <div class="block-stack">
         <StaffRecipientsSettingsView :loading="loading" :recipients="recipients" />

@@ -38,7 +38,9 @@ function updateField<K extends keyof StaffDigestSettings>(key: K, value: StaffDi
 
     <label class="field-card">
       <span class="field-title">Недавняя активность сотрудника</span>
-      <span class="field-note">Через сколько часов после последней активности сотрудник считается активным.</span>
+      <span class="field-note"
+        >Через сколько часов после последней активности сотрудник считается активным.</span
+      >
       <input
         :value="modelValue.staff_notification_active_hours"
         type="number"

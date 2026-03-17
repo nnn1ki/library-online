@@ -53,14 +53,6 @@ const blockSaving = reactive({
   staff: false,
 });
 
-const selectedHolidayCount = computed(() => settings.value.holidays.length);
-const selectedScheduleOverridesCount = computed(
-  () => Object.keys(settings.value.staff_digest_schedule_overrides).length
-);
-const selectedReaderStatusesCount = computed(
-  () => settings.value.reader_notification_statuses.length
-);
-
 const generalSettings = computed(() => ({
   max_books_per_order: settings.value.max_books_per_order,
   max_books_per_reader: settings.value.max_books_per_reader,
@@ -149,21 +141,19 @@ async function saveSettingsPatch(
       <div class="hero-copy">
         <p class="eyebrow">Moderator / Settings</p>
         <h1>Настройки библиотеки и рассылок</h1>
-        <p class="hero-text">Настройки сохраняются по блокам и сразу подтягиваются заново.</p>
-      </div>
-
-      <div class="hero-stats">
-        <div class="stat-card">
-          <span class="stat-label">Праздничных дат</span>
-          <strong class="stat-value">{{ selectedHolidayCount }}</strong>
-        </div>
-        <div class="stat-card">
-          <span class="stat-label">Статусов для читателя</span>
-          <strong class="stat-value">{{ selectedReaderStatusesCount }}</strong>
-        </div>
-        <div class="stat-card">
-          <span class="stat-label">Изменений в графике</span>
-          <strong class="stat-value">{{ selectedScheduleOverridesCount }}</strong>
+        <p class="hero-text">
+          Здесь администратор управляет правилами работы библиотеки, уведомлениями для сотрудников и
+          читателей, рабочим календарем и логотипом сервиса.
+        </p>
+        <div class="hero-guide">
+          <p>
+            1. Редактируйте блоки по отдельности: каждое изменение сразу сохраняется на сервере.
+          </p>
+          <p>2. В рабочем календаре задаются обычные часы, праздники и исключения по датам.</p>
+          <p>
+            3. Для сотрудников можно настроить автоматическую сводку и вручную выбрать получателей.
+          </p>
+          <p>4. Для читателей можно выбрать, по каким статусам заказа отправлять письма.</p>
         </div>
       </div>
     </header>
@@ -196,7 +186,7 @@ async function saveSettingsPatch(
           @save="saveSettingsPatch('branding', { logo: $event })"
         />
 
-                <StaffDigestSettingsBlock
+        <StaffDigestSettingsBlock
           :model-value="staffDigestSettings"
           :saving="blockSaving.staff"
           :sync-token="settingsRevision"
@@ -225,8 +215,7 @@ async function saveSettingsPatch(
 
 .page-hero {
   display: grid;
-  grid-template-columns: minmax(0, 2.2fr) minmax(280px, 1fr);
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
   padding: 1.5rem;
   border-radius: 1.5rem;
   border: 1px solid var(--color-text-200);
@@ -252,36 +241,24 @@ async function saveSettingsPatch(
 }
 
 .hero-text {
-  max-width: 58ch;
+  max-width: none;
   margin: 0.85rem 0 0;
   color: var(--color-text-700);
   font-size: var(--text-sm);
   line-height: 1.6;
 }
 
-.hero-stats {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.stat-card {
+.hero-guide {
   display: grid;
   gap: 0.35rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--color-text-200);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.42);
-  backdrop-filter: blur(8px);
+  margin-top: 0.75rem;
 }
 
-.stat-label {
+.hero-guide p {
+  margin: 0;
   color: var(--color-text-600);
-  font-size: var(--text-xs);
-}
-
-.stat-value {
-  font-size: var(--text-xl);
-  font-weight: 700;
+  font-size: var(--text-sm);
+  line-height: 1.6;
 }
 
 .settings-layout {
@@ -305,7 +282,6 @@ async function saveSettingsPatch(
 }
 
 @media (max-width: 960px) {
-  .page-hero,
   .settings-layout {
     grid-template-columns: 1fr;
   }
@@ -317,15 +293,25 @@ async function saveSettingsPatch(
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 840px) {
   .settings-page {
     gap: 1rem;
     margin: 0.85rem auto 1.5rem;
-    padding: 0 0.75rem;
+    padding: 0 1rem;
   }
 
   .page-hero {
+    width: 100%;
+    max-width: 34rem;
+    margin: 0 auto;
     padding: 1.2rem;
+  }
+
+  .settings-span-full,
+  .settings-column {
+    width: 100%;
+    max-width: 34rem;
+    margin: 0 auto;
   }
 }
 </style>

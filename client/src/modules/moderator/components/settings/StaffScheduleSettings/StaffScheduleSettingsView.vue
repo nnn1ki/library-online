@@ -22,11 +22,11 @@ const overrides = computed(() =>
 );
 
 const visibleOverrides = computed(() => overrides.value.slice(0, 4));
-const remainingOverrides = computed(() => Math.max(overrides.value.length - visibleOverrides.value.length, 0));
+const remainingOverrides = computed(() =>
+  Math.max(overrides.value.length - visibleOverrides.value.length, 0)
+);
 
-function formatWindow(
-  window: { enabled: boolean; start?: string; end?: string } | undefined
-) {
+function formatWindow(window: { enabled: boolean; start?: string; end?: string } | undefined) {
   if (!window?.enabled) return "Выходной";
   return `${window.start} - ${window.end}`;
 }
@@ -61,7 +61,9 @@ function formatDate(dateValue: string) {
           <strong>{{ formatWindow(window) }}</strong>
         </div>
 
-        <p v-if="remainingOverrides" class="hint-text">Еще {{ remainingOverrides }} дат в списке.</p>
+        <p v-if="remainingOverrides" class="hint-text">
+          Еще {{ remainingOverrides }} дат в списке.
+        </p>
       </div>
 
       <p v-else class="hint-text">Пока используются только стандартные часы недели.</p>

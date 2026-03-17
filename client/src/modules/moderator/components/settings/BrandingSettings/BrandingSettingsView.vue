@@ -19,5 +19,4 @@ defineProps<{
   background: linear-gradient(180deg, var(--color-background-50), var(--color-background-100));
   border: 1px solid var(--color-text-200);
 }
-
 </style>

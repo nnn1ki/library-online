@@ -22,5 +22,5 @@ else
 
     echo "Starting production server as django user..."
     export DJANGO_SETTINGS_MODULE=service_settings
-    exec su django -c "uvicorn --host 0.0.0.0 --workers 4 app.asgi:application"
+    exec su django -c "uvicorn --host 0.0.0.0 app.asgi:application"
 fi

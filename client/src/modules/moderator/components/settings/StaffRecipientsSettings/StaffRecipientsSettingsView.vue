@@ -9,18 +9,26 @@ const props = defineProps<{
 }>();
 
 const alwaysCount = computed(
-  () => props.recipients.filter((recipient) => recipient.staff_notification_mode === "always").length
+  () =>
+    props.recipients.filter((recipient) => recipient.staff_notification_mode === "always").length
 );
 const disabledCount = computed(
-  () => props.recipients.filter((recipient) => recipient.staff_notification_mode === "disabled").length
+  () =>
+    props.recipients.filter((recipient) => recipient.staff_notification_mode === "disabled").length
 );
 </script>
 
 <template>
   <div class="summary-inline">
-    <span>Сотрудников: <strong>{{ loading ? "..." : recipients.length }}</strong></span>
-    <span>Всегда: <strong>{{ loading ? "..." : alwaysCount }}</strong></span>
-    <span>Отключены: <strong>{{ loading ? "..." : disabledCount }}</strong></span>
+    <span
+      >Сотрудников: <strong>{{ loading ? "..." : recipients.length }}</strong></span
+    >
+    <span
+      >Всегда: <strong>{{ loading ? "..." : alwaysCount }}</strong></span
+    >
+    <span
+      >Отключены: <strong>{{ loading ? "..." : disabledCount }}</strong></span
+    >
   </div>
 </template>
 

@@ -24,7 +24,10 @@ const emit = defineEmits<{
 
 const weekDays = Object.entries(staffScheduleDayLabels) as Array<[StaffScheduleDayKey, string]>;
 
-function normalizeWindow(window: StaffScheduleWindow, fallback: StaffScheduleWindow): StaffScheduleWindow {
+function normalizeWindow(
+  window: StaffScheduleWindow,
+  fallback: StaffScheduleWindow
+): StaffScheduleWindow {
   if (!window.enabled) return { enabled: false };
   return {
     enabled: true,
@@ -111,9 +114,10 @@ function renameOverrideDate(oldDateKey: string, newDateKey: string) {
 
   const nextOverrides: Record<string, StaffScheduleWindow> = {};
   for (const [dateKey, value] of Object.entries(props.modelValue.staff_digest_schedule_overrides)) {
-    nextOverrides[dateKey === oldDateKey ? newDateKey : dateKey] = dateKey === oldDateKey
-      ? normalizeWindow(value, getDefaultOverrideWindow(newDateKey))
-      : { ...value };
+    nextOverrides[dateKey === oldDateKey ? newDateKey : dateKey] =
+      dateKey === oldDateKey
+        ? normalizeWindow(value, getDefaultOverrideWindow(newDateKey))
+        : { ...value };
   }
 
   emitValue({
@@ -124,7 +128,10 @@ function renameOverrideDate(oldDateKey: string, newDateKey: string) {
 
 function updateOverride(dateKey: string, patch: Partial<StaffScheduleWindow>) {
   const currentWindow = props.modelValue.staff_digest_schedule_overrides[dateKey];
-  const nextWindow = normalizeWindow({ ...currentWindow, ...patch }, getDefaultOverrideWindow(dateKey));
+  const nextWindow = normalizeWindow(
+    { ...currentWindow, ...patch },
+    getDefaultOverrideWindow(dateKey)
+  );
 
   emitValue({
     ...props.modelValue,
@@ -148,7 +155,10 @@ const sortedOverrides = computed(() =>
       <div class="section-heading">
         <div>
           <h3>Базовый шаблон недели</h3>
-          <p>Используется по умолчанию. Праздники из календаря выше автоматически делают день нерабочим.</p>
+          <p>
+            Используется по умолчанию. Праздники из календаря выше автоматически делают день
+            нерабочим.
+          </p>
         </div>
       </div>
 
@@ -267,7 +277,9 @@ const sortedOverrides = computed(() =>
 
           <span v-else class="day-off">Выходной</span>
 
-          <button class="remove-button" type="button" @click="removeOverride(dateKey)">Удалить</button>
+          <button class="remove-button" type="button" @click="removeOverride(dateKey)">
+            Удалить
+          </button>
         </div>
       </div>
 

@@ -47,7 +47,9 @@ const overrides = computed(() => {
 });
 
 const visibleOverrides = computed(() => overrides.value.slice(0, 4));
-const remainingOverrides = computed(() => Math.max(overrides.value.length - visibleOverrides.value.length, 0));
+const remainingOverrides = computed(() =>
+  Math.max(overrides.value.length - visibleOverrides.value.length, 0)
+);
 
 const calendarAttributes = computed<CalendarAttribute[]>(() => [
   {
@@ -101,7 +103,7 @@ watch(
 <template>
   <div class="view-layout">
     <div class="calendar-card">
-      <p class="section-note">Красный день: праздник. Синяя рамка: ручное исключение.</p>
+      <p class="section-note">Красный день: праздник. Рамка: ручное исключение.</p>
       <Calendar
         ref="calendarRef"
         :from-page="currentPage"
@@ -198,21 +200,29 @@ watch(
 
 :deep(.vc-container) {
   width: 100%;
-  border: none;
+  border: none !important;
   border-radius: 1rem;
-  background: transparent;
+  background: transparent !important;
   color: var(--color-text-900);
   font-family: inherit;
 }
 
 :deep(.vc-header) {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+:deep(.vc-arrows-container) {
+  padding: 0.9rem 0.9rem 0 !important;
 }
 
 :deep(.vc-title) {
-  color: var(--color-text-900);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--color-background-50) !important;
+  color: var(--color-text-900) !important;
   font-size: var(--text-lg);
   font-weight: 700;
+  box-shadow: inset 0 0 0 1px var(--color-text-200);
 }
 
 :deep(.vc-weekday) {
@@ -223,14 +233,29 @@ watch(
 }
 
 :deep(.vc-arrow) {
-  color: var(--color-primary-600);
+  width: 2.2rem;
+  height: 2.2rem;
+  color: var(--color-primary-700) !important;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-background-50) 88%, transparent) !important;
+  box-shadow: inset 0 0 0 1px var(--color-text-200);
+}
+
+:deep(.vc-arrow svg) {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 2.2;
+}
+
+:deep(.vc-arrow.is-disabled) {
+  opacity: 0.35;
   border-radius: 999px;
 }
 
 :deep(.vc-arrow:hover),
 :deep(.vc-nav-item:hover),
 :deep(.vc-day-content:hover) {
-  background: var(--color-primary-100);
+  background: var(--color-primary-100) !important;
 }
 
 :deep(.vc-day-content) {
@@ -240,12 +265,22 @@ watch(
   border-radius: 0.75rem;
 }
 
+:deep(.vc-highlight-bg-solid) {
+  background: var(--color-accent-500) !important;
+}
+
 :deep(.vc-highlight-content-solid) {
   color: var(--color-text-50);
 }
 
+:deep(.vc-highlight-bg-outline) {
+  border-color: var(--color-primary-500) !important;
+  background: color-mix(in srgb, var(--color-primary-500) 14%, transparent) !important;
+}
+
 :deep(.vc-highlight-content-outline) {
   border-width: 2px;
+  color: var(--color-text-900);
 }
 
 :deep(.vc-day.is-not-in-month .vc-day-content) {
