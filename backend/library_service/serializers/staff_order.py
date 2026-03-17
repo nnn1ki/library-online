@@ -29,8 +29,8 @@ class StaffOrderSerializer(aserializers.ModelSerializer):
     username = serializers.CharField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
-    fullname = serializers.CharField(read_only=True)
-    department = serializers.CharField(read_only=True)
+    fullname = serializers.CharField(source="profile.fullname", read_only=True)
+    department = serializers.CharField(source="profile.department", read_only=True)
 
     class Meta:
         model = User
@@ -52,8 +52,8 @@ class OrderUserSerializer(aserializers.ModelSerializer):
     username = serializers.CharField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
-    fullname = serializers.CharField(read_only=True)
-    department = serializers.CharField(read_only=True)
+    fullname = serializers.CharField(source="profile.fullname", read_only=True)
+    department = serializers.CharField(source="profile.department", read_only=True)
 
     class Meta:
         model = User

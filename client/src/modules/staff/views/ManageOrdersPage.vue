@@ -226,8 +226,12 @@ const handleVisibilityChange = () => {
 };
 
 async function handleCheckOrder(orderId: number): Promise<OrderCheckingInfo | undefined> {
+  isLoading.value = true;
+
   try {
-    return await checkOrder(orderId);
+    const r = await checkOrder(orderId);
+    isLoading.value = false;
+    return r;
   } catch (error) {
     console.error("Ошибка при проверке готовности заказа", error);
   }

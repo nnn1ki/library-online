@@ -74,9 +74,9 @@ class AuthViewset(AsyncAPIView):
                     await user.groups.aadd(await Group.objects.aget(name="Reader"))
                     if "Librarian" in response.roles:
                         await user.groups.aadd(await Group.objects.aget(name="Librarian"))
-                        if "Admin" in response.roles:
-                            await user.groups.aadd(await Group.objects.aget(name="Librarian"))
-                            user.is_superuser = True
+                    if "Admin" in response.roles:
+                        await user.groups.aadd(await Group.objects.aget(name="Librarian"))
+                        user.is_superuser = True
                     await user.asave()
 
                 user.profile.library_card = info.ticket
