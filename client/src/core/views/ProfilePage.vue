@@ -11,12 +11,17 @@
     </div>
   </div>
 
-  
   <ModalDialog v-model="openModal">
     <h4 class="modal-text">Зайти как сотрудник<br />или как читатель ?</h4>
     <div class="choice-buttons">
-      <StyledButton :disabled="isRoleChanging" @click="handleUserRoleChoice('Reader')"> Читатель </StyledButton>
-      <StyledButton :disabled="isRoleChanging" @click="handleUserRoleChoice('Librarian')" theme="accent">
+      <StyledButton :disabled="isRoleChanging" @click="handleUserRoleChoice('Reader')">
+        Читатель
+      </StyledButton>
+      <StyledButton
+        :disabled="isRoleChanging"
+        @click="handleUserRoleChoice('Librarian')"
+        theme="accent"
+      >
         Сотрудник
       </StyledButton>
     </div>
@@ -87,8 +92,6 @@ const handleUserRoleChoice = async (choice: Group) => {
 
   window.location.reload();
 };
-
-
 </script>
 
 <style scoped lang="scss">

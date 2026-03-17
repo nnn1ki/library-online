@@ -6,7 +6,9 @@
           <th
             @click="sortCandidates('library_card')"
             class="sortable-th library-card-column"
-            :aria-sort="sortKey === 'library_card' ? (sortOrder === 1 ? 'ascending' : 'descending') : 'none'"
+            :aria-sort="
+              sortKey === 'library_card' ? (sortOrder === 1 ? 'ascending' : 'descending') : 'none'
+            "
           >
             <span class="th-content">
               Читательский билет
@@ -21,7 +23,9 @@
           <th
             @click="sortCandidates('fullname')"
             class="sortable-th fullname-column"
-            :aria-sort="sortKey === 'fullname' ? (sortOrder === 1 ? 'ascending' : 'descending') : 'none'"
+            :aria-sort="
+              sortKey === 'fullname' ? (sortOrder === 1 ? 'ascending' : 'descending') : 'none'
+            "
           >
             <span class="th-content">
               ФИО
@@ -33,11 +37,13 @@
               </div>
             </span>
           </th>
-          
-          <th 
+
+          <th
             @click="sortCandidates('is_candidate')"
             class="sortable-th candidate-column"
-            :aria-sort="sortKey === 'is_candidate' ? (sortOrder === 1 ? 'ascending' : 'descending') : 'none'"
+            :aria-sort="
+              sortKey === 'is_candidate' ? (sortOrder === 1 ? 'ascending' : 'descending') : 'none'
+            "
           >
             <span class="th-content">
               Претендент на блокировку
@@ -53,7 +59,13 @@
           <th
             @click="sortCandidates('total_orders_count')"
             class="sortable-th orders-column"
-            :aria-sort="sortKey === 'total_orders_count' ? (sortOrder === 1 ? 'ascending' : 'descending') : 'none'"
+            :aria-sort="
+              sortKey === 'total_orders_count'
+                ? sortOrder === 1
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
           >
             <span class="th-content">
               Количество заказов
@@ -68,7 +80,13 @@
           <th
             @click="sortCandidates('cancelled_orders_count')"
             class="sortable-th cancellations-column"
-            :aria-sort="sortKey === 'cancelled_orders_count' ? (sortOrder === 1 ? 'ascending' : 'descending') : 'none'"
+            :aria-sort="
+              sortKey === 'cancelled_orders_count'
+                ? sortOrder === 1
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
           >
             <span class="th-content">
               Количество отказов
@@ -94,11 +112,11 @@
       </tbody>
     </table>
     <div v-if="candidates.length === 0 && !loading" class="empty-state">
-      {{ hasSearched ? 'Кандидаты на блокировку не найдены' : 'Укажите период для поиска кандидатов' }}
+      {{
+        hasSearched ? "Кандидаты на блокировку не найдены" : "Укажите период для поиска кандидатов"
+      }}
     </div>
-    <div v-if="loading" class="loading-state">
-      Загрузка...
-    </div>
+    <div v-if="loading" class="loading-state">Загрузка...</div>
   </div>
 </template>
 
@@ -119,10 +137,15 @@ const emit = defineEmits<{
 }>();
 
 // Добавили "is_candidate" в типы ключей сортировки
-type SortKey = "library_card" | "fullname" | "total_orders_count" | "cancelled_orders_count" | "is_candidate";
+type SortKey =
+  | "library_card"
+  | "fullname"
+  | "total_orders_count"
+  | "cancelled_orders_count"
+  | "is_candidate";
 
 const sortKey = ref<SortKey>("cancelled_orders_count");
-const sortOrder = ref<1 | -1>(-1); 
+const sortOrder = ref<1 | -1>(-1);
 
 function sortCandidates(key: SortKey) {
   if (sortKey.value === key) {
@@ -141,11 +164,11 @@ const sortedCandidates = computed(() => {
 
     switch (sortKey.value) {
       case "fullname":
-        comparison = (a.fullname || '').localeCompare(b.fullname || '');
+        comparison = (a.fullname || "").localeCompare(b.fullname || "");
         break;
       case "is_candidate":
         // Сортировка "Да"/"Нет"
-        comparison = (a.is_candidate || '').localeCompare(b.is_candidate || '');
+        comparison = (a.is_candidate || "").localeCompare(b.is_candidate || "");
         break;
       case "total_orders_count":
         comparison = a.total_orders_count - b.total_orders_count;
@@ -155,7 +178,7 @@ const sortedCandidates = computed(() => {
         break;
       case "library_card":
       default:
-        comparison = (a.library_card || '').localeCompare(b.library_card || '');
+        comparison = (a.library_card || "").localeCompare(b.library_card || "");
     }
 
     return comparison * sortOrder.value;
@@ -185,12 +208,12 @@ td {
   text-align: left;
   color: var(--color-text-800);
   background-color: var(--color-background-100);
-  
+
   @media (max-width: 768px) {
     padding: 10px 6px;
     font-size: 0.9em;
   }
-  
+
   @media (max-width: 480px) {
     padding: 8px 4px;
     font-size: 0.85em;

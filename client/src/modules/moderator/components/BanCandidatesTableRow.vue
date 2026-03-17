@@ -2,22 +2,15 @@
   <tr class="candidate-row">
     <td class="library-card">{{ candidate.library_card }}</td>
     <td class="fullname">{{ candidate.fullname }}</td>
-    
-    <td 
-      class="candidate-status" 
-      :class="{ 'is-real-candidate': candidate.is_candidate === 'Да' }"
-    >
+
+    <td class="candidate-status" :class="{ 'is-real-candidate': candidate.is_candidate === 'Да' }">
       {{ candidate.is_candidate }}
     </td>
 
     <td class="total-orders">{{ candidate.total_orders_count }}</td>
     <td class="cancelled-orders">{{ candidate.cancelled_orders_count }}</td>
     <td class="actions">
-      <button 
-        class="ban-button"
-        @click="handleBan"
-        :disabled="loading"
-      >
+      <button class="ban-button" @click="handleBan" :disabled="loading">
         <span v-if="loading">Блокировка...</span>
         <span v-else>Заблокировать</span>
       </button>
@@ -59,7 +52,7 @@ const handleBan = () => {
   font-size: 0.9em;
   word-break: break-all;
   background-color: inherit;
-  
+
   @media (max-width: 480px) {
     font-size: 0.85em;
   }
@@ -69,7 +62,7 @@ const handleBan = () => {
   color: var(--color-text-700);
   word-break: break-word;
   background-color: inherit;
-  
+
   @media (max-width: 480px) {
     font-size: 0.9em;
   }
@@ -78,11 +71,11 @@ const handleBan = () => {
 .candidate-status {
   text-align: center;
   font-weight: 500;
-  color: var(--color-text-500); 
+  color: var(--color-text-500);
   background-color: inherit;
 
   &.is-real-candidate {
-    color: var(--color-accent-400); 
+    color: var(--color-accent-400);
   }
 }
 
@@ -126,7 +119,7 @@ const handleBan = () => {
     outline: 2px solid var(--color-accent-500);
     outline-offset: 2px;
   }
-  
+
   @media (max-width: 480px) {
     padding: 5px 8px;
     font-size: 0.85em;

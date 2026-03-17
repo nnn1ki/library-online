@@ -92,7 +92,7 @@ export type OrderBook = {
 export type CustomOrderBook = {
   original: OrderBook;
   analogous: OrderBook;
-}
+};
 
 export type Order = {
   id: number;
@@ -147,10 +147,15 @@ export type LibrarySettings = {
   max_books_per_order: number;
   max_books_per_reader: number;
   max_borrow_days: number;
-  holidays: Date[] | null;
-  logo: string | null;
+  holidays: string[];
+  logo: string | File | null;
   new_order_wait: number;
   processing_order_wait: number;
+  staff_digest_enabled: boolean;
+  staff_notification_active_hours: number;
+  staff_digest_stale_order_hours: number;
+  reader_status_notifications_enabled: boolean;
+  reader_notification_statuses: string[];
 };
 
 export type ReaderStats = {
@@ -179,8 +184,14 @@ export type ReadersFilters = {
   last_order_date_from?: string;
   last_order_date_to?: string;
   current_order_statuses?: OrderStatusEnum[];
-  sort_by?: 'id' | 'fullname' | 'department' | 'total_books_ordered' | 'total_orders' | 'cancelled_orders';
-  sort_order?: 'asc' | 'desc';
+  sort_by?:
+    | "id"
+    | "fullname"
+    | "department"
+    | "total_books_ordered"
+    | "total_orders"
+    | "cancelled_orders";
+  sort_order?: "asc" | "desc";
   page?: number;
   page_size?: number;
 };
@@ -202,8 +213,8 @@ export type PaginatedStaff = {
 
 export type StaffFilters = {
   search?: string;
-  sort_by?: 'fullname' | 'department' | 'total_orders' | 'cancelled_orders';
-  sort_order?: 'asc' | 'desc';
+  sort_by?: "fullname" | "department" | "total_orders" | "cancelled_orders";
+  sort_order?: "asc" | "desc";
   page?: number;
   page_size?: number;
 };
@@ -231,8 +242,8 @@ export type OrdersFilters = {
   date_from?: string;
   date_to?: string;
   statuses?: OrderStatusEnum[];
-  sort_by?: 'id' | 'fullname' | 'employee_collect' | 'employee_issue' | 'status';
-  sort_order?: 'asc' | 'desc';
+  sort_by?: "id" | "fullname" | "employee_collect" | "employee_issue" | "status";
+  sort_order?: "asc" | "desc";
   page?: number;
   page_size?: number;
 };

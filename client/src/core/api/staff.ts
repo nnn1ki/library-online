@@ -1,4 +1,4 @@
-import { api } from "./axios"
+import { api } from "./axios";
 import type { StaffStats, PaginatedStaff, StaffFilters, Order, UserOrder } from "./types";
 
 export async function getStaff(filters?: StaffFilters): Promise<PaginatedStaff> {
@@ -6,8 +6,8 @@ export async function getStaff(filters?: StaffFilters): Promise<PaginatedStaff> 
     const { data } = await api.get("/api/staff/", {
       params: filters,
       paramsSerializer: {
-        indexes: null
-      }
+        indexes: null,
+      },
     });
     return data;
   } catch (error) {
@@ -21,8 +21,8 @@ export async function getStaffStats(filters?: StaffFilters): Promise<PaginatedSt
     const { data } = await api.get("/api/staff/stats/", {
       params: filters,
       paramsSerializer: {
-        indexes: null
-      }
+        indexes: null,
+      },
     });
     return data;
   } catch (error) {
@@ -54,7 +54,7 @@ export async function getStaffOrderDetail(staffId: number, orderId: number): Pro
 export async function searchStaff(query: string): Promise<StaffStats[]> {
   try {
     const { data } = await api.get("/api/staff/search/", {
-      params: { q: query }
+      params: { q: query },
     });
     return data;
   } catch (error) {
