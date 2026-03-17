@@ -11,7 +11,7 @@ from library_service.models.user import UserProfile
 from library_service.opac.api.ticket import opac_reader_loans
 from library_service.opac.book import book_retrieve_by_id
 from library_service.opac.book import book_retrieve
-from library_service.emails import send_order_status_update_notification
+from library_service.services.order_status_notifications import notify_reader_about_order_status_change
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
 from library_service.serializers.parallel_list import ParallelListSerializer
@@ -159,22 +159,17 @@ class UpdateOrderSerializer(aserializers.Serializer):
         user = self.context["request"].user
         new_status = validated_data["status"]
         email_mode = getattr(settings, "EMAIL_MODE", "prod")
-        order_instance_for_email = await Order.objects.select_related("user").aget(pk=instance.pk)
 
         if new_status["status"] == OrderHistory.Status.PROCESSING:
-            was_already_processing = await OrderHistory.objects.filter(
-                order=instance, status=OrderHistory.Status.PROCESSING
-            ).aexists()
             await OrderHistory.objects.acreate(
                 order=instance, status=OrderHistory.Status.PROCESSING, description=new_status["description"], staff=user
             )
-            if not was_already_processing:
-                await send_order_status_update_notification(
-                    order_instance_for_email,
-                    OrderHistory.Status.PROCESSING,
-                    new_status["description"],
-                    email_mode,
-                )
+            await notify_reader_about_order_status_change(
+                order_id=instance.pk,
+                new_status=OrderHistory.Status.PROCESSING,
+                description=new_status["description"],
+                email_mode=email_mode,
+            )
 
         elif new_status["status"] == OrderHistory.Status.NEW:
             await OrderHistory.objects.acreate(
@@ -227,21 +222,21 @@ class UpdateOrderSerializer(aserializers.Serializer):
                 await OrderHistory.objects.acreate(
                     order=instance, status=OrderHistory.Status.CANCELLED, description=description, staff=user
                 )
-                await send_order_status_update_notification(
-                    order_instance_for_email,
-                    OrderHistory.Status.CANCELLED,
-                    description,
-                    email_mode,
+                await notify_reader_about_order_status_change(
+                    order_id=instance.pk,
+                    new_status=OrderHistory.Status.CANCELLED,
+                    description=description,
+                    email_mode=email_mode,
                 )
             else:    
                 await OrderHistory.objects.acreate(
                     order=instance, status=OrderHistory.Status.READY, description=new_status["description"], staff=user
                 )
-                await send_order_status_update_notification(
-                    order_instance_for_email,
-                    OrderHistory.Status.READY,
-                    new_status["description"],
-                    email_mode,
+                await notify_reader_about_order_status_change(
+                    order_id=instance.pk,
+                    new_status=OrderHistory.Status.READY,
+                    description=new_status["description"],
+                    email_mode=email_mode,
                 )
 
         elif new_status["status"] == OrderHistory.Status.DONE:
@@ -313,11 +308,11 @@ class UpdateOrderSerializer(aserializers.Serializer):
             await OrderHistory.objects.acreate(
                 order=instance, status=OrderHistory.Status.CANCELLED, description=new_status["description"], staff=user
             )
-            await send_order_status_update_notification(
-                order_instance_for_email,
-                OrderHistory.Status.CANCELLED,
-                new_status["description"],
-                email_mode,
+            await notify_reader_about_order_status_change(
+                order_id=instance.pk,
+                new_status=OrderHistory.Status.CANCELLED,
+                description=new_status["description"],
+                email_mode=email_mode,
             )
 
         return validated_data

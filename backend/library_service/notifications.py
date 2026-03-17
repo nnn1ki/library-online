@@ -22,26 +22,26 @@ def get_new_orders_digest_data(
     latest_status_subquery = (
         OrderHistory.objects.filter(order=OuterRef("pk")).order_by("-date").values("status")[:1]
     )
-    first_new_date_subquery = (
+    latest_new_date_subquery = (
         OrderHistory.objects.filter(order=OuterRef("pk"), status=OrderHistory.Status.NEW)
-        .order_by("date")
+        .order_by("-date")
         .values("date")[:1]
     )
 
     orders_with_current_new = (
         Order.objects.select_related("user", "library")
         .annotate(current_status=Subquery(latest_status_subquery))
-        .annotate(first_new_date=Subquery(first_new_date_subquery, output_field=DateTimeField()))
+        .annotate(current_new_date=Subquery(latest_new_date_subquery, output_field=DateTimeField()))
         .filter(current_status=OrderHistory.Status.NEW)
-        .exclude(first_new_date__isnull=True)
-        .order_by("first_new_date", "id")
+        .exclude(current_new_date__isnull=True)
+        .order_by("current_new_date", "id")
     )
 
     fresh_orders: list[Order] = []
     stale_new_orders: list[Order] = []
 
     for order in orders_with_current_new:
-        if order.first_new_date >= fresh_cutoff:
+        if order.current_new_date >= fresh_cutoff:
             fresh_orders.append(order)
         else:
             stale_new_orders.append(order)

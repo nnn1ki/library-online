@@ -15,18 +15,20 @@
     {% for order in fresh_orders %}
       <li>
         Заказ #{{ order.id }}, читатель: {{ order.user.email }}, библиотека: {{ order.library.description }},
-        создан: {{ order.first_new_date|date:"Y-m-d H:i:s" }}
+        в NEW с: {{ order.current_new_date|date:"Y-m-d H:i:s" }}
       </li>
+    {% empty %}
+      <li>Нет</li>
     {% endfor %}
   </ul>
 
-  <h3>Старые заказы со статусом NEW</h3>
+  <h3>Заказы, которые находятся в NEW дольше {{ window_minutes }} минут</h3>
   {% if stale_orders %}
     <ul>
       {% for order in stale_orders %}
         <li>
           Заказ #{{ order.id }}, читатель: {{ order.user.email }}, библиотека: {{ order.library.description }},
-          создан: {{ order.first_new_date|date:"Y-m-d H:i:s" }}
+          в NEW с: {{ order.current_new_date|date:"Y-m-d H:i:s" }}
         </li>
       {% endfor %}
     </ul>

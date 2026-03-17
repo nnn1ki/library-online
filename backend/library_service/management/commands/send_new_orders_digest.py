@@ -31,8 +31,8 @@ class Command(BaseCommand):
 
         fresh_orders, stale_new_orders, now_aware, _ = get_new_orders_digest_data(window_minutes=window_minutes)
 
-        if not fresh_orders:
-            self.stdout.write(self.style.WARNING("Digest: no fresh NEW orders in current window, skipping."))
+        if not fresh_orders and not stale_new_orders:
+            self.stdout.write(self.style.WARNING("Digest: no NEW orders in current window, skipping."))
             return
 
         self.stdout.write(

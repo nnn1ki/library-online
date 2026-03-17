@@ -26,8 +26,9 @@ def _build_digest_payload(
     window_minutes: int,
 ) -> tuple[str, str, str]:
     fresh_count = len(fresh_orders)
+    stale_count = len(stale_new_orders)
 
-    subject = f"Новые заказы за последние {window_minutes} минут: {fresh_count}"
+    subject = f"Заказы в статусе NEW: свежие {fresh_count}, ожидают {stale_count}"
 
     plain_lines: list[str] = [
         "Здравствуйте, [LIBRARIAN_NAME].",
@@ -38,21 +39,21 @@ def _build_digest_payload(
     ]
 
     for order in fresh_orders:
-        created_at = getattr(order, "first_new_date", None)
-        created_at_text = created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else "N/A"
+        new_since = getattr(order, "current_new_date", None)
+        new_since_text = new_since.strftime("%Y-%m-%d %H:%M:%S") if new_since else "N/A"
         plain_lines.append(
-            f"- Заказ #{order.id}, читатель: {order.user.email}, библиотека: {order.library.description}, создан: {created_at_text}"
+            f"- Заказ #{order.id}, читатель: {order.user.email}, библиотека: {order.library.description}, в NEW с: {new_since_text}"
         )
 
     plain_lines.append("")
-    plain_lines.append("Старые заказы со статусом NEW:")
+    plain_lines.append(f"Заказы, которые находятся в NEW дольше {window_minutes} минут:")
 
     if stale_new_orders:
         for order in stale_new_orders:
-            created_at = getattr(order, "first_new_date", None)
-            created_at_text = created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else "N/A"
+            new_since = getattr(order, "current_new_date", None)
+            new_since_text = new_since.strftime("%Y-%m-%d %H:%M:%S") if new_since else "N/A"
             plain_lines.append(
-                f"- Заказ #{order.id}, читатель: {order.user.email}, библиотека: {order.library.description}, создан: {created_at_text}"
+                f"- Заказ #{order.id}, читатель: {order.user.email}, библиотека: {order.library.description}, в NEW с: {new_since_text}"
             )
     else:
         plain_lines.append("- Нет")
@@ -81,8 +82,8 @@ async def send_new_orders_digest_notification(
 ) -> None:
     email_mode = email_mode.lower()
 
-    if not fresh_orders:
-        print("Email digest: no fresh orders, nothing to send.")
+    if not fresh_orders and not stale_new_orders:
+        print("Email digest: no NEW orders, nothing to send.")
         return
 
     if _should_skip_by_schedule(email_mode, now=now):
@@ -117,7 +118,7 @@ async def send_new_orders_digest_notification(
     )
 
     for librarian in librarians:
-        if not is_user_active_recently(librarian):
+        if not is_user_active_recently(librarian, now=generated_at):
             print(f"Email digest: skip {librarian.username}, not active recently.")
             continue
 
