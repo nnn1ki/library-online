@@ -12,7 +12,7 @@ def get_new_orders_digest_data(
 ) -> tuple[list[Order], list[Order], datetime, datetime]:
     """Return fresh and stale orders that currently have NEW status."""
     library_settings = LibrarySettings.get_settings()
-    digest_window_minutes = window_minutes or max(1, int(library_settings.new_order_wait * 60))
+    digest_window_minutes = window_minutes or max(1, int(library_settings.staff_digest_stale_order_hours * 60))
 
     now_aware = now or timezone.now()
     if timezone.is_naive(now_aware):

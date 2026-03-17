@@ -25,6 +25,12 @@ def get_notification_now(now: datetime | None = None) -> datetime:
     return base_now.astimezone(ZoneInfo(tz_name))
 
 
+def is_holiday(dt: datetime, holidays: list[str] | None = None) -> bool:
+    if not holidays:
+        return False
+    return dt.date().isoformat() in set(holidays)
+
+
 def is_user_active_recently(user, now: datetime | None = None, active_threshold_hours: float | None = None) -> bool:
     if not user.is_authenticated:
         return False

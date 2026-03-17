@@ -78,6 +78,7 @@ class LibrarySettingsAdmin(admin.ModelAdmin):
         "new_order_wait",
         "staff_digest_enabled",
         "staff_notification_active_hours",
+        "staff_digest_stale_order_hours",
         "reader_status_notifications_enabled",
     ]
 

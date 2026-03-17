@@ -11,15 +11,19 @@ from django.template.loader import render_to_string
 from library_service.models.library_settings import LibrarySettings
 from library_service.models.order import Order, OrderHistory
 from library_service.models.user import UserProfile
-from library_service.utils.datetime_helpers import get_notification_now, is_user_active_recently, is_working_hour
+from library_service.utils.datetime_helpers import get_notification_now, is_holiday, is_user_active_recently, is_working_hour
 
 
-def _should_skip_by_schedule(email_mode: str, now: datetime | None = None) -> bool:
+async def _should_skip_by_schedule(email_mode: str, now: datetime | None = None) -> bool:
     if email_mode.lower() != "prod":
         return False
 
     current_local_time = get_notification_now(now)
-    return not is_working_hour(current_local_time)
+    if not is_working_hour(current_local_time):
+        return True
+
+    library_settings = await LibrarySettings.aget_settings()
+    return is_holiday(current_local_time, library_settings.holidays)
 
 
 def _build_digest_payload(
@@ -89,8 +93,8 @@ async def send_new_orders_digest_notification(
         print("Email digest: no NEW orders, nothing to send.")
         return
 
-    if _should_skip_by_schedule(email_mode, now=now):
-        print("Email digest: outside working hours in prod mode, skipping.")
+    if await _should_skip_by_schedule(email_mode, now=now):
+        print("Email digest: outside working hours or on holiday in prod mode, skipping.")
         return
 
     library_settings = await LibrarySettings.aget_settings()
@@ -183,8 +187,8 @@ async def send_order_status_update_notification(
 ) -> None:
     email_mode = email_mode.lower()
 
-    if _should_skip_by_schedule(email_mode, now=now):
-        print(f"Status email: outside working hours in prod mode for order #{order.id}, skipping.")
+    if await _should_skip_by_schedule(email_mode, now=now):
+        print(f"Status email: outside working hours or on holiday in prod mode for order #{order.id}, skipping.")
         return
 
     user = order.user

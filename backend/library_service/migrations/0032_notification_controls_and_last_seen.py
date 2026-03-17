@@ -42,6 +42,14 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
+            model_name="librarysettings",
+            name="staff_digest_stale_order_hours",
+            field=models.FloatField(
+                default=1,
+                verbose_name="Через сколько часов заказ в NEW считается необработанным для рассылки",
+            ),
+        ),
+        migrations.AddField(
             model_name="userprofile",
             name="staff_notification_mode",
             field=models.CharField(

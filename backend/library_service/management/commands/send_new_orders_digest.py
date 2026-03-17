@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         library_settings = LibrarySettings.get_settings()
-        window_minutes = options["window_minutes"] or max(1, int(library_settings.new_order_wait * 60))
+        window_minutes = options["window_minutes"] or max(1, int(library_settings.staff_digest_stale_order_hours * 60))
         email_mode = (options["email_mode"] or getattr(settings, "EMAIL_MODE", "prod")).lower()
 
         fresh_orders, stale_new_orders, now_aware, _ = get_new_orders_digest_data(window_minutes=window_minutes)

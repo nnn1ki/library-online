@@ -23,6 +23,10 @@ class LibrarySettings(models.Model):
         verbose_name="Сотрудник считается недавно активным (в часах)",
         default=2,
     )
+    staff_digest_stale_order_hours = models.FloatField(
+        verbose_name="Через сколько часов заказ в NEW считается необработанным для рассылки",
+        default=1,
+    )
     reader_status_notifications_enabled = models.BooleanField(
         verbose_name="Отправлять читателю уведомления об изменении статуса заказа",
         default=True,
