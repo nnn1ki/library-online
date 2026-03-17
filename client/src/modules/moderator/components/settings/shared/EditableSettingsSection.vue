@@ -35,6 +35,8 @@ defineEmits<{
       </div>
 
       <div class="card-actions">
+        <slot name="actions" />
+
         <span v-if="badge" class="card-badge">{{ badge }}</span>
 
         <template v-if="showEditButton">

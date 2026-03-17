@@ -2,6 +2,7 @@
 import { computed, ref, watch } from "vue";
 
 import type { LibrarySettings } from "@core/api/types";
+import { sendStaffSummary } from "@core/api/settings";
 import EditableSettingsSection from "../shared/EditableSettingsSection.vue";
 import StaffDigestSettingsView from "./StaffDigestSettingsView.vue";
 import StaffDigestSettingsEdit from "./StaffDigestSettingsEdit.vue";
@@ -24,6 +25,8 @@ const emit = defineEmits<{
 const isEditing = ref(false);
 const pendingSyncToken = ref<number | null>(null);
 const draft = ref<StaffDigestSettings>({ ...props.modelValue });
+const isSendingSummary = ref(false);
+const summaryMessage = ref<string | null>(null);
 
 watch(
   () => props.modelValue,
@@ -68,6 +71,31 @@ function saveChanges() {
   pendingSyncToken.value = props.syncToken;
   emit("save", { ...draft.value });
 }
+
+async function handleSendSummary() {
+  isSendingSummary.value = true;
+  summaryMessage.value = null;
+
+  try {
+    const result = await sendStaffSummary();
+    if (result.reason === "empty") {
+      summaryMessage.value = "Сейчас нет заказов для отправки.";
+      return;
+    }
+
+    if (result.reason === "recipients") {
+      summaryMessage.value = "Сводка собрана, но получателей для отправки не нашлось.";
+      return;
+    }
+
+    summaryMessage.value = `Сводка отправлена: новых ${result.fresh_count}, ожидающих ${result.stale_count}.`;
+  } catch (error) {
+    console.error("Не удалось отправить сводку сотрудникам", error);
+    summaryMessage.value = "Не удалось отправить сводку. Попробуйте еще раз.";
+  } finally {
+    isSendingSummary.value = false;
+  }
+}
 </script>
 
 <template>
@@ -80,12 +108,65 @@ function saveChanges() {
     @edit="startEditing"
     @save="saveChanges"
   >
+    <template #actions>
+      <button
+        class="summary-button"
+        :disabled="isSendingSummary || saving"
+        type="button"
+        @click="handleSendSummary"
+      >
+        {{ isSendingSummary ? "Отправляем..." : "Отправить" }}
+      </button>
+    </template>
+
     <template #view>
-      <StaffDigestSettingsView :model-value="modelValue" />
+      <div class="section-stack">
+        <StaffDigestSettingsView :model-value="modelValue" />
+        <p v-if="summaryMessage" class="summary-message">{{ summaryMessage }}</p>
+      </div>
     </template>
 
     <template #edit>
-      <StaffDigestSettingsEdit :model-value="draft" @update:model-value="draft = $event" />
+      <div class="section-stack">
+        <StaffDigestSettingsEdit :model-value="draft" @update:model-value="draft = $event" />
+        <p v-if="summaryMessage" class="summary-message">{{ summaryMessage }}</p>
+      </div>
     </template>
   </EditableSettingsSection>
 </template>
+
+<style scoped lang="scss">
+.section-stack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.summary-button {
+  min-height: 2.35rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--color-text-300);
+  border-radius: 999px;
+  background: var(--color-background-100);
+  color: var(--color-text-900);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.summary-button:hover:not(:disabled) {
+  background: var(--color-primary-100);
+  border-color: var(--color-primary-300);
+}
+
+.summary-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.summary-message {
+  margin: 0;
+  color: var(--color-text-600);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+</style>

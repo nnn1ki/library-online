@@ -175,6 +175,12 @@ class UpdateOrderSerializer(aserializers.Serializer):
             await OrderHistory.objects.acreate(
                 order=instance, status=OrderHistory.Status.NEW, description=new_status["description"], staff=user
             )
+            await notify_reader_about_order_status_change(
+                order_id=instance.pk,
+                new_status=OrderHistory.Status.NEW,
+                description=new_status["description"],
+                email_mode=email_mode,
+            )
 
         elif new_status["status"] == OrderHistory.Status.READY:
             order: Order = await Order.objects.prefetch_related("user").filter(id=instance.id).afirst()
@@ -287,6 +293,12 @@ class UpdateOrderSerializer(aserializers.Serializer):
 
             await OrderHistory.objects.acreate(
                 order=instance, status=OrderHistory.Status.DONE, description=new_status["description"], staff=user
+            )
+            await notify_reader_about_order_status_change(
+                order_id=instance.pk,
+                new_status=OrderHistory.Status.DONE,
+                description=new_status["description"],
+                email_mode=email_mode,
             )
 
         elif new_status["status"] == OrderHistory.Status.CANCELLED:

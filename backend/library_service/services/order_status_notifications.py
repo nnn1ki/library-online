@@ -25,13 +25,12 @@ async def notify_reader_about_order_status_change(
     if new_status not in configured_statuses:
         return
 
-    if new_status == OrderHistory.Status.PROCESSING:
-        processing_count = await OrderHistory.objects.filter(
-            order_id=order_id,
-            status=OrderHistory.Status.PROCESSING,
-        ).acount()
-        if processing_count > 1:
-            return
+    status_count = await OrderHistory.objects.filter(
+        order_id=order_id,
+        status=new_status,
+    ).acount()
+    if status_count > 1:
+        return
 
     order = await Order.objects.select_related("user").aget(pk=order_id)
     await send_order_status_update_notification(order, new_status, description, email_mode)

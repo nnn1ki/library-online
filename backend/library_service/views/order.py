@@ -16,8 +16,10 @@ from library_service.mixins import (
     SessionUpdateModelMixin,
 )
 from library_service.models.order import Order, OrderHistory, OrderItem
+from django.conf import settings
 
 from library_service.serializers.order import BorrowedBookSerializer, CreateUpdateOrderSerializer, OrderSerializer
+from library_service.services.order_status_notifications import notify_reader_about_order_status_change
 
 ACCEPTABLE_STATUSES = [
     OrderHistory.Status.NEW,
@@ -59,6 +61,7 @@ class OrderViewset(
     @LockUserMixin.lock_request
     async def adestroy(self, request, *args, **kwargs):
         order = await self.aget_object()
+        email_mode = getattr(settings, "EMAIL_MODE", "prod")
 
         order_last_status = (
             await OrderHistory.objects.filter(order=order).order_by("date").alast()
@@ -71,6 +74,12 @@ class OrderViewset(
             )
 
         await OrderHistory.objects.acreate(order=order, status=OrderHistory.Status.CANCELLED)
+        await notify_reader_about_order_status_change(
+            order_id=order.pk,
+            new_status=OrderHistory.Status.CANCELLED,
+            description="",
+            email_mode=email_mode,
+        )
 
         async for book in order.books.all():
             book.status = OrderItem.Status.CANCELLED

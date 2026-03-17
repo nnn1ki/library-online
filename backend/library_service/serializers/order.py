@@ -1,6 +1,7 @@
 import asyncio
 from django.db.models import Q
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -14,6 +15,7 @@ from library_service.models.catalog import Library
 
 from library_service.serializers.catalog import BookSerializer, LibrarySerializer
 from library_service.serializers.parallel_list import ParallelListSerializer
+from library_service.services.order_status_notifications import notify_reader_about_order_status_change
 
 User = get_user_model()
 
@@ -147,12 +149,19 @@ class CreateUpdateOrderSerializer(aserializers.Serializer):
 
     async def acreate(self, validated_data):
         user = self.context["request"].user
+        email_mode = getattr(settings, "EMAIL_MODE", "prod")
 
         await self.validate_order(validated_data)  # Проводим валидацию перед тем, как что-то добавлять в БД
         order = await Order.objects.acreate(user=user, library=await Library.objects.aget(pk=validated_data["library"]))
         await self.configure_order(order, validated_data)
 
         await OrderHistory.objects.acreate(order=order, status=OrderHistory.Status.NEW)
+        await notify_reader_about_order_status_change(
+            order_id=order.pk,
+            new_status=OrderHistory.Status.NEW,
+            description="",
+            email_mode=email_mode,
+        )
         return validated_data
 
     async def aupdate(self, instance: Order, validated_data):

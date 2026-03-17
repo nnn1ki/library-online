@@ -7,6 +7,7 @@ from adrf import mixins as amixins
 
 from library_service.models.library_settings import LibrarySettings
 from library_service.serializers.library_settings import LibrarySettingsSerializer
+from library_service.services.staff_digest import dispatch_staff_digest
 
 import requests
 from datetime import datetime, timedelta
@@ -61,3 +62,8 @@ class LibrarySettingsViewSet(amixins.ListModelMixin, AsyncGenericViewSet):
         await serializer.asave()
 
         return await self.alist(*args, **kwargs)
+
+    @action(detail=False, url_path="send-staff-summary", methods=["post"], permission_classes=[IsAuthenticated, IsAdmin])
+    async def send_staff_summary(self, request, *args, **kwargs):
+        result = await dispatch_staff_digest(force=True)
+        return Response(result)

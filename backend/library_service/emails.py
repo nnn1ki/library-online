@@ -95,6 +95,8 @@ async def send_new_orders_digest_notification(
     email_mode: str = "prod",
     window_minutes: int = 60,
     now: datetime | None = None,
+    ignore_schedule: bool = False,
+    ignore_disabled: bool = False,
 ) -> bool:
     email_mode = email_mode.lower()
 
@@ -103,11 +105,11 @@ async def send_new_orders_digest_notification(
         return False
 
     library_settings = await LibrarySettings.aget_settings()
-    if _should_skip_staff_digest_by_schedule(email_mode, library_settings, now=now):
+    if not ignore_schedule and _should_skip_staff_digest_by_schedule(email_mode, library_settings, now=now):
         print("Email digest: outside configured staff schedule or on holiday in prod mode, skipping.")
         return False
 
-    if not library_settings.staff_digest_enabled:
+    if not ignore_disabled and not library_settings.staff_digest_enabled:
         print("Email digest: disabled by library settings.")
         return False
 
@@ -171,6 +173,7 @@ async def send_new_orders_digest_notification(
             print(f"Subject: {subject}")
             print(f"Body:\n{body}")
             print("------------------------------")
+            sent_any = True
             continue
 
         try:
@@ -206,14 +209,22 @@ async def send_order_status_update_notification(
         return
 
     subject_map = {
+        OrderHistory.Status.NEW: f"Ваш заказ #{order.id} принят",
         OrderHistory.Status.PROCESSING: f"Ваш заказ #{order.id} в работе",
         OrderHistory.Status.READY: f"Ваш заказ #{order.id} готов к выдаче",
+        OrderHistory.Status.DONE: f"Ваш заказ #{order.id} завершен",
         OrderHistory.Status.CANCELLED: f"Ваш заказ #{order.id} отменен",
+        OrderHistory.Status.ERROR: f"По заказу #{order.id} требуется внимание",
+        OrderHistory.Status.ARCHIVED: f"Ваш заказ #{order.id} перемещен в архив",
     }
     body_map = {
+        OrderHistory.Status.NEW: "Ваш заказ принят системой.",
         OrderHistory.Status.PROCESSING: "Ваш заказ был взят в работу.",
         OrderHistory.Status.READY: "Ваш заказ готов к выдаче.",
+        OrderHistory.Status.DONE: "Ваш заказ завершен.",
         OrderHistory.Status.CANCELLED: "Ваш заказ был отменен.",
+        OrderHistory.Status.ERROR: "По вашему заказу возникла ситуация, требующая внимания.",
+        OrderHistory.Status.ARCHIVED: "Ваш заказ перемещен в архив.",
     }
 
     subject = subject_map.get(new_status)

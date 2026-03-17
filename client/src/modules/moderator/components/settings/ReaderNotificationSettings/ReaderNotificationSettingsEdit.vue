@@ -7,9 +7,13 @@ type ReaderNotificationSettings = Pick<
 >;
 
 const readerStatusOptions = [
+  { label: "Новый", value: "new" },
   { label: "В работе", value: "processing" },
   { label: "Готов", value: "ready" },
+  { label: "Выдан", value: "done" },
   { label: "Отменен", value: "cancelled" },
+  { label: "Ошибка", value: "error" },
+  { label: "Архив", value: "archived" },
 ] as const;
 
 const props = defineProps<{

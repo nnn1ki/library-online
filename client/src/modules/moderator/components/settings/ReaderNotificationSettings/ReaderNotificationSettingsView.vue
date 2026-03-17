@@ -2,9 +2,13 @@
 import type { LibrarySettings } from "@core/api/types";
 
 const labels: Record<string, string> = {
+  new: "Новый",
   processing: "В работе",
   ready: "Готов",
+  done: "Выдан",
   cancelled: "Отменен",
+  error: "Ошибка",
+  archived: "Архив",
 };
 
 defineProps<{

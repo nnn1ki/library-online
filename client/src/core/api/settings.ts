@@ -1,6 +1,14 @@
 import { api } from "./axios";
 import type { LibrarySettings } from "@api/types";
 
+export type SendStaffSummaryResult = {
+  sent: boolean;
+  reason: "sent" | "empty" | "interval" | "recipients";
+  window_minutes: number;
+  fresh_count: number;
+  stale_count: number;
+};
+
 export async function getSettings(): Promise<LibrarySettings> {
   const { data } = await api.get("/api/settings/");
   return data;
@@ -70,6 +78,16 @@ export async function updateSettings(settings: LibrarySettings) {
     await api.put("/api/settings/update/", payload);
   } catch (error) {
     console.error("Ошибка при настроек", error);
+    throw error;
+  }
+}
+
+export async function sendStaffSummary(): Promise<SendStaffSummaryResult> {
+  try {
+    const { data } = await api.post("/api/settings/send-staff-summary/");
+    return data;
+  } catch (error) {
+    console.error("Ошибка при ручной отправке сводки сотрудникам", error);
     throw error;
   }
 }
