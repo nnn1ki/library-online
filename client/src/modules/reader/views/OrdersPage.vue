@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { ordersList } from "@api/order";
-import { type Order } from "@api/types";
+import { type Order, type OrderBook, type OrderStatus } from "@api/types";
 import { useOrderStore } from "@reader/store/orderStore";
 import { useAuthStore } from "@core/store/auth";
 import OrderCard from "@reader/components/OrderCard.vue";
@@ -37,7 +37,7 @@ const orderStore = useOrderStore();
 const authStore = useAuthStore();
 const notAllowedModalOpen = ref(false);
 const confirmationModalOpen = ref(false);
-const cancelOrderId = ref<number | null>();
+const cancelOrderId = ref<number | null>(null);
 
 const router = useRouter();
 
@@ -67,20 +67,36 @@ useAuthentication((isAuthenticated) => {
 });
 
 async function fetchOrderList() {
-  orders.value = (await ordersList()).reverse();
+  const fetchedOrders = await ordersList();
+  orders.value = [...fetchedOrders].reverse().map((order) => normalizeOrder(order));
 }
 
 const handleConfirmCancel = async () => {
-  console.log(cancelOrderId.value);
   if (cancelOrderId.value !== null && cancelOrderId.value !== undefined) {
-    orderStore.handleDeleteOrder(cancelOrderId.value);
+    await orderStore.handleDeleteOrder(cancelOrderId.value);
   }
+  confirmationModalOpen.value = false;
   await fetchOrders();
 };
 
 const openCancelModal = (orderId: number) => {
   cancelOrderId.value = orderId;
   confirmationModalOpen.value = true;
+};
+
+const normalizeOrder = (order: Order): Order => {
+  return {
+    ...order,
+    statuses: Array.isArray(order.statuses)
+      ? order.statuses.filter((status): status is OrderStatus => Boolean(status))
+      : [],
+    books: Array.isArray(order.books)
+      ? order.books.filter((book): book is OrderBook => Boolean(book?.book?.id))
+      : [],
+    books_to_return: Array.isArray(order.books_to_return)
+      ? order.books_to_return.filter((book): book is OrderBook => Boolean(book?.book?.id))
+      : [],
+  };
 };
 </script>
 

@@ -3,11 +3,11 @@
     <div class="order-header">
       <span class="order-number">📦 Заказ #{{ num }} oт {{ orderedDate }}</span>
       <span class="order-status" :class="statusClass"
-        >● {{ orderStatuses[currentStatus] }} {{ lastStatusDate }}</span
+        >● {{ statusLabel }} {{ lastStatusDate }}</span
       >
     </div>
     <div class="book-list">
-      <div v-for="(orderBook, index) in order.books" :key="orderBook.book.id" class="book-item">
+      <div v-for="(orderBook, index) in safeBooks" :key="orderBook.book.id" class="book-item">
         <div class="book-info">
           <div class="col">
             <ShortBookCard :book="orderBook.book" />
@@ -21,7 +21,7 @@
           </StyledButton>
         </div>
 
-        <hr v-if="index < order.books.length - 1" class="divider" />
+        <hr v-if="index < safeBooks.length - 1" class="divider" />
       </div>
     </div>
     <div class="order-actions-footer" v-if="showOrderActions">
@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { OrderStatusEnum, Order, Book } from "@api/types";
+import type { OrderStatus, OrderStatusEnum, Order, Book, OrderBook } from "@api/types";
 import { orderStatuses } from "@api/types";
 import { useOrderStore } from "@reader/store/orderStore";
 import ShortBookCard from "@components/ShortBookCard.vue";
@@ -57,23 +57,49 @@ const emit = defineEmits<{
 
 const { formatDate } = useFormattedDate();
 
+const safeStatuses = computed<OrderStatus[]>(() => {
+  if (!Array.isArray(order.statuses)) {
+    return [];
+  }
+
+  return order.statuses.filter((status): status is OrderStatus => Boolean(status));
+});
+
+const safeBooks = computed<OrderBook[]>(() => {
+  if (!Array.isArray(order.books)) {
+    return [];
+  }
+
+  return order.books.filter((orderBook): orderBook is OrderBook => Boolean(orderBook?.book?.id));
+});
+
+const firstStatus = computed(() => safeStatuses.value[0]);
+const lastStatus = computed(() => safeStatuses.value.at(-1));
+
+const orderedDate = computed(() => formatDate(firstStatus.value?.date));
+const lastStatusDate = computed(() => formatDate(lastStatus.value?.date));
+
+const currentStatus = computed<OrderStatusEnum>(() => {
+  const status = lastStatus.value?.status;
+  return status && status in orderStatuses ? status : "error";
+});
+
+const statusLabel = computed(() => {
+  if (!lastStatus.value) {
+    return "Статус неизвестен";
+  }
+
+  return orderStatuses[currentStatus.value];
+});
+
 const canCancelOrder = computed(() => allowedCancelStatuses.includes(currentStatus.value));
 
 const canReorder = computed(() => !notAllowedToReOrderBoookStatuses.includes(currentStatus.value));
 const showOrderActions = computed(() => canCancelOrder.value);
 
-const orderedDate = formatDate(order.statuses[0].date);
-const lastStatusDate = formatDate(order.statuses[order.statuses.length - 1].date);
-
-const currentStatus = computed(() => {
-  const lastStatus = order.statuses[order.statuses.length - 1]?.status;
-  return lastStatus;
-});
-
 const statusClass = computed(() => {
-  const status = currentStatus.value as OrderStatusEnum;
   return {
-    [status]: true,
+    [currentStatus.value]: true,
   };
 });
 
