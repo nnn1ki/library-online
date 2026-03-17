@@ -192,9 +192,14 @@ const currentData = computed<UserOrder[]>((): UserOrder[] => {
 
 const fetchOrder = async (orderId: number) => {
   isLoading.value = true;
-  selectedOrder.value = await getOrderStaff(orderId);
-
-  isLoading.value = false;
+  try {
+    selectedOrder.value = await getOrderStaff(orderId);
+  } catch (error) {
+    console.error("Ошибка при получении деталей заказа", error);
+    selectedOrder.value = null;
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 async function handleUpdateOrderStatus(
@@ -229,11 +234,11 @@ async function handleCheckOrder(orderId: number): Promise<OrderCheckingInfo | un
   isLoading.value = true;
 
   try {
-    const r = await checkOrder(orderId);
-    isLoading.value = false;
-    return r;
+    return await checkOrder(orderId);
   } catch (error) {
     console.error("Ошибка при проверке готовности заказа", error);
+  } finally {
+    isLoading.value = false;
   }
 }
 

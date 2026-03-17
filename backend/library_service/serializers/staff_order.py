@@ -17,7 +17,6 @@ from library_service.serializers.parallel_list import ParallelListSerializer
 from aiohttp import ClientSession
 
 from datetime import datetime
-
 from asgiref.sync import sync_to_async
 
 User = get_user_model()
@@ -104,13 +103,22 @@ class OrderSerializer(aserializers.ModelSerializer):
         fields = ["id", "library", "statuses", "books", "user", "books_to_return"]
         list_serializer_class = ParallelListSerializer
 
-    @sync_to_async
-    def get_books_to_return(self, obj: Order):
-        last_status = OrderHistory.objects.filter(order=obj).order_by("-date").values("status")[:1]
-        if (last_status == OrderHistory.Status.DONE):
-            return BorrowedBookSerializer(OrderItem.objects.filter(order_to_return = obj, status = OrderItem.Status.RETURNED).all(), many=True).data
+    async def get_books_to_return(self, obj: Order):
+        last_status = await OrderHistory.objects.filter(order=obj).order_by("-date").values_list(
+            "status", flat=True
+        ).afirst()
+        borrowed_books = OrderItem.objects.filter(order_to_return=obj)
+
+        if last_status == OrderHistory.Status.DONE:
+            borrowed_books = borrowed_books.filter(status=OrderItem.Status.RETURNED)
         else:
-            return BorrowedBookSerializer(OrderItem.objects.filter(order_to_return = obj, status = OrderItem.Status.HANDED).all(), many=True).data
+            borrowed_books = borrowed_books.filter(status=OrderItem.Status.HANDED)
+
+        return await BorrowedBookSerializer(
+            borrowed_books,
+            many=True,
+            context=self.context,
+        ).adata
 
 
 # TODO: нам нужно это повторение?
