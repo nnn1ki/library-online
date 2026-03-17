@@ -36,8 +36,6 @@ if EMAIL_USE_TLS and EMAIL_USE_SSL:
     raise ValueError("EMAIL_USE_TLS and EMAIL_USE_SSL cannot both be enabled.")
 
 EMAIL_MODE = os.environ.get("EMAIL_MODE", "prod").lower()
-NOTIFICATION_DIGEST_WINDOW_MINUTES = int(os.environ.get("NOTIFICATION_DIGEST_WINDOW_MINUTES", "60"))
-NOTIFICATION_ACTIVE_HOURS = int(os.environ.get("NOTIFICATION_ACTIVE_HOURS", "2"))
 NOTIFICATION_TIME_ZONE = os.environ.get("NOTIFICATION_TIME_ZONE", "Asia/Irkutsk")
 
 # Если код ниже:

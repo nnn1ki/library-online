@@ -56,37 +56,29 @@ def test_get_new_orders_digest_data_classifies_fresh_and_stale(library: Library)
 def test_digest_sends_only_to_active_librarians(monkeypatch, settings, library: Library):
     now = timezone.now()
     settings.DEFAULT_FROM_EMAIL = "noreply@example.com"
-    settings.NOTIFICATION_ACTIVE_HOURS = 2
 
     librarian_group, _ = Group.objects.get_or_create(name="Librarian")
 
     active_librarian = User.objects.create_user(username="active_lib", email="active@example.com", password="1234")
-    active_librarian.last_login = now - timedelta(minutes=20)
-    active_librarian.save(update_fields=["last_login"])
+    active_librarian.profile.last_seen = now - timedelta(minutes=20)
+    active_librarian.profile.save(update_fields=["last_seen"])
     active_librarian.groups.add(librarian_group)
 
     inactive_librarian = User.objects.create_user(username="inactive_lib", email="inactive@example.com", password="1234")
-    inactive_librarian.last_login = now - timedelta(hours=5)
-    inactive_librarian.save(update_fields=["last_login"])
+    inactive_librarian.profile.last_seen = now - timedelta(hours=5)
+    inactive_librarian.profile.save(update_fields=["last_seen"])
     inactive_librarian.groups.add(librarian_group)
 
     reader = User.objects.get(username="user")
     fresh_order = _create_order_with_new_status(reader, library, now - timedelta(minutes=15))
 
-    class FakeEmail:
-        sent_to: list[str] = []
+    sent_to: list[str] = []
 
-        def __init__(self, subject, body, from_email, to):  # pylint: disable=unused-argument
-            self.to = to
+    def fake_send_mail(subject, message, from_email, recipients, fail_silently=False, html_message=None):  # pylint: disable=unused-argument
+        sent_to.extend(recipients)
+        return 1
 
-        def attach_alternative(self, html_body, content_type):  # pylint: disable=unused-argument
-            return None
-
-        def send(self, fail_silently=False):  # pylint: disable=unused-argument
-            FakeEmail.sent_to.extend(self.to)
-            return 1
-
-    monkeypatch.setattr("library_service.emails.EmailMultiAlternatives", FakeEmail)
+    monkeypatch.setattr("library_service.emails.send_mail", fake_send_mail)
 
     asyncio.run(
         send_new_orders_digest_notification(
@@ -98,12 +90,12 @@ def test_digest_sends_only_to_active_librarians(monkeypatch, settings, library: 
         )
     )
 
-    assert "active@example.com" in FakeEmail.sent_to
-    assert "inactive@example.com" not in FakeEmail.sent_to
+    assert "active@example.com" in sent_to
+    assert "inactive@example.com" not in sent_to
 
 
 @pytest.mark.django_db
-def test_status_notification_respects_mode_and_working_hours(monkeypatch, settings, library: Library):
+def test_status_notification_respects_mode_without_schedule_gate(monkeypatch, settings, library: Library):
     user = User.objects.get(username="user")
     user.email = "reader@example.com"
     user.save(update_fields=["email"])
@@ -129,7 +121,7 @@ def test_status_notification_respects_mode_and_working_hours(monkeypatch, settin
             now=outside_hours,
         )
     )
-    assert calls == []
+    assert len(calls) == 1
 
     asyncio.run(
         send_order_status_update_notification(
@@ -140,7 +132,7 @@ def test_status_notification_respects_mode_and_working_hours(monkeypatch, settin
             now=outside_hours,
         )
     )
-    assert len(calls) == 1
+    assert len(calls) == 2
 
     asyncio.run(
         send_order_status_update_notification(
@@ -151,7 +143,7 @@ def test_status_notification_respects_mode_and_working_hours(monkeypatch, settin
             now=outside_hours,
         )
     )
-    assert len(calls) == 1
+    assert len(calls) == 2
 
 
 @pytest.mark.django_db

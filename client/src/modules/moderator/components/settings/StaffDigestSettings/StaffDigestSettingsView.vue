@@ -12,7 +12,7 @@ defineProps<{
 <template>
   <div class="stats-grid">
     <div class="stat-box stat-box-wide">
-      <span class="stat-name">Digest по необработанным заказам</span>
+      <span class="stat-name">Рассылка по необработанным заказам</span>
       <strong>{{ modelValue.staff_digest_enabled ? "Включен" : "Выключен" }}</strong>
     </div>
     <div class="stat-box">
@@ -20,7 +20,7 @@ defineProps<{
       <strong>{{ modelValue.staff_notification_active_hours }} ч.</strong>
     </div>
     <div class="stat-box">
-      <span class="stat-name">Порог висящего NEW</span>
+      <span class="stat-name">Интервал дайджеста</span>
       <strong>{{ modelValue.staff_digest_stale_order_hours }} ч.</strong>
     </div>
   </div>

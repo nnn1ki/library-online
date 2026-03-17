@@ -63,7 +63,7 @@ function updateField<K extends keyof GeneralSettings>(key: K, value: GeneralSett
     </label>
 
     <label class="field-card">
-      <span class="field-title">Ожидание NEW</span>
+      <span class="field-title">Ожидание нового заказа</span>
       <span class="field-note">Через сколько часов новый заказ считается задержанным.</span>
       <input
         :value="modelValue.new_order_wait"

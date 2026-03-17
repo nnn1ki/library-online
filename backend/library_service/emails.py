@@ -11,19 +11,28 @@ from django.template.loader import render_to_string
 from library_service.models.library_settings import LibrarySettings
 from library_service.models.order import Order, OrderHistory
 from library_service.models.user import UserProfile
-from library_service.utils.datetime_helpers import get_notification_now, is_holiday, is_user_active_recently, is_working_hour
+from library_service.utils.datetime_helpers import (
+    get_notification_now,
+    is_user_active_recently,
+    is_within_staff_schedule,
+)
 
 
-async def _should_skip_by_schedule(email_mode: str, now: datetime | None = None) -> bool:
+def _should_skip_staff_digest_by_schedule(
+    email_mode: str,
+    library_settings: LibrarySettings,
+    now: datetime | None = None,
+) -> bool:
     if email_mode.lower() != "prod":
         return False
 
     current_local_time = get_notification_now(now)
-    if not is_working_hour(current_local_time):
-        return True
-
-    library_settings = await LibrarySettings.aget_settings()
-    return is_holiday(current_local_time, library_settings.holidays)
+    return not is_within_staff_schedule(
+        current_local_time,
+        week_schedule=library_settings.staff_digest_week_schedule,
+        schedule_overrides=library_settings.staff_digest_schedule_overrides,
+        holidays=library_settings.holidays,
+    )
 
 
 def _build_digest_payload(
@@ -86,21 +95,21 @@ async def send_new_orders_digest_notification(
     email_mode: str = "prod",
     window_minutes: int = 60,
     now: datetime | None = None,
-) -> None:
+) -> bool:
     email_mode = email_mode.lower()
 
     if not fresh_orders and not stale_new_orders:
         print("Email digest: no NEW orders, nothing to send.")
-        return
-
-    if await _should_skip_by_schedule(email_mode, now=now):
-        print("Email digest: outside working hours or on holiday in prod mode, skipping.")
-        return
+        return False
 
     library_settings = await LibrarySettings.aget_settings()
+    if _should_skip_staff_digest_by_schedule(email_mode, library_settings, now=now):
+        print("Email digest: outside configured staff schedule or on holiday in prod mode, skipping.")
+        return False
+
     if not library_settings.staff_digest_enabled:
         print("Email digest: disabled by library settings.")
-        return
+        return False
 
     try:
         librarian_group = await Group.objects.aget(name="Librarian")
@@ -123,7 +132,7 @@ async def send_new_orders_digest_notification(
 
     if not librarians:
         print("Email digest: no librarians with email found.")
-        return
+        return False
 
     generated_at = get_notification_now(now)
     subject, plain_body, html_body = _build_digest_payload(
@@ -132,6 +141,7 @@ async def send_new_orders_digest_notification(
         generated_at,
         window_minutes,
     )
+    sent_any = False
 
     for librarian in librarians:
         notification_mode = getattr(
@@ -174,8 +184,11 @@ async def send_new_orders_digest_notification(
                 html_message=html_body,
             )
             print(f"Email digest: sent to {librarian.email}")
+            sent_any = True
         except Exception as exc:  # pylint: disable=broad-exception-caught
             print(f"Email digest: failed for {librarian.email}: {exc}")
+
+    return sent_any
 
 
 async def send_order_status_update_notification(
@@ -186,10 +199,6 @@ async def send_order_status_update_notification(
     now: datetime | None = None,
 ) -> None:
     email_mode = email_mode.lower()
-
-    if await _should_skip_by_schedule(email_mode, now=now):
-        print(f"Status email: outside working hours or on holiday in prod mode for order #{order.id}, skipping.")
-        return
 
     user = order.user
     if not user.email:

@@ -47,7 +47,7 @@ function toggleStatus(status: string) {
   <div class="edit-stack">
     <label class="toggle-card">
       <div>
-        <span class="field-title">Включить reader-уведомления</span>
+        <span class="field-title">Включить уведомления читателю</span>
         <p class="field-note">Глобальный переключатель отправки писем читателю.</p>
       </div>
       <input

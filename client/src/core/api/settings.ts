@@ -18,6 +18,8 @@ export async function updateSettings(settings: LibrarySettings) {
       staff_digest_enabled: settings.staff_digest_enabled,
       staff_notification_active_hours: settings.staff_notification_active_hours,
       staff_digest_stale_order_hours: settings.staff_digest_stale_order_hours,
+      staff_digest_week_schedule: settings.staff_digest_week_schedule,
+      staff_digest_schedule_overrides: settings.staff_digest_schedule_overrides,
       reader_status_notifications_enabled: settings.reader_status_notifications_enabled,
       reader_notification_statuses: settings.reader_notification_statuses,
     };
@@ -37,6 +39,14 @@ export async function updateSettings(settings: LibrarySettings) {
       formData.append(
         "staff_digest_stale_order_hours",
         String(payload.staff_digest_stale_order_hours)
+      );
+      formData.append(
+        "staff_digest_week_schedule",
+        JSON.stringify(payload.staff_digest_week_schedule)
+      );
+      formData.append(
+        "staff_digest_schedule_overrides",
+        JSON.stringify(payload.staff_digest_schedule_overrides)
       );
       formData.append(
         "reader_status_notifications_enabled",

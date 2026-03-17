@@ -6,6 +6,22 @@ def default_reader_notification_statuses():
     return ["processing", "ready", "cancelled"]
 
 
+def default_staff_digest_week_schedule():
+    return {
+        "monday": {"enabled": True, "start": "10:00", "end": "17:00"},
+        "tuesday": {"enabled": True, "start": "10:00", "end": "17:00"},
+        "wednesday": {"enabled": True, "start": "10:00", "end": "17:00"},
+        "thursday": {"enabled": True, "start": "10:00", "end": "17:00"},
+        "friday": {"enabled": True, "start": "10:00", "end": "17:00"},
+        "saturday": {"enabled": True, "start": "10:00", "end": "15:00"},
+        "sunday": {"enabled": False},
+    }
+
+
+def default_staff_digest_schedule_overrides():
+    return {}
+
+
 class LibrarySettings(models.Model):
     lock = models.CharField(max_length=1, null=False, primary_key=True, default="X")
     max_books_per_order = models.PositiveIntegerField(verbose_name="Максимальное количество книг в заказе", default=7)
@@ -24,8 +40,21 @@ class LibrarySettings(models.Model):
         default=2,
     )
     staff_digest_stale_order_hours = models.FloatField(
-        verbose_name="Через сколько часов заказ в NEW считается необработанным для рассылки",
+        verbose_name="Интервал отправки дайджеста сотрудникам (в часах)",
         default=1,
+    )
+    staff_digest_last_sent_at = models.DateTimeField(
+        verbose_name="Когда дайджест сотрудникам был отправлен в последний раз",
+        null=True,
+        blank=True,
+    )
+    staff_digest_week_schedule = models.JSONField(
+        verbose_name="Шаблон рабочих часов для рассылки сотрудникам",
+        default=default_staff_digest_week_schedule,
+    )
+    staff_digest_schedule_overrides = models.JSONField(
+        verbose_name="Переопределения рабочих часов для конкретных дат",
+        default=default_staff_digest_schedule_overrides,
     )
     reader_status_notifications_enabled = models.BooleanField(
         verbose_name="Отправлять читателю уведомления об изменении статуса заказа",

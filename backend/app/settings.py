@@ -142,20 +142,3 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@example.com'
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
-
-WORKING_HOURS = {
-    'MONDAY_TO_FRIDAY_START_HOUR': 9,
-    'MONDAY_TO_FRIDAY_END_HOUR': 17,
-    'SATURDAY_START_HOUR': 9,
-    'SATURDAY_END_HOUR': 15,
-}
-
-DAYS = {
-    'MONDAY': 0,
-    'TUESDAY': 1,
-    'WEDNESDAY': 2, 
-    'THURSDAY': 3,  
-    'FRIDAY': 4,    
-    'SATURDAY': 5,  
-    'SUNDAY': 6,    
-}

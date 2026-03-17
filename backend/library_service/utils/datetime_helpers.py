@@ -3,19 +3,15 @@ from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.utils import timezone
 
-
-def is_working_hour(dt: datetime) -> bool:
-    day = dt.weekday()
-    hour = dt.hour
-
-    if settings.DAYS["MONDAY"] <= day <= settings.DAYS["FRIDAY"]:
-        return settings.WORKING_HOURS["MONDAY_TO_FRIDAY_START_HOUR"] <= hour < settings.WORKING_HOURS[
-            "MONDAY_TO_FRIDAY_END_HOUR"
-        ]
-    if day == settings.DAYS["SATURDAY"]:
-        return settings.WORKING_HOURS["SATURDAY_START_HOUR"] <= hour < settings.WORKING_HOURS["SATURDAY_END_HOUR"]
-    return False
-
+WEEKDAY_KEYS = (
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+)
 
 def get_notification_now(now: datetime | None = None) -> datetime:
     base_now = now or timezone.now()
@@ -29,6 +25,54 @@ def is_holiday(dt: datetime, holidays: list[str] | None = None) -> bool:
     if not holidays:
         return False
     return dt.date().isoformat() in set(holidays)
+
+
+def _time_to_minutes(value: str) -> int:
+    hours, minutes = value.split(":")
+    return int(hours) * 60 + int(minutes)
+
+
+def get_effective_staff_schedule_window(
+    dt: datetime,
+    week_schedule: dict | None = None,
+    schedule_overrides: dict | None = None,
+    holidays: list[str] | None = None,
+) -> dict | None:
+    if is_holiday(dt, holidays):
+        return None
+
+    date_key = dt.date().isoformat()
+    override = (schedule_overrides or {}).get(date_key)
+    if isinstance(override, dict):
+        return override if override.get("enabled") else None
+
+    day_key = WEEKDAY_KEYS[dt.weekday()]
+    day_schedule = (week_schedule or {}).get(day_key)
+    if not isinstance(day_schedule, dict):
+        return None
+
+    return day_schedule if day_schedule.get("enabled") else None
+
+
+def is_within_staff_schedule(
+    dt: datetime,
+    week_schedule: dict | None = None,
+    schedule_overrides: dict | None = None,
+    holidays: list[str] | None = None,
+) -> bool:
+    schedule_window = get_effective_staff_schedule_window(
+        dt,
+        week_schedule=week_schedule,
+        schedule_overrides=schedule_overrides,
+        holidays=holidays,
+    )
+    if not schedule_window:
+        return False
+
+    current_minutes = dt.hour * 60 + dt.minute
+    start_minutes = _time_to_minutes(schedule_window["start"])
+    end_minutes = _time_to_minutes(schedule_window["end"])
+    return start_minutes <= current_minutes < end_minutes
 
 
 def is_user_active_recently(user, now: datetime | None = None, active_threshold_hours: float | None = None) -> bool:

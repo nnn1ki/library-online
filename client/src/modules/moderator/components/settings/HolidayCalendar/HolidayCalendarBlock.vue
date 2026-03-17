@@ -81,7 +81,7 @@ function toggleHoliday(day: DayClickEvent) {
   <section class="settings-card calendar-card">
     <header class="card-heading">
       <div>
-        <p class="card-kicker">Schedule</p>
+        <p class="card-kicker">Календарь</p>
         <h2>Праздники и выходные</h2>
       </div>
       <span class="card-badge">Календарь</span>

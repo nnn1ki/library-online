@@ -69,7 +69,7 @@ function saveChanges() {
 <template>
   <EditableSettingsSection
     badge="Медиа"
-    kicker="Branding"
+    kicker="Оформление"
     title="Логотип"
     :can-save="canSave"
     :is-editing="isEditing"

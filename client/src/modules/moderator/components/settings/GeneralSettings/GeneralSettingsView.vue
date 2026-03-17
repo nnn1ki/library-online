@@ -28,11 +28,11 @@ defineProps<{
       <strong>{{ modelValue.max_borrow_days }} дн.</strong>
     </div>
     <div class="stat-box">
-      <span class="stat-name">Ожидание NEW</span>
+      <span class="stat-name">Ожидание нового заказа</span>
       <strong>{{ modelValue.new_order_wait }} ч.</strong>
     </div>
     <div class="stat-box stat-box-wide">
-      <span class="stat-name">Порог задержки processing</span>
+      <span class="stat-name">Порог задержки в работе</span>
       <strong>{{ modelValue.processing_order_wait }} ч.</strong>
     </div>
   </div>

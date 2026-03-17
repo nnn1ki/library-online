@@ -1,13 +1,30 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, reactive, ref } from "vue";
 
-import type { LibrarySettings } from "@core/api/types";
+import type {
+  LibrarySettings,
+  StaffDigestScheduleOverrides,
+  StaffDigestWeekSchedule,
+} from "@core/api/types";
 import { getSettings, updateSettings } from "@core/api/settings";
+import { defaultStaffDigestWeekSchedule } from "@core/api/types";
 import GeneralSettingsBlock from "../components/settings/GeneralSettings/GeneralSettingsBlock.vue";
 import StaffDigestSettingsBlock from "../components/settings/StaffDigestSettings/StaffDigestSettingsBlock.vue";
+import WorkScheduleSettingsBlock from "../components/settings/WorkScheduleSettings/WorkScheduleSettingsBlock.vue";
 import ReaderNotificationSettingsBlock from "../components/settings/ReaderNotificationSettings/ReaderNotificationSettingsBlock.vue";
-import HolidayCalendarBlock from "../components/settings/HolidayCalendar/HolidayCalendarBlock.vue";
 import BrandingSettingsBlock from "../components/settings/BrandingSettings/BrandingSettingsBlock.vue";
+
+function cloneWeekSchedule(schedule: StaffDigestWeekSchedule): StaffDigestWeekSchedule {
+  return Object.fromEntries(
+    Object.entries(schedule).map(([dayKey, value]) => [dayKey, { ...value }])
+  ) as StaffDigestWeekSchedule;
+}
+
+function cloneOverrides(overrides: StaffDigestScheduleOverrides): StaffDigestScheduleOverrides {
+  return Object.fromEntries(
+    Object.entries(overrides).map(([dateKey, value]) => [dateKey, { ...value }])
+  );
+}
 
 const settings = ref<LibrarySettings>({
   max_books_per_order: 0,
@@ -20,6 +37,8 @@ const settings = ref<LibrarySettings>({
   staff_digest_enabled: true,
   staff_notification_active_hours: 2,
   staff_digest_stale_order_hours: 1,
+  staff_digest_week_schedule: cloneWeekSchedule(defaultStaffDigestWeekSchedule),
+  staff_digest_schedule_overrides: {},
   reader_status_notifications_enabled: true,
   reader_notification_statuses: ["processing", "ready", "cancelled"],
 });
@@ -27,13 +46,16 @@ const settingsRevision = ref(0);
 
 const blockSaving = reactive({
   branding: false,
-  calendar: false,
   general: false,
   reader: false,
+  schedule: false,
   staff: false,
 });
 
 const selectedHolidayCount = computed(() => settings.value.holidays.length);
+const selectedScheduleOverridesCount = computed(
+  () => Object.keys(settings.value.staff_digest_schedule_overrides).length
+);
 const selectedReaderStatusesCount = computed(
   () => settings.value.reader_notification_statuses.length
 );
@@ -51,6 +73,12 @@ const staffDigestSettings = computed(() => ({
   staff_digest_enabled: settings.value.staff_digest_enabled,
   staff_notification_active_hours: settings.value.staff_notification_active_hours,
   staff_digest_stale_order_hours: settings.value.staff_digest_stale_order_hours,
+}));
+
+const staffScheduleSettings = computed(() => ({
+  holidays: settings.value.holidays,
+  staff_digest_week_schedule: settings.value.staff_digest_week_schedule,
+  staff_digest_schedule_overrides: settings.value.staff_digest_schedule_overrides,
 }));
 
 const readerNotificationSettings = computed(() => ({
@@ -73,6 +101,12 @@ async function refreshSettings() {
   settings.value = {
     ...loadedSettings,
     holidays: loadedSettings.holidays ?? [],
+    staff_digest_week_schedule: cloneWeekSchedule(
+      loadedSettings.staff_digest_week_schedule ?? defaultStaffDigestWeekSchedule
+    ),
+    staff_digest_schedule_overrides: cloneOverrides(
+      loadedSettings.staff_digest_schedule_overrides ?? {}
+    ),
     reader_notification_statuses: loadedSettings.reader_notification_statuses ?? [],
   };
   settingsRevision.value += 1;
@@ -89,6 +123,12 @@ async function saveSettingsPatch(
       ...settings.value,
       ...patch,
       holidays: [...(patch.holidays ?? settings.value.holidays)],
+      staff_digest_week_schedule: cloneWeekSchedule(
+        patch.staff_digest_week_schedule ?? settings.value.staff_digest_week_schedule
+      ),
+      staff_digest_schedule_overrides: cloneOverrides(
+        patch.staff_digest_schedule_overrides ?? settings.value.staff_digest_schedule_overrides
+      ),
       reader_notification_statuses: [
         ...(patch.reader_notification_statuses ?? settings.value.reader_notification_statuses),
       ],
@@ -121,8 +161,12 @@ async function saveSettingsPatch(
           <strong class="stat-value">{{ selectedHolidayCount }}</strong>
         </div>
         <div class="stat-card">
-          <span class="stat-label">Reader-статусов включено</span>
+          <span class="stat-label">Статусов для читателя</span>
           <strong class="stat-value">{{ selectedReaderStatusesCount }}</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Изменений в графике</span>
+          <strong class="stat-value">{{ selectedScheduleOverridesCount }}</strong>
         </div>
         <div class="stat-card">
           <span class="stat-label">Статус страницы</span>
@@ -132,6 +176,14 @@ async function saveSettingsPatch(
     </header>
 
     <div class="settings-layout">
+      <div class="settings-span-full">
+        <WorkScheduleSettingsBlock
+          :model-value="staffScheduleSettings"
+          :saving="blockSaving.schedule"
+          :sync-token="settingsRevision"
+          @save="saveSettingsPatch('schedule', $event)"
+        />
+      </div>
       <div class="settings-column settings-column-main">
         <GeneralSettingsBlock
           :model-value="generalSettings"
@@ -156,11 +208,6 @@ async function saveSettingsPatch(
       </div>
 
       <aside class="settings-column settings-column-side">
-        <HolidayCalendarBlock
-          :holidays="settings.holidays"
-          @update:holidays="saveSettingsPatch('calendar', { holidays: $event })"
-        />
-
         <BrandingSettingsBlock
           :current-logo-label="currentLogoLabel"
           :saving="blockSaving.branding"
@@ -255,7 +302,11 @@ async function saveSettingsPatch(
 
 .settings-column-side {
   align-content: start;
-  gap: 3rem;
+  gap: 1.5rem;
+}
+
+.settings-span-full {
+  grid-column: 1 / -1;
 }
 
 @media (max-width: 960px) {

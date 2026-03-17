@@ -26,7 +26,7 @@ function updateField<K extends keyof StaffDigestSettings>(key: K, value: StaffDi
   <div class="form-grid">
     <label class="toggle-card field-card-wide">
       <div>
-        <span class="field-title">Включить staff digest</span>
+        <span class="field-title">Включить рассылку сотрудникам</span>
         <p class="field-note">Общий переключатель рассылки о необработанных заказах.</p>
       </div>
       <input
@@ -38,9 +38,7 @@ function updateField<K extends keyof StaffDigestSettings>(key: K, value: StaffDi
 
     <label class="field-card">
       <span class="field-title">Недавняя активность сотрудника</span>
-      <span class="field-note"
-        >Через сколько часов после `last_seen` сотрудник считается активным.</span
-      >
+      <span class="field-note">Через сколько часов после последней активности сотрудник считается активным.</span>
       <input
         :value="modelValue.staff_notification_active_hours"
         type="number"
@@ -54,10 +52,8 @@ function updateField<K extends keyof StaffDigestSettings>(key: K, value: StaffDi
     </label>
 
     <label class="field-card">
-      <span class="field-title">Порог для висящего NEW</span>
-      <span class="field-note"
-        >Через сколько часов заказ попадает в digest как необработанный.</span
-      >
+      <span class="field-title">Интервал отправки дайджеста</span>
+      <span class="field-note">Как часто система может отправлять дайджест сотрудникам.</span>
       <input
         :value="modelValue.staff_digest_stale_order_hours"
         type="number"

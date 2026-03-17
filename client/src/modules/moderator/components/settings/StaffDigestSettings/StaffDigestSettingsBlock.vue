@@ -72,8 +72,8 @@ function saveChanges() {
 
 <template>
   <EditableSettingsSection
-    badge="Email policy"
-    kicker="Staff Digest"
+    badge="Почтовые правила"
+    kicker="Уведомления сотрудникам"
     title="Рассылка сотрудникам"
     :can-save="canSave"
     :is-editing="isEditing"

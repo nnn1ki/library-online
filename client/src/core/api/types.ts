@@ -21,6 +21,36 @@ export type Library = {
   address: string;
 };
 
+export const staffScheduleDayLabels = {
+  monday: "Понедельник",
+  tuesday: "Вторник",
+  wednesday: "Среда",
+  thursday: "Четверг",
+  friday: "Пятница",
+  saturday: "Суббота",
+  sunday: "Воскресенье",
+} as const;
+export type StaffScheduleDayKey = keyof typeof staffScheduleDayLabels;
+
+export type StaffScheduleWindow = {
+  enabled: boolean;
+  start?: string;
+  end?: string;
+};
+
+export type StaffDigestWeekSchedule = Record<StaffScheduleDayKey, StaffScheduleWindow>;
+export type StaffDigestScheduleOverrides = Record<string, StaffScheduleWindow>;
+
+export const defaultStaffDigestWeekSchedule: StaffDigestWeekSchedule = {
+  monday: { enabled: true, start: "10:00", end: "17:00" },
+  tuesday: { enabled: true, start: "10:00", end: "17:00" },
+  wednesday: { enabled: true, start: "10:00", end: "17:00" },
+  thursday: { enabled: true, start: "10:00", end: "17:00" },
+  friday: { enabled: true, start: "10:00", end: "17:00" },
+  saturday: { enabled: true, start: "10:00", end: "15:00" },
+  sunday: { enabled: false },
+};
+
 export type Scenario = {
   prefix: string;
   description: string | null;
@@ -154,6 +184,8 @@ export type LibrarySettings = {
   staff_digest_enabled: boolean;
   staff_notification_active_hours: number;
   staff_digest_stale_order_hours: number;
+  staff_digest_week_schedule: StaffDigestWeekSchedule;
+  staff_digest_schedule_overrides: StaffDigestScheduleOverrides;
   reader_status_notifications_enabled: boolean;
   reader_notification_statuses: string[];
 };
