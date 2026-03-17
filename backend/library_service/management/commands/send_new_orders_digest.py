@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from library_service.emails import send_new_orders_digest_notification
+from library_service.models.library_settings import LibrarySettings
 from library_service.notifications import get_new_orders_digest_data
 
 
@@ -26,7 +27,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        window_minutes = options["window_minutes"] or getattr(settings, "NOTIFICATION_DIGEST_WINDOW_MINUTES", 60)
+        library_settings = LibrarySettings.get_settings()
+        window_minutes = options["window_minutes"] or max(1, int(library_settings.new_order_wait * 60))
         email_mode = (options["email_mode"] or getattr(settings, "EMAIL_MODE", "prod")).lower()
 
         fresh_orders, stale_new_orders, now_aware, _ = get_new_orders_digest_data(window_minutes=window_minutes)

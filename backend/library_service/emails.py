@@ -5,9 +5,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.template.loader import render_to_string
 
+from library_service.models.library_settings import LibrarySettings
 from library_service.models.order import Order, OrderHistory
+from library_service.models.user import UserProfile
 from library_service.utils.datetime_helpers import get_notification_now, is_user_active_recently, is_working_hour
 
 
@@ -90,15 +93,24 @@ async def send_new_orders_digest_notification(
         print("Email digest: outside working hours in prod mode, skipping.")
         return
 
+    library_settings = await LibrarySettings.aget_settings()
+    if not library_settings.staff_digest_enabled:
+        print("Email digest: disabled by library settings.")
+        return
+
     try:
         librarian_group = await Group.objects.aget(name="Librarian")
+        recipients_filter = (
+            Q(groups=librarian_group)
+            | Q(profile__staff_notification_mode=UserProfile.StaffNotificationMode.ALWAYS)
+        )
     except Group.DoesNotExist:
-        print("Email digest: Librarian group not found.")
-        return
+        recipients_filter = Q(profile__staff_notification_mode=UserProfile.StaffNotificationMode.ALWAYS)
 
     librarians_qs = (
         get_user_model()
-        .objects.filter(groups=librarian_group)
+        .objects.select_related("profile")
+        .filter(recipients_filter)
         .exclude(email__isnull=True)
         .exclude(email="")
         .distinct()
@@ -118,7 +130,22 @@ async def send_new_orders_digest_notification(
     )
 
     for librarian in librarians:
-        if not is_user_active_recently(librarian, now=generated_at):
+        notification_mode = getattr(
+            librarian.profile,
+            "staff_notification_mode",
+            UserProfile.StaffNotificationMode.AUTO,
+        )
+        if notification_mode == UserProfile.StaffNotificationMode.DISABLED:
+            print(f"Email digest: skip {librarian.username}, disabled by profile settings.")
+            continue
+
+        should_receive = is_user_active_recently(
+            librarian,
+            now=generated_at,
+            active_threshold_hours=library_settings.staff_notification_active_hours,
+        ) or notification_mode == UserProfile.StaffNotificationMode.ALWAYS
+
+        if not should_receive:
             print(f"Email digest: skip {librarian.username}, not active recently.")
             continue
 

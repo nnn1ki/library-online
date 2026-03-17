@@ -25,14 +25,22 @@ def get_notification_now(now: datetime | None = None) -> datetime:
     return base_now.astimezone(ZoneInfo(tz_name))
 
 
-def is_user_active_recently(user, now: datetime | None = None) -> bool:
-    if not user.is_authenticated or not user.last_login:
+def is_user_active_recently(user, now: datetime | None = None, active_threshold_hours: float | None = None) -> bool:
+    if not user.is_authenticated:
+        return False
+
+    profile = getattr(user, "profile", None)
+    last_seen = getattr(profile, "last_seen", None)
+    if not last_seen:
         return False
 
     now_aware = now or timezone.now()
-    time_since_last_login = now_aware - user.last_login
+    time_since_last_seen = now_aware - last_seen
 
-    active_threshold_hours = getattr(settings, "NOTIFICATION_ACTIVE_HOURS", 2)
+    if active_threshold_hours is None:
+        from library_service.models.library_settings import LibrarySettings
+
+        active_threshold_hours = LibrarySettings.get_settings().staff_notification_active_hours
     active_threshold = timedelta(hours=active_threshold_hours)
 
-    return time_since_last_login <= active_threshold
+    return time_since_last_seen <= active_threshold

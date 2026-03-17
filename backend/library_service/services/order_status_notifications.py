@@ -1,8 +1,9 @@
+from library_service.models.library_settings import LibrarySettings
 from library_service.emails import send_order_status_update_notification
 from library_service.models.order import Order, OrderHistory
 
 
-NOTIFIABLE_READER_STATUSES = {
+DEFAULT_NOTIFIABLE_READER_STATUSES = {
     OrderHistory.Status.PROCESSING,
     OrderHistory.Status.READY,
     OrderHistory.Status.CANCELLED,
@@ -16,7 +17,12 @@ async def notify_reader_about_order_status_change(
     description: str,
     email_mode: str,
 ) -> None:
-    if new_status not in NOTIFIABLE_READER_STATUSES:
+    library_settings = await LibrarySettings.aget_settings()
+    if not library_settings.reader_status_notifications_enabled:
+        return
+
+    configured_statuses = set(library_settings.reader_notification_statuses or DEFAULT_NOTIFIABLE_READER_STATUSES)
+    if new_status not in configured_statuses:
         return
 
     if new_status == OrderHistory.Status.PROCESSING:

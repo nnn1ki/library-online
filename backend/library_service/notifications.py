@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, timezone as dt_timezone
 
-from django.conf import settings
 from django.db.models import DateTimeField, OuterRef, Subquery
 from django.utils import timezone
 
+from library_service.models.library_settings import LibrarySettings
 from library_service.models.order import Order, OrderHistory
 
 
@@ -11,7 +11,8 @@ def get_new_orders_digest_data(
     *, window_minutes: int | None = None, now: datetime | None = None
 ) -> tuple[list[Order], list[Order], datetime, datetime]:
     """Return fresh and stale orders that currently have NEW status."""
-    digest_window_minutes = window_minutes or getattr(settings, "NOTIFICATION_DIGEST_WINDOW_MINUTES", 60)
+    library_settings = LibrarySettings.get_settings()
+    digest_window_minutes = window_minutes or max(1, int(library_settings.new_order_wait * 60))
 
     now_aware = now or timezone.now()
     if timezone.is_naive(now_aware):
