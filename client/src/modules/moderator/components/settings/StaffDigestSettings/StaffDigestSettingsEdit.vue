@@ -52,8 +52,8 @@ function updateField<K extends keyof StaffDigestSettings>(key: K, value: StaffDi
     </label>
 
     <label class="field-card">
-      <span class="field-title">Интервал отправки дайджеста</span>
-      <span class="field-note">Как часто система может отправлять дайджест сотрудникам.</span>
+      <span class="field-title">Интервал отправки сводки</span>
+      <span class="field-note">Как часто система может отправлять сводку сотрудникам.</span>
       <input
         :value="modelValue.staff_digest_stale_order_hours"
         type="number"

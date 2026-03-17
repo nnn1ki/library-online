@@ -236,6 +236,25 @@ export type StaffStats = {
   cancelled_orders: number;
 };
 
+export const staffNotificationModeLabels = {
+  auto: "По активности",
+  always: "Всегда получать",
+  disabled: "Не получать",
+} as const;
+export type StaffNotificationMode = keyof typeof staffNotificationModeLabels;
+
+export type StaffNotificationRecipient = {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  fullname: string;
+  department: string;
+  current_role: string | null;
+  last_seen: string | null;
+  staff_notification_mode: StaffNotificationMode;
+};
+
 export type PaginatedStaff = {
   count: number;
   next: string | null;

@@ -101,7 +101,7 @@ watch(
 <template>
   <div class="view-layout">
     <div class="calendar-card">
-      <p class="section-note">Красным отмечены нерабочие праздничные даты, синей рамкой выделены дни с ручными исключениями.</p>
+      <p class="section-note">Красный день: праздник. Синяя рамка: ручное исключение.</p>
       <Calendar
         ref="calendarRef"
         :from-page="currentPage"
@@ -128,7 +128,7 @@ watch(
 
       <div class="summary-card">
         <div class="summary-header">
-          <span class="summary-title">Исключения по датам</span>
+          <span class="summary-title">Исключения</span>
           <strong>{{ overrides.length }}</strong>
         </div>
 
@@ -138,7 +138,7 @@ watch(
             <strong>{{ formatWindow(window) }}</strong>
           </div>
 
-          <p v-if="remainingOverrides" class="section-note">Еще {{ remainingOverrides }} дат в списке.</p>
+          <p v-if="remainingOverrides" class="section-note">Еще {{ remainingOverrides }}.</p>
         </div>
 
         <p v-else class="section-note">Для открытого месяца исключений пока нет.</p>

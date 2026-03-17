@@ -96,9 +96,7 @@ function saveChanges() {
 
 <template>
   <EditableSettingsSection
-    badge="Рабочий календарь"
     kicker="График работы"
-    title="Рабочие дни и часы"
     :can-save="canSave"
     :is-editing="isEditing"
     :is-saving="saving"

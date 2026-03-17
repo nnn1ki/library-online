@@ -76,9 +76,7 @@ function saveChanges() {
 
 <template>
   <EditableSettingsSection
-    badge="Базовые лимиты"
     kicker="Основные правила"
-    title="Параметры обслуживания"
     :can-save="canSave"
     :is-editing="isEditing"
     :is-saving="saving"

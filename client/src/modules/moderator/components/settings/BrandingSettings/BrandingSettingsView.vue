@@ -6,7 +6,6 @@ defineProps<{
 
 <template>
   <div class="logo-view">
-    <span class="logo-label">Текущий статус</span>
     <strong>{{ currentLogoLabel }}</strong>
   </div>
 </template>
@@ -21,8 +20,4 @@ defineProps<{
   border: 1px solid var(--color-text-200);
 }
 
-.logo-label {
-  color: var(--color-text-600);
-  font-size: var(--text-xs);
-}
 </style>

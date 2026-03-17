@@ -1,15 +1,17 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    title: string;
+    title?: string;
     kicker: string;
-    badge: string;
+    badge?: string;
     isEditing?: boolean;
     isSaving?: boolean;
     canSave?: boolean;
     showEditButton?: boolean;
   }>(),
   {
+    title: "",
+    badge: "",
     isEditing: false,
     isSaving: false,
     canSave: false,
@@ -29,11 +31,11 @@ defineEmits<{
     <header class="card-heading">
       <div>
         <p class="card-kicker">{{ kicker }}</p>
-        <h2>{{ title }}</h2>
+        <h2 v-if="title">{{ title }}</h2>
       </div>
 
       <div class="card-actions">
-        <span class="card-badge">{{ badge }}</span>
+        <span v-if="badge" class="card-badge">{{ badge }}</span>
 
         <template v-if="showEditButton">
           <button v-if="!isEditing" class="edit-button" type="button" @click="$emit('edit')">
@@ -83,7 +85,7 @@ defineEmits<{
 
 .card-heading {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
 }

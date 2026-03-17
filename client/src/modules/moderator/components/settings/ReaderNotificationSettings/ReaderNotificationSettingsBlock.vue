@@ -90,9 +90,7 @@ function saveChanges() {
 
 <template>
   <EditableSettingsSection
-    badge="Статусы заказа"
     kicker="Уведомления читателю"
-    title="Уведомления читателю"
     :can-save="canSave"
     :is-editing="isEditing"
     :is-saving="saving"

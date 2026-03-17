@@ -10,6 +10,7 @@ import { getSettings, updateSettings } from "@core/api/settings";
 import { defaultStaffDigestWeekSchedule } from "@core/api/types";
 import GeneralSettingsBlock from "../components/settings/GeneralSettings/GeneralSettingsBlock.vue";
 import StaffDigestSettingsBlock from "../components/settings/StaffDigestSettings/StaffDigestSettingsBlock.vue";
+import StaffRecipientsSettingsBlock from "../components/settings/StaffRecipientsSettings/StaffRecipientsSettingsBlock.vue";
 import WorkScheduleSettingsBlock from "../components/settings/WorkScheduleSettings/WorkScheduleSettingsBlock.vue";
 import ReaderNotificationSettingsBlock from "../components/settings/ReaderNotificationSettings/ReaderNotificationSettingsBlock.vue";
 import BrandingSettingsBlock from "../components/settings/BrandingSettings/BrandingSettingsBlock.vue";
@@ -59,7 +60,6 @@ const selectedScheduleOverridesCount = computed(
 const selectedReaderStatusesCount = computed(
   () => settings.value.reader_notification_statuses.length
 );
-const hasActiveSave = computed(() => Object.values(blockSaving).some(Boolean));
 
 const generalSettings = computed(() => ({
   max_books_per_order: settings.value.max_books_per_order,
@@ -149,10 +149,7 @@ async function saveSettingsPatch(
       <div class="hero-copy">
         <p class="eyebrow">Moderator / Settings</p>
         <h1>Настройки библиотеки и рассылок</h1>
-        <p class="hero-text">
-          Каждый блок редактируется и сохраняется отдельно. После обновления секция заново
-          подтягивает актуальные настройки с сервера.
-        </p>
+        <p class="hero-text">Настройки сохраняются по блокам и сразу подтягиваются заново.</p>
       </div>
 
       <div class="hero-stats">
@@ -167,10 +164,6 @@ async function saveSettingsPatch(
         <div class="stat-card">
           <span class="stat-label">Изменений в графике</span>
           <strong class="stat-value">{{ selectedScheduleOverridesCount }}</strong>
-        </div>
-        <div class="stat-card">
-          <span class="stat-label">Статус страницы</span>
-          <strong class="stat-value">{{ hasActiveSave ? "Идет обновление" : "Готово" }}</strong>
         </div>
       </div>
     </header>
@@ -192,7 +185,18 @@ async function saveSettingsPatch(
           @save="saveSettingsPatch('general', $event)"
         />
 
-        <StaffDigestSettingsBlock
+        <StaffRecipientsSettingsBlock />
+      </div>
+
+      <aside class="settings-column settings-column-side">
+        <BrandingSettingsBlock
+          :current-logo-label="currentLogoLabel"
+          :saving="blockSaving.branding"
+          :sync-token="settingsRevision"
+          @save="saveSettingsPatch('branding', { logo: $event })"
+        />
+
+                <StaffDigestSettingsBlock
           :model-value="staffDigestSettings"
           :saving="blockSaving.staff"
           :sync-token="settingsRevision"
@@ -204,15 +208,6 @@ async function saveSettingsPatch(
           :saving="blockSaving.reader"
           :sync-token="settingsRevision"
           @save="saveSettingsPatch('reader', $event)"
-        />
-      </div>
-
-      <aside class="settings-column settings-column-side">
-        <BrandingSettingsBlock
-          :current-logo-label="currentLogoLabel"
-          :saving="blockSaving.branding"
-          :sync-token="settingsRevision"
-          @save="saveSettingsPatch('branding', { logo: $event })"
         />
       </aside>
     </div>

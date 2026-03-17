@@ -2,6 +2,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from django.db.models import Count, Q, Subquery, OuterRef, Min
 
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
@@ -13,6 +14,8 @@ from library_service.serializers.order import OrderSerializer
 from library_service.serializers.moderator import (
     ReaderStatsSerializer, 
     StaffStatsSerializer, 
+    StaffNotificationRecipientSerializer,
+    StaffNotificationModeSerializer,
     ModeratorOrderSerializer
 )
 
@@ -304,6 +307,18 @@ class StaffViewset(AsyncGenericViewSet):
                 Q(department__icontains=search_query)
             )
         return queryset
+
+    def _apply_notification_search_filter(self, queryset, search_query):
+        if not search_query:
+            return queryset
+
+        return queryset.filter(
+            Q(fullname__icontains=search_query)
+            | Q(department__icontains=search_query)
+            | Q(user__username__icontains=search_query)
+            | Q(user__first_name__icontains=search_query)
+            | Q(user__last_name__icontains=search_query)
+        )
     
     def _apply_ordering(self, queryset, sort_by, sort_order):
         valid_sort_fields = ['fullname', 'department', 'total_orders', 'cancelled_orders']
@@ -485,6 +500,49 @@ class StaffViewset(AsyncGenericViewSet):
             return Response(
                 {"error": "Ошибка при получении статистики сотрудников"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=False, methods=['get'], url_path='notification-recipients')
+    async def notification_recipients(self, request):
+        try:
+            search_query = request.query_params.get('q', '').strip()
+            queryset = self._apply_notification_search_filter(
+                self.get_staff_queryset(),
+                search_query,
+            ).order_by('fullname', 'user__username')
+
+            recipients = await sync_to_async(list)(queryset)
+            serializer = StaffNotificationRecipientSerializer(recipients, many=True)
+            return Response(await serializer.adata)
+        except Exception as e:
+            print(f"Error in notification_recipients: {str(e)}")
+            return Response(
+                {"error": "Ошибка при получении сотрудников для рассылки"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    @action(detail=True, methods=['patch'], url_path='notification-mode')
+    async def notification_mode(self, request, pk=None):
+        try:
+            profile = await self.get_staff_queryset().aget(pk=pk)
+            serializer = StaffNotificationModeSerializer(
+                profile,
+                data=request.data,
+                partial=True,
+            )
+            serializer.is_valid(raise_exception=True)
+            await serializer.asave()
+
+            refreshed_profile = await self.get_staff_queryset().aget(pk=profile.pk)
+            response_serializer = StaffNotificationRecipientSerializer(refreshed_profile)
+            return Response(await response_serializer.adata)
+        except ValidationError as exc:
+            return Response(exc.detail, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f"Error in notification_mode: {str(e)}")
+            return Response(
+                {"error": "Ошибка при обновлении режима уведомлений сотрудника"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 class ModeratorOrderViewset(AsyncGenericViewSet):

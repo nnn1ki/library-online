@@ -16,11 +16,11 @@ defineProps<{
 <template>
   <div class="stats-grid">
     <div class="stat-box">
-      <span class="stat-name">Книг в заказе</span>
+      <span class="stat-name">В заказе</span>
       <strong>{{ modelValue.max_books_per_order }}</strong>
     </div>
     <div class="stat-box">
-      <span class="stat-name">Книг на руках</span>
+      <span class="stat-name">На руках</span>
       <strong>{{ modelValue.max_books_per_reader }}</strong>
     </div>
     <div class="stat-box">
@@ -28,11 +28,11 @@ defineProps<{
       <strong>{{ modelValue.max_borrow_days }} дн.</strong>
     </div>
     <div class="stat-box">
-      <span class="stat-name">Ожидание нового заказа</span>
+      <span class="stat-name">Новый заказ</span>
       <strong>{{ modelValue.new_order_wait }} ч.</strong>
     </div>
     <div class="stat-box stat-box-wide">
-      <span class="stat-name">Порог задержки в работе</span>
+      <span class="stat-name">Порог в работе</span>
       <strong>{{ modelValue.processing_order_wait }} ч.</strong>
     </div>
   </div>

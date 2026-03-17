@@ -11,16 +11,16 @@ defineProps<{
 
 <template>
   <div class="stats-grid">
-    <div class="stat-box stat-box-wide">
-      <span class="stat-name">Рассылка по необработанным заказам</span>
+    <div class="stat-box">
+      <span class="stat-name">Сводка</span>
       <strong>{{ modelValue.staff_digest_enabled ? "Включен" : "Выключен" }}</strong>
     </div>
     <div class="stat-box">
-      <span class="stat-name">Активность сотрудника</span>
+      <span class="stat-name">Активность</span>
       <strong>{{ modelValue.staff_notification_active_hours }} ч.</strong>
     </div>
     <div class="stat-box">
-      <span class="stat-name">Интервал дайджеста</span>
+      <span class="stat-name">Интервал</span>
       <strong>{{ modelValue.staff_digest_stale_order_hours }} ч.</strong>
     </div>
   </div>
@@ -49,10 +49,6 @@ defineProps<{
 .stat-name {
   color: var(--color-text-600);
   font-size: var(--text-xs);
-}
-
-.stat-box-wide {
-  grid-column: 1 / -1;
 }
 
 @media (max-width: 640px) {

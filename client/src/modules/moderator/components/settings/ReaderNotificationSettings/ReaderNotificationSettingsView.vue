@@ -18,7 +18,7 @@ defineProps<{
 <template>
   <div class="view-stack">
     <div class="state-row">
-      <span class="state-label">Уведомления читателю</span>
+      <span class="state-label">Статус</span>
       <strong>{{
         modelValue.reader_status_notifications_enabled ? "Включены" : "Выключены"
       }}</strong>
