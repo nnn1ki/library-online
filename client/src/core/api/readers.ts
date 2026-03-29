@@ -1,14 +1,17 @@
 import { api } from "./axios";
 import type { ReaderStats, PaginatedReaders, ReadersFilters, Order } from "./types";
 
+
+
 export async function getReaders(filters?: ReadersFilters): Promise<PaginatedReaders> {
   try {
+    const { current_order_statuses, ...restFilters } = filters ?? {};
     const { data } = await api.get("/api/readers/", {
       params: {
-        ...filters,
-        ...(filters?.current_order_statuses && {
-          "current_order_statuses[]": filters.current_order_statuses,
-        }),
+        ...restFilters,
+        ...(current_order_statuses && current_order_statuses.length > 0 && {
+          'current_order_statuses[]': current_order_statuses
+        })
       },
       paramsSerializer: {
         indexes: null,

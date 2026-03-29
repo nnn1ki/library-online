@@ -1,4 +1,3 @@
-<!-- OrdersPage.vue (adjusted localFilters to include department to suppress warnings; assume FiltersSection uses it) -->
 <template>
   <div class="orders-page">
     <div class="page-header">
@@ -6,7 +5,7 @@
       <div class="stats">Всего заказов: {{ pagination.total }}</div>
     </div>
 
-    <FiltersSection
+    <OrdersFiltersSection
       v-model:filters="localFilters"
       :loading="loading"
       :date-error="dateError"
@@ -30,47 +29,51 @@
       @row-click="showOrderDetails"
     />
 
-    <OrderDetailsModal v-model:isOpen="isDetailsModalOpen" :orderId="selectedOrderId" />
+    <OrderDetailsModal
+      v-if="selectedOrder"
+      v-model:isOpen="isDetailsModalOpen"
+      :order-id="selectedOrder.id"
+    />
 
-    <LoadingModal v-model="loading" />
+    <LoadingModal :model-value="loading" />
   </div>
 </template>
 
 <script setup lang="ts">
-import FiltersSection from "@modules/moderator/components/FiltersSection.vue";
-import OrdersTable from "@modules/moderator/components/orders/OrdersTable.vue";
+import OrdersFiltersSection from "@moderator/components/orders/OrdersFiltersSection.vue";
+import OrdersTable from "@moderator/components/orders/OrdersTable.vue";
 import LoadingModal from "@components/LoadingModal.vue";
-import OrderDetailsModal from "@modules/moderator/components/orders/OrderDetailsModal.vue";
+import OrderDetailsModal from "@moderator/components/orders/OrderDetailsModal.vue";
 
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { useAuthentication } from "@core/composables/auth";
 import { useRouter } from "vue-router";
-import { getOrdersStats } from "@api/orders";
-import type { OrderStats, OrdersFilters, OrderStatusEnum } from "@api/types";
+import { getModeratorOrders } from "@api/orders";
+import type { ModeratorOrderStats, ModeratorOrdersFilters, OrderStatusEnum } from "@api/types";
 
-const ordersData = ref<OrderStats[]>([]);
+const ordersData = ref<ModeratorOrderStats[]>([]);
 const loading = ref(false);
 const router = useRouter();
 const dateError = ref("");
 
 const localFilters = ref({
-  fullname: "",
-  department: "", // Added to suppress warning; perhaps map to employee_collect or ignore
-  employee_collect: "",
-  employee_issue: "",
-  lastOrderDateFrom: "", // For dateFrom
-  lastOrderDateTo: "", // For dateTo
-  currentOrderStatuses: [] as OrderStatusEnum[], // For statuses
+  fullname: '',
+  libraryName: '',
+  employeeCollect: '',
+  employeeIssue: '',
+  dateFrom: '',
+  dateTo: '',
+  statuses: [] as OrderStatusEnum[],
 });
 
 const activeFilters = ref({
-  fullname: "",
-  department: "",
-  employee_collect: "",
-  employee_issue: "",
-  lastOrderDateFrom: "",
-  lastOrderDateTo: "",
-  currentOrderStatuses: [] as OrderStatusEnum[],
+  fullname: '',
+  libraryName: '',
+  employeeCollect: '',
+  employeeIssue: '',
+  dateFrom: '',
+  dateTo: '',
+  statuses: [] as OrderStatusEnum[],
 });
 
 const pagination = ref({
@@ -79,16 +82,16 @@ const pagination = ref({
   total: 0,
 });
 
-type SortField = "id" | "fullname" | "employee_collect" | "employee_issue" | "status";
+type SortField = 'id' | 'fullname' | 'library' | 'employee_collect' | 'employee_issue' | 'status' | 'created_date' | 'books_count';
 
-const sortField = ref<SortField>("id");
-const sortDirection = ref<"asc" | "desc">("asc");
+const sortField = ref<SortField>('created_date');
+const sortDirection = ref<'asc' | 'desc'>('desc');
 
 const isDetailsModalOpen = ref(false);
-const selectedOrderId = ref<number>();
+const selectedOrder = ref<ModeratorOrderStats | null>(null);
 
-const showOrderDetails = (order: OrderStats) => {
-  selectedOrderId.value = order.id;
+const showOrderDetails = (order: ModeratorOrderStats) => {
+  selectedOrder.value = order;
   isDetailsModalOpen.value = true;
 };
 
@@ -100,38 +103,28 @@ const hasFilterChanges = computed(() => {
 
 const hasActiveFilters = computed(() => {
   const f = activeFilters.value;
-  return (
-    f.fullname !== "" ||
-    f.department !== "" ||
-    f.employee_collect !== "" ||
-    f.employee_issue !== "" ||
-    f.lastOrderDateFrom !== "" ||
-    f.lastOrderDateTo !== "" ||
-    f.currentOrderStatuses.length > 0
-  );
+  return f.fullname !== '' || f.libraryName !== '' || 
+         f.employeeCollect !== '' || f.employeeIssue !== '' ||
+         f.dateFrom !== '' || f.dateTo !== '' ||
+         f.statuses.length > 0;
 });
 
 const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.value.limit));
 
-const requestParams = computed((): OrdersFilters => {
-  const params: OrdersFilters = {
+const requestParams = computed((): ModeratorOrdersFilters => {
+  const params: ModeratorOrdersFilters = {
     page: pagination.value.page,
     page_size: pagination.value.limit,
   };
 
   if (activeFilters.value.fullname) params.fullname = activeFilters.value.fullname;
-  if (activeFilters.value.employee_collect)
-    params.employee_collect = activeFilters.value.employee_collect;
-  if (activeFilters.value.employee_issue)
-    params.employee_issue = activeFilters.value.employee_issue;
-  if (activeFilters.value.lastOrderDateFrom)
-    params.date_from = activeFilters.value.lastOrderDateFrom;
-  if (activeFilters.value.lastOrderDateTo) params.date_to = activeFilters.value.lastOrderDateTo;
-  if (
-    activeFilters.value.currentOrderStatuses &&
-    activeFilters.value.currentOrderStatuses.length > 0
-  ) {
-    params.statuses = activeFilters.value.currentOrderStatuses;
+  if (activeFilters.value.libraryName) params.library_name = activeFilters.value.libraryName;
+  if (activeFilters.value.employeeCollect) params.employee_collect = activeFilters.value.employeeCollect;
+  if (activeFilters.value.employeeIssue) params.employee_issue = activeFilters.value.employeeIssue;
+  if (activeFilters.value.dateFrom) params.date_from = activeFilters.value.dateFrom;
+  if (activeFilters.value.dateTo) params.date_to = activeFilters.value.dateTo;
+  if (activeFilters.value.statuses && activeFilters.value.statuses.length > 0) {
+    params.statuses = activeFilters.value.statuses;
   }
 
   if (sortField.value) {
@@ -143,12 +136,10 @@ const requestParams = computed((): OrdersFilters => {
 });
 
 const validateDates = (): boolean => {
-  dateError.value = "";
-
-  if (
-    !validateDateRange(localFilters.value.lastOrderDateFrom, localFilters.value.lastOrderDateTo)
-  ) {
-    dateError.value = "Дата начала не может быть больше даты окончания";
+  dateError.value = '';
+  
+  if (!validateDateRange(localFilters.value.dateFrom, localFilters.value.dateTo)) {
+    dateError.value = 'Дата начала не может быть больше даты окончания';
     return false;
   }
 
@@ -173,7 +164,7 @@ const loadOrdersData = async () => {
   loading.value = true;
 
   try {
-    const response = await getOrdersStats(requestParams.value);
+    const response = await getModeratorOrders(requestParams.value);
     ordersData.value = response.results;
     pagination.value.total = response.count;
   } catch (error: any) {
@@ -208,34 +199,39 @@ const handleSort = (field: string, direction: "asc" | "desc") => {
 
 const clearAllFilters = () => {
   localFilters.value = {
-    fullname: "",
-    department: "",
-    employee_collect: "",
-    employee_issue: "",
-    lastOrderDateFrom: "",
-    lastOrderDateTo: "",
-    currentOrderStatuses: [],
+    fullname: '',
+    libraryName: '',
+    employeeCollect: '',
+    employeeIssue: '',
+    dateFrom: '',
+    dateTo: '',
+    statuses: [],
   };
   activeFilters.value = { ...localFilters.value };
   pagination.value.page = 1;
-  sortField.value = "id";
-  sortDirection.value = "asc";
+  sortField.value = 'created_date';
+  sortDirection.value = 'desc';
   loadOrdersData();
 };
 
 const nextPage = () => {
   if (pagination.value.page < totalPages.value) {
     pagination.value.page++;
-    loadOrdersData();
   }
 };
 
 const prevPage = () => {
   if (pagination.value.page > 1) {
     pagination.value.page--;
-    loadOrdersData();
   }
 };
+
+watch(
+  () => pagination.value.page,
+  () => {
+    loadOrdersData();
+  }
+);
 
 onMounted(async () => {
   await loadOrdersData();

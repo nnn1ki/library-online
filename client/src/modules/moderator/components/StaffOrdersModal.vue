@@ -7,9 +7,17 @@
       </div>
 
       <div class="staff-info">
+        <div class="staff-info-item">
+          <strong>ФИО:</strong> {{ staff.fullname }}
+        </div>
+        <div class="staff-info-item">
+          <strong>Всего заказов:</strong> {{ staff.total_orders }}
+        </div>
+<!-- =======
         <div class="staff-info-item"><strong>ФИО:</strong> {{ staff.fullname }}</div>
         <div class="staff-info-item"><strong>Подразделение:</strong> {{ staff.department }}</div>
         <div class="staff-info-item"><strong>Всего заказов:</strong> {{ staff.total_orders }}</div>
+>>>>>>> dev -->
         <div class="staff-info-item">
           <strong>Отмененные заказы:</strong> {{ staff.cancelled_orders }}
         </div>

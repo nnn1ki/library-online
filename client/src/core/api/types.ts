@@ -231,7 +231,6 @@ export type ReadersFilters = {
 export type StaffStats = {
   id: number;
   fullname: string;
-  department: string;
   total_orders: number;
   cancelled_orders: number;
 };
@@ -264,37 +263,46 @@ export type PaginatedStaff = {
 
 export type StaffFilters = {
   search?: string;
-  sort_by?: "fullname" | "department" | "total_orders" | "cancelled_orders";
-  sort_order?: "asc" | "desc";
+  sort_by?: 'fullname' | 'total_orders' | 'cancelled_orders';
+  sort_order?: 'asc' | 'desc';
+// =======
+//   sort_by?: "fullname" | "department" | "total_orders" | "cancelled_orders";
+//   sort_order?: "asc" | "desc";
+// >>>>>>> dev
   page?: number;
   page_size?: number;
 };
 
-export type OrderStats = {
+export type ModeratorOrderStats = {
   id: number;
   fullname: string;
   library_card: string | null;
+  library_name: string;
+  current_status: OrderStatusEnum;
+  created_date: string;
   employee_collect: string;
   employee_issue: string;
-  status: OrderStatusEnum;
+  books_count: number;
 };
 
-export type PaginatedOrderStats = {
+export type ModeratorPaginatedOrders = {
+  length: number;
   count: number;
   next: string | null;
   previous: string | null;
-  results: OrderStats[];
+  results: ModeratorOrderStats[];
 };
 
-export type OrdersFilters = {
+export type ModeratorOrdersFilters = {
   fullname?: string;
+  library_name?: string;
   employee_collect?: string;
   employee_issue?: string;
   date_from?: string;
   date_to?: string;
   statuses?: OrderStatusEnum[];
-  sort_by?: "id" | "fullname" | "employee_collect" | "employee_issue" | "status";
-  sort_order?: "asc" | "desc";
+  sort_by?: 'id' | 'fullname' | 'library' | 'employee_collect' | 'employee_issue' | 'status' | 'created_date' | 'books_count';
+  sort_order?: 'asc' | 'desc';
   page?: number;
   page_size?: number;
 };
