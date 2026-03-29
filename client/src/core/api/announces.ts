@@ -1,5 +1,5 @@
 import type { Book } from "./types";
-import { api } from "./axios"
+import { api } from "./axios";
 
 export async function announcesList(): Promise<Book[]> {
   try {

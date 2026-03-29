@@ -1,7 +1,7 @@
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
-import { api } from "../api/axios"
+import { api } from "../api/axios";
 import { computed } from "vue";
 
 export const useAuthStore = defineStore("auth", () => {

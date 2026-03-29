@@ -2,7 +2,7 @@
   <div class="filter-group">
     <label class="filter-label">{{ label }}</label>
     <div class="dropdown-container" ref="dropdownContainer">
-      <div 
+      <div
         class="dropdown-trigger"
         :class="{ 'dropdown-open': isOpen, 'dropdown-disabled': disabled }"
         @click="toggleDropdown"
@@ -12,13 +12,10 @@
         </span>
         <span class="dropdown-arrow">▼</span>
       </div>
-      
-      <div 
-        v-show="isOpen"
-        class="dropdown-menu"
-      >
-        <div 
-          v-for="status in statusOptions" 
+
+      <div v-show="isOpen" class="dropdown-menu">
+        <div
+          v-for="status in statusOptions"
           :key="status.value"
           class="dropdown-item"
           :class="{ 'dropdown-item-selected': isSelected(status.value) }"
@@ -29,15 +26,9 @@
           </span>
           <span class="dropdown-item-label">{{ status.label }}</span>
         </div>
-        
+
         <div class="dropdown-actions" v-if="localValue.length > 0">
-          <button 
-            @click="clearAll"
-            class="clear-all-btn"
-            type="button"
-          >
-            Сбросить все
-          </button>
+          <button @click="clearAll" class="clear-all-btn" type="button">Сбросить все</button>
         </div>
       </div>
     </div>
@@ -45,8 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
-import { orderStatuses, type OrderStatusEnum } from '@api/types';
+import { computed, ref, onMounted, onUnmounted } from "vue";
+import { orderStatuses, type OrderStatusEnum } from "@api/types";
 
 interface Props {
   modelValue: OrderStatusEnum[];
@@ -55,11 +46,11 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: OrderStatusEnum[]): void;
+  (e: "update:modelValue", value: OrderStatusEnum[]): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  disabled: false
+  disabled: false,
 });
 
 const emit = defineEmits<Emits>();
@@ -69,29 +60,31 @@ const dropdownContainer = ref<HTMLElement>();
 
 const localValue = computed({
   get: () => props.modelValue || [],
-  set: (value) => emit('update:modelValue', value)
+  set: (value) => emit("update:modelValue", value),
 });
 
 const statusOptions = computed(() => {
   return Object.entries(orderStatuses).map(([value, label]) => ({
     value: value as OrderStatusEnum,
-    label
+    label,
   }));
 });
 
 const selectedText = computed(() => {
   const selected = localValue.value || [];
   if (selected.length === 0) {
-    return 'Выберите статусы...';
+    return "Выберите статусы...";
   }
   if (selected.length === statusOptions.value.length) {
-    return 'Все статусы';
+    return "Все статусы";
   }
   if (selected.length <= 2) {
-    return selected.map(statusValue => {
-      const status = statusOptions.value.find(s => s.value === statusValue);
-      return status ? status.label : statusValue;
-    }).join(', ');
+    return selected
+      .map((statusValue) => {
+        const status = statusOptions.value.find((s) => s.value === statusValue);
+        return status ? status.label : statusValue;
+      })
+      .join(", ");
   }
   return `Выбрано: ${selected.length}`;
 });
@@ -103,19 +96,19 @@ const isSelected = (statusValue: OrderStatusEnum) => {
 const toggleStatus = (statusValue: OrderStatusEnum) => {
   const currentValue = [...localValue.value];
   const index = currentValue.indexOf(statusValue);
-  
+
   if (index > -1) {
     currentValue.splice(index, 1);
   } else {
     currentValue.push(statusValue);
   }
-  
+
   localValue.value = currentValue;
 };
 
 const toggleDropdown = (event: MouseEvent) => {
   event.stopPropagation();
-  
+
   if (!props.disabled) {
     isOpen.value = !isOpen.value;
   }
@@ -133,11 +126,11 @@ const handleClickOutside = (event: MouseEvent) => {
 };
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
+  document.addEventListener("click", handleClickOutside);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener("click", handleClickOutside);
 });
 </script>
 
@@ -146,7 +139,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   .filter-label {
     font-size: 0.8rem;
     font-weight: 500;
@@ -175,24 +168,24 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
-  
+
   &:hover:not(.dropdown-disabled) {
     border-color: var(--color-primary-500);
     background: var(--color-background-50);
   }
-  
+
   &.dropdown-open {
     border-color: var(--color-primary-500);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     box-shadow: 0 0 0 1px var(--color-primary-500);
   }
-  
+
   &.dropdown-disabled {
     background: var(--color-background-300);
     cursor: not-allowed;
     opacity: 0.6;
-    
+
     &:hover {
       border-color: var(--color-text-300);
       background: var(--color-background-300);
@@ -206,7 +199,7 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
-  
+
   .dropdown-disabled & {
     color: var(--color-text-500);
   }
@@ -217,11 +210,11 @@ onUnmounted(() => {
   font-size: 0.75rem;
   margin-left: 0.5rem;
   transition: transform 0.2s ease;
-  
+
   .dropdown-open & {
     transform: rotate(180deg);
   }
-  
+
   .dropdown-disabled & {
     color: var(--color-text-400);
   }
@@ -258,20 +251,20 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.15s ease;
   border-bottom: 1px solid var(--color-text-100);
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &:hover {
     background: var(--color-primary-50);
   }
-  
+
   &.dropdown-item-selected {
     background: var(--color-primary-50);
     color: var(--color-primary-700);
     font-weight: 500;
-    
+
     &:hover {
       background: var(--color-primary-100);
     }
@@ -288,12 +281,12 @@ onUnmounted(() => {
   border: 1px solid var(--color-text-300);
   border-radius: 3px;
   transition: all 0.15s ease;
-  
+
   .dropdown-item-selected & {
     border-color: var(--color-primary-500);
     background: var(--color-primary-500);
   }
-  
+
   .dropdown-item:hover & {
     border-color: var(--color-primary-400);
   }
@@ -328,7 +321,7 @@ onUnmounted(() => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: var(--color-primary-400);
   }

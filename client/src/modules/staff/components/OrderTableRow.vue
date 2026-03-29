@@ -1,7 +1,13 @@
 <template>
   <tr :class="{ 'highlight-red': shouldHighlight }">
     <th>{{ order.id }}</th>
-    <td>{{ order.user.fullname !== null ? order.user.fullname : `${order.user.first_name} ${order.user.last_name}` }}</td>
+    <td>
+      {{
+        order.user.fullname !== null
+          ? order.user.fullname
+          : `${order.user.first_name} ${order.user.last_name}`
+      }}
+    </td>
     <td>{{ formatDate(order.statuses[0]?.date) }}</td>
     <td>
       <button

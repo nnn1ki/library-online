@@ -22,6 +22,22 @@ OAUTH_CLIENT_SECRET = os.environ.get("OAUTH_CLIENT_SECRET", "")
 
 OPAC_INTERNAL_TOKEN = os.environ.get("OPAC_INTERNAL_TOKEN", "")
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "1").lower() in {"1", "true", "yes", "on"}
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "0").lower() in {"1", "true", "yes", "on"}
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "noreply@example.com")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+if EMAIL_USE_TLS and EMAIL_USE_SSL:
+    raise ValueError("EMAIL_USE_TLS and EMAIL_USE_SSL cannot both be enabled.")
+
+EMAIL_MODE = os.environ.get("EMAIL_MODE", "prod").lower()
+NOTIFICATION_TIME_ZONE = os.environ.get("NOTIFICATION_TIME_ZONE", "Asia/Irkutsk")
+
 # Если код ниже:
 
 # FORCE_SCRIPT_NAME не будет задан (останется None);

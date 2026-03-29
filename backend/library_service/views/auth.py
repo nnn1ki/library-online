@@ -93,9 +93,11 @@ class AuthViewset(AsyncAPIView):
                 else:
                     user.profile.current_role = None
 
+                now = timezone.now()
+                user.profile.last_seen = now
                 await user.profile.asave()
 
-                user.last_login = timezone.now()
+                user.last_login = now
                 await user.asave(update_fields=['last_login'])
 
                 tokens = await sync_to_async(TokenObtainPairSerializer.get_token)(user)
@@ -131,9 +133,11 @@ class AuthThirdPartyViewset(AsyncAPIView):
                 user.profile.fullname = info.name
                 user.profile.department = info.department
                 user.profile.mira_id = info.mira
+                now = timezone.now()
+                user.profile.last_seen = now
                 await user.profile.asave()
 
-                user.last_login = timezone.now()
+                user.last_login = now
                 await user.asave(update_fields=['last_login'])
                 
                 tokens = await sync_to_async(TokenObtainPairSerializer.get_token)(user)
