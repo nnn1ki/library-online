@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "./axios"
 import type { ReaderStats, PaginatedReaders, ReadersFilters, Order } from "./types";
 
 
@@ -26,7 +26,7 @@ export async function getReaders(filters?: ReadersFilters): Promise<PaginatedRea
 
 export async function getReaderOrders(readerId: number): Promise<Order[]> {
   try {
-    const { data } = await axios.get(`/api/readers/${readerId}/orders/`);
+    const { data } = await api.get(`/api/readers/${readerId}/orders/`);
     return data;
   } catch (error) {
     console.error(`Ошибка при получении заказов читателя ${readerId}`, error);
@@ -36,7 +36,7 @@ export async function getReaderOrders(readerId: number): Promise<Order[]> {
 
 export async function getReaderOrderDetail(readerId: number, orderId: number): Promise<Order> {
   try {
-    const { data } = await axios.get(`/api/readers/${readerId}/orders/${orderId}/`);
+    const { data } = await api.get(`/api/readers/${readerId}/orders/${orderId}/`);
     return data;
   } catch (error) {
     console.error(`Ошибка при получении заказа ${orderId} читателя ${readerId}`, error);

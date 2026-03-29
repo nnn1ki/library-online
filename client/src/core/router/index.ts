@@ -4,6 +4,7 @@ import { staffRoutes } from "@core/router/routes.staff";
 import { moderatorRoutes } from "./routes.moderator";
 import { useAuthStore } from "@core/store/auth";
 import { useUserStore } from "@core/store/user";
+//@ts-nocheck
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,6 +12,7 @@ const router = createRouter({
 });
 
 const roleHomeRoutes: Record<string, string> = {
+  None: "/profile",
   Reader: "/",
   Librarian: "/staff/orders",
   Admin: "/moderator/readers",
@@ -40,15 +42,27 @@ router.beforeEach(async (to, from, next) => {
     lastProfileCheck = now;
   }
 
+  if (!user.currentUser) {
+    if (to.path === "/profile") {
+      return next();
+    }
+    return next("/profile");
+  }
+
   const requiredRoles = to.matched.map((r) => r.meta.roles).find((r) => r !== undefined) as
     | string[]
     | undefined;
 
-  if (requiredRoles?.includes(user.currentRole)) {
+  const currentRole = user.currentUser.current_role || "None";
+
+  if (requiredRoles?.includes(currentRole)) {
     return next();
   }
 
-  const fallback = roleHomeRoutes[user.currentRole] ?? "/";
+  const fallback = roleHomeRoutes[currentRole] ?? "/profile";
+  if (fallback === to.path) {
+    return next();
+  }
   return next(fallback);
 });
 

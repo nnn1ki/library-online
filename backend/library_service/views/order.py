@@ -3,6 +3,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 
+from datetime import datetime
+
 from adrf.viewsets import GenericViewSet as AsyncGenericViewSet
 from asgiref.sync import sync_to_async
 
@@ -88,4 +90,4 @@ class BorrowedViewset(SessionListModelMixin, AsyncGenericViewSet):
     queryset = OrderItem.objects.all()
 
     def get_queryset(self):
-        return super().get_queryset().filter(order__user=self.request.user, status=OrderItem.Status.HANDED)
+        return super().get_queryset().filter(order__user=self.request.user, status=OrderItem.Status.HANDED, to_return_date__lt=datetime.now())

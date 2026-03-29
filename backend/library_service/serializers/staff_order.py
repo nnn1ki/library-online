@@ -17,7 +17,6 @@ from library_service.serializers.parallel_list import ParallelListSerializer
 from aiohttp import ClientSession
 
 from datetime import datetime
-
 from asgiref.sync import sync_to_async
 
 User = get_user_model()
@@ -29,8 +28,8 @@ class StaffOrderSerializer(aserializers.ModelSerializer):
     username = serializers.CharField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
-    fullname = serializers.CharField(read_only=True)
-    department = serializers.CharField(read_only=True)
+    fullname = serializers.CharField(source="profile.fullname", read_only=True)
+    department = serializers.CharField(source="profile.department", read_only=True)
 
     class Meta:
         model = User
@@ -52,8 +51,8 @@ class OrderUserSerializer(aserializers.ModelSerializer):
     username = serializers.CharField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
-    fullname = serializers.CharField(read_only=True)
-    department = serializers.CharField(read_only=True)
+    fullname = serializers.CharField(source="profile.fullname", read_only=True)
+    department = serializers.CharField(source="profile.department", read_only=True)
 
     class Meta:
         model = User
@@ -104,13 +103,22 @@ class OrderSerializer(aserializers.ModelSerializer):
         fields = ["id", "library", "statuses", "books", "user", "books_to_return"]
         list_serializer_class = ParallelListSerializer
 
-    @sync_to_async
-    def get_books_to_return(self, obj: Order):
-        last_status = OrderHistory.objects.filter(order=obj).order_by("-date").values("status")[:1]
-        if (last_status == OrderHistory.Status.DONE):
-            return BorrowedBookSerializer(OrderItem.objects.filter(order_to_return = obj, status = OrderItem.Status.RETURNED).all(), many=True).data
+    async def get_books_to_return(self, obj: Order):
+        last_status = await OrderHistory.objects.filter(order=obj).order_by("-date").values_list(
+            "status", flat=True
+        ).afirst()
+        borrowed_books = OrderItem.objects.filter(order_to_return=obj)
+
+        if last_status == OrderHistory.Status.DONE:
+            borrowed_books = borrowed_books.filter(status=OrderItem.Status.RETURNED)
         else:
-            return BorrowedBookSerializer(OrderItem.objects.filter(order_to_return = obj).all(), many=True).data
+            borrowed_books = borrowed_books.filter(status=OrderItem.Status.HANDED)
+
+        return await BorrowedBookSerializer(
+            borrowed_books,
+            many=True,
+            context=self.context,
+        ).adata
 
 
 # TODO: нам нужно это повторение?
@@ -160,6 +168,19 @@ class UpdateOrderSerializer(aserializers.Serializer):
             )
 
         elif new_status["status"] == OrderHistory.Status.READY:
+            order: Order = await Order.objects.prefetch_related("user").filter(id=instance.id).afirst()
+            profile: UserProfile = await UserProfile.objects.prefetch_related("user").aget(user=order.user)
+
+            loans_id_list = []
+            loans = []
+
+            loans = await opac_reader_loans(self.context["client_session"], profile.library_card)
+
+            for loan in loans:
+                book = await book_retrieve_by_id(self.context["client_session"], loan.db, loan.book)
+                loans_id_list.append(book.id)
+                loan.book_id = book.id
+
             books = validated_data["books"]
 
             if (len(books) > 0):
@@ -175,6 +196,15 @@ class UpdateOrderSerializer(aserializers.Serializer):
                     if book["status"] == "cancelled":
                         order_item.status = OrderItem.Status.CANCELLED
                         order_item.description = book["description"]
+
+                    for loan in loans:
+                        if loan.book_id == order_item.book_id:
+                            order_item.handed_date = loan.date
+                            order_item.to_return_date = loan.deadline
+
+                        elif loan.book_id == order_item.analogous_order_item.book_id:
+                            order_item.analogous_order_item.handed_date = loan.date
+                            order_item.analogous_order_item.to_return_date = loan.deadline
 
                     await order_item.asave()
 

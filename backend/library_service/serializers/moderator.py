@@ -7,8 +7,8 @@ from library_service.models.order import Order, OrderHistory
 
 class ReaderStatsSerializer(aserializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
-    fullname = serializers.CharField(read_only=True)
-    department = serializers.CharField(read_only=True)
+    fullname = serializers.CharField(source="profile.fullname", read_only=True)
+    department = serializers.CharField(source="profile.department", read_only=True)
     library_card = serializers.CharField(read_only=True)
     campus_id = serializers.CharField(read_only=True)
     mira_id = serializers.CharField(read_only=True)
