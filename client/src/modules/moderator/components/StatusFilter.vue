@@ -65,11 +65,11 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: OrderStatusEnum[]): void;
+  (e: "update:modelValue", value: OrderStatusEnum[]): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  disabled: false
+  disabled: false,
 });
 
 const emit = defineEmits<Emits>();
@@ -131,11 +131,11 @@ const handleClickOutside = (event: MouseEvent) => {
 };
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
+  document.addEventListener("click", handleClickOutside);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener("click", handleClickOutside);
 });
 </script>
 
@@ -145,7 +145,6 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   position: relative;
-  
   .filter-label {
     font-size: 0.8rem;
     font-weight: 500;
@@ -185,7 +184,7 @@ onUnmounted(() => {
     border-color: var(--color-primary-500);
     box-shadow: 0 0 0 2px rgba(var(--color-primary-500-rgb, 59, 130, 246), 0.2);
   }
-  
+
   &:disabled {
     background: var(--color-background-300);
     cursor: not-allowed;
@@ -229,6 +228,13 @@ onUnmounted(() => {
   border-radius: 4px;
   transition: background-color 0.2s;
   
+  transition: all 0.15s ease;
+  border-bottom: 1px solid var(--color-text-100);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
   &:hover {
     background-color: var(--color-background-100);
   }
@@ -299,7 +305,6 @@ onUnmounted(() => {
   font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
-  
   &:hover {
     background: var(--color-background-200);
     border-color: var(--color-text-400);

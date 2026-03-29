@@ -2,7 +2,7 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { useAuthStore } from "./auth";
 import { profileInfo, setRole } from "@api/profile";
-import type { Group} from "@core/api/types";
+import type { Group } from "@core/api/types";
 
 export const useUserStore = defineStore("user", () => {
   const currentUser = ref<Awaited<ReturnType<typeof profileInfo>> | null>(null);
@@ -26,7 +26,7 @@ export const useUserStore = defineStore("user", () => {
     }
 
     if (currentUser.value?.current_role === null || currentUser.value?.current_role === "") {
-      currentUser.value.current_role = "None"
+      currentUser.value.current_role = "None";
     }
   }
 

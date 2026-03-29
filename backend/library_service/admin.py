@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from library_service.models.catalog import Library, LibraryDatabase
+from library_service.models.library_settings import LibrarySettings
 from library_service.models.order import Order, OrderHistory, OrderItem
 from library_service.models.user import Basket, BasketItem, UserProfile
 from library_service.models.comments import OrderComment, OrderItemComment
@@ -15,7 +16,10 @@ class UserProfileAdmin(admin.ModelAdmin):
         "mira_id",
         "fullname",
         "department",
+        "last_seen",
+        "staff_notification_mode",
     ]
+    list_filter = ["staff_notification_mode"]
 
 
 @admin.register(Basket)
@@ -65,6 +69,19 @@ class LibraryAdmin(admin.ModelAdmin):
 @admin.register(LibraryDatabase)
 class LibraryDatabaseAdmin(admin.ModelAdmin):
     list_display = ["id", "database", "library"]
+
+
+@admin.register(LibrarySettings)
+class LibrarySettingsAdmin(admin.ModelAdmin):
+    list_display = [
+        "lock",
+        "new_order_wait",
+        "staff_digest_enabled",
+        "staff_notification_active_hours",
+        "staff_digest_stale_order_hours",
+        "staff_digest_last_sent_at",
+        "reader_status_notifications_enabled",
+    ]
 
 
 @admin.register(OrderComment)

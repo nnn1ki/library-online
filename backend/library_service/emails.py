@@ -1,44 +1,262 @@
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
+import asyncio
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from datetime import datetime
+from django.core.mail import send_mail
+from django.db.models import Q
+from django.template.loader import render_to_string
 
-from .utils.datetime_helpers import is_working_hour, is_user_active_recently
+from library_service.models.library_settings import LibrarySettings
+from library_service.models.order import Order, OrderHistory
+from library_service.models.user import UserProfile
+from library_service.utils.datetime_helpers import (
+    get_notification_now,
+    is_user_active_recently,
+    is_within_staff_schedule,
+)
 
-from asgiref.sync import sync_to_async
 
-async def send_new_order_notification():
-    now = datetime.now()
-    if not is_working_hour(now): 
+def _should_skip_staff_digest_by_schedule(
+    email_mode: str,
+    library_settings: LibrarySettings,
+    now: datetime | None = None,
+) -> bool:
+    if email_mode.lower() != "prod":
+        return False
+
+    current_local_time = get_notification_now(now)
+    return not is_within_staff_schedule(
+        current_local_time,
+        week_schedule=library_settings.staff_digest_week_schedule,
+        schedule_overrides=library_settings.staff_digest_schedule_overrides,
+        holidays=library_settings.holidays,
+    )
+
+
+def _build_digest_payload(
+    fresh_orders: list[Order],
+    stale_new_orders: list[Order],
+    now: datetime,
+    window_minutes: int,
+) -> tuple[str, str, str]:
+    fresh_count = len(fresh_orders)
+    stale_count = len(stale_new_orders)
+
+    subject = f"Заказы в статусе NEW: свежие {fresh_count}, ожидают {stale_count}"
+
+    plain_lines: list[str] = [
+        "Здравствуйте, [LIBRARIAN_NAME].",
+        "",
+        f"За последние {window_minutes} минут поступило новых заказов: {fresh_count}.",
+        "",
+        f"Новые заказы за последние {window_minutes} минут:",
+    ]
+
+    for order in fresh_orders:
+        new_since = getattr(order, "current_new_date", None)
+        new_since_text = new_since.strftime("%Y-%m-%d %H:%M:%S") if new_since else "N/A"
+        plain_lines.append(
+            f"- Заказ #{order.id}, читатель: {order.user.email}, библиотека: {order.library.description}, в NEW с: {new_since_text}"
+        )
+
+    plain_lines.append("")
+    plain_lines.append(f"Заказы, которые находятся в NEW дольше {window_minutes} минут:")
+
+    if stale_new_orders:
+        for order in stale_new_orders:
+            new_since = getattr(order, "current_new_date", None)
+            new_since_text = new_since.strftime("%Y-%m-%d %H:%M:%S") if new_since else "N/A"
+            plain_lines.append(
+                f"- Заказ #{order.id}, читатель: {order.user.email}, библиотека: {order.library.description}, в NEW с: {new_since_text}"
+            )
+    else:
+        plain_lines.append("- Нет")
+
+    plain_lines.append("")
+    plain_lines.append("Пожалуйста, проверьте заказы в системе.")
+
+    html_context = {
+        "fresh_orders": fresh_orders,
+        "stale_orders": stale_new_orders,
+        "total_fresh_orders": fresh_count,
+        "window_minutes": window_minutes,
+        "generated_at": now,
+    }
+    html_body = render_to_string("emails/new_orders_digest.html", html_context)
+
+    return subject, "\n".join(plain_lines), html_body
+
+
+async def send_new_orders_digest_notification(
+    fresh_orders: list[Order],
+    stale_new_orders: list[Order],
+    email_mode: str = "prod",
+    window_minutes: int = 60,
+    now: datetime | None = None,
+    ignore_schedule: bool = False,
+    ignore_disabled: bool = False,
+) -> bool:
+    email_mode = email_mode.lower()
+
+    if not fresh_orders and not stale_new_orders:
+        print("Email digest: no NEW orders, nothing to send.")
+        return False
+
+    library_settings = await LibrarySettings.aget_settings()
+    if not ignore_schedule and _should_skip_staff_digest_by_schedule(email_mode, library_settings, now=now):
+        print("Email digest: outside configured staff schedule or on holiday in prod mode, skipping.")
+        return False
+
+    if not ignore_disabled and not library_settings.staff_digest_enabled:
+        print("Email digest: disabled by library settings.")
+        return False
+
+    try:
+        librarian_group = await Group.objects.aget(name="Librarian")
+        recipients_filter = (
+            Q(groups=librarian_group)
+            | Q(profile__staff_notification_mode=UserProfile.StaffNotificationMode.ALWAYS)
+        )
+    except Group.DoesNotExist:
+        recipients_filter = Q(profile__staff_notification_mode=UserProfile.StaffNotificationMode.ALWAYS)
+
+    librarians_qs = (
+        get_user_model()
+        .objects.select_related("profile")
+        .filter(recipients_filter)
+        .exclude(email__isnull=True)
+        .exclude(email="")
+        .distinct()
+    )
+    librarians = [librarian async for librarian in librarians_qs]
+
+    if not librarians:
+        print("Email digest: no librarians with email found.")
+        return False
+
+    generated_at = get_notification_now(now)
+    subject, plain_body, html_body = _build_digest_payload(
+        fresh_orders,
+        stale_new_orders,
+        generated_at,
+        window_minutes,
+    )
+    sent_any = False
+
+    for librarian in librarians:
+        notification_mode = getattr(
+            librarian.profile,
+            "staff_notification_mode",
+            UserProfile.StaffNotificationMode.AUTO,
+        )
+        if notification_mode == UserProfile.StaffNotificationMode.DISABLED:
+            print(f"Email digest: skip {librarian.username}, disabled by profile settings.")
+            continue
+
+        should_receive = is_user_active_recently(
+            librarian,
+            now=generated_at,
+            active_threshold_hours=library_settings.staff_notification_active_hours,
+        ) or notification_mode == UserProfile.StaffNotificationMode.ALWAYS
+
+        if not should_receive:
+            print(f"Email digest: skip {librarian.username}, not active recently.")
+            continue
+
+        body = plain_body.replace("[LIBRARIAN_NAME]", librarian.get_full_name() or librarian.username)
+
+        if email_mode == "off":
+            print("--- Console Email (Digest) ---")
+            print(f"To: {librarian.email}")
+            print(f"Subject: {subject}")
+            print(f"Body:\n{body}")
+            print("------------------------------")
+            sent_any = True
+            continue
+
+        try:
+            await asyncio.to_thread(
+                send_mail,
+                subject,
+                body,
+                settings.DEFAULT_FROM_EMAIL,
+                [librarian.email],
+                False,
+                html_message=html_body,
+            )
+            print(f"Email digest: sent to {librarian.email}")
+            sent_any = True
+        except Exception as exc:  # pylint: disable=broad-exception-caught
+            print(f"Email digest: failed for {librarian.email}: {exc}")
+
+    return sent_any
+
+
+async def send_order_status_update_notification(
+    order: Order,
+    new_status: str,
+    description: str,
+    email_mode: str = "prod",
+    now: datetime | None = None,
+) -> None:
+    email_mode = email_mode.lower()
+
+    user = order.user
+    if not user.email:
+        print(f"Status email: user {user.username} has no email, skipping.")
+        return
+
+    subject_map = {
+        OrderHistory.Status.NEW: f"Ваш заказ #{order.id} принят",
+        OrderHistory.Status.PROCESSING: f"Ваш заказ #{order.id} в работе",
+        OrderHistory.Status.READY: f"Ваш заказ #{order.id} готов к выдаче",
+        OrderHistory.Status.DONE: f"Ваш заказ #{order.id} завершен",
+        OrderHistory.Status.CANCELLED: f"Ваш заказ #{order.id} отменен",
+        OrderHistory.Status.ERROR: f"По заказу #{order.id} требуется внимание",
+        OrderHistory.Status.ARCHIVED: f"Ваш заказ #{order.id} перемещен в архив",
+    }
+    body_map = {
+        OrderHistory.Status.NEW: "Ваш заказ принят системой.",
+        OrderHistory.Status.PROCESSING: "Ваш заказ был взят в работу.",
+        OrderHistory.Status.READY: "Ваш заказ готов к выдаче.",
+        OrderHistory.Status.DONE: "Ваш заказ завершен.",
+        OrderHistory.Status.CANCELLED: "Ваш заказ был отменен.",
+        OrderHistory.Status.ERROR: "По вашему заказу возникла ситуация, требующая внимания.",
+        OrderHistory.Status.ARCHIVED: "Ваш заказ перемещен в архив.",
+    }
+
+    subject = subject_map.get(new_status)
+    body_intro = body_map.get(new_status)
+
+    if not subject or not body_intro:
+        print(f"Status email: status {new_status} is not configured for notifications.")
+        return
+
+    plain_message = f"Здравствуйте, {user.get_full_name() or user.username}.\n\n"
+    plain_message += f"{body_intro}\n"
+    if description:
+        plain_message += f"Комментарий от сотрудника: {description}\n\n"
+    plain_message += "Спасибо!"
+
+    if email_mode == "off":
+        print("--- Console Email (Status Update) ---")
+        print(f"To: {user.email}")
+        print(f"Subject: {subject}")
+        print(f"Body:\n{plain_message}")
+        print("------------------------------------")
         return
 
     try:
-        librarian_group = await Group.objects.aget(name='Librarian')
-        librarians = get_user_model().objects.filter(groups=librarian_group)
-    except Group.DoesNotExist:
-        return
-
-    notified_count = 0
-
-
-    async for librarian in librarians: 
-        if is_user_active_recently(librarian):
-            try:
-                context = {}
-                subject = "У вас новый заказ!"
-                html_message = await sync_to_async(render_to_string)('emails/new_order_notification.html', context)
-                plain_message = "У вас новый заказ! Пожалуйста, проверьте систему."
-
-                email = EmailMultiAlternatives(
-                    subject,
-                    plain_message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [librarian.email]
-                )
-                await sync_to_async(email.attach_alternative)(html_message, "text/html")
-                await sync_to_async(email.send)(fail_silently=False)
-                notified_count += 1
-            except Exception as e:
-                return
+        await asyncio.to_thread(
+            send_mail,
+            subject,
+            plain_message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            False,
+        )
+        print(f"Status email: sent to {user.email} for order #{order.id}")
+    except Exception as exc:  # pylint: disable=broad-exception-caught
+        print(f"Status email: failed for {user.email}: {exc}")

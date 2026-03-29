@@ -100,9 +100,11 @@ class BitrixAuthView(AsyncAPIView):
             else:
                 user.profile.current_role = None
 
+            now = timezone.now()
+            user.profile.last_seen = now
             await user.profile.asave()
 
-            user.last_login = timezone.now()
+            user.last_login = now
             await user.asave(update_fields=['last_login'])
 
             # TODO: это можно в асинке переписать

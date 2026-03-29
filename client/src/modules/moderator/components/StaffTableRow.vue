@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import type { StaffStats } from "@api/types";
-import { computed } from 'vue';
+import { computed } from "vue";
 
 interface Props {
   staff: StaffStats;
@@ -16,7 +16,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  'row-click': [staff: StaffStats]
+  "row-click": [staff: StaffStats];
 }>();
 
 const hasOrders = computed(() => {
@@ -24,7 +24,7 @@ const hasOrders = computed(() => {
 });
 
 const handleRowClick = () => {
-  emit('row-click', props.staff);
+  emit("row-click", props.staff);
 };
 </script>
 
@@ -33,11 +33,11 @@ const handleRowClick = () => {
   cursor: pointer;
   transition: background-color 0.2s;
   background-color: var(--color-background-100);
-  
+
   &:hover {
     background-color: var(--color-background-200);
   }
-  
+
   td {
     padding: 12px;
     text-align: left;

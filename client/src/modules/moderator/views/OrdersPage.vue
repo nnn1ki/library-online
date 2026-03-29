@@ -2,9 +2,7 @@
   <div class="orders-page">
     <div class="page-header">
       <h2>Заказы</h2>
-      <div class="stats">
-        Всего заказов: {{ pagination.total }}
-      </div>
+      <div class="stats">Всего заказов: {{ pagination.total }}</div>
     </div>
 
     <OrdersFiltersSection
@@ -56,7 +54,7 @@ import type { ModeratorOrderStats, ModeratorOrdersFilters, OrderStatusEnum } fro
 const ordersData = ref<ModeratorOrderStats[]>([]);
 const loading = ref(false);
 const router = useRouter();
-const dateError = ref('');
+const dateError = ref("");
 
 const localFilters = ref({
   fullname: '',
@@ -81,7 +79,7 @@ const activeFilters = ref({
 const pagination = ref({
   page: 1,
   limit: 10,
-  total: 0
+  total: 0,
 });
 
 type SortField = 'id' | 'fullname' | 'library' | 'employee_collect' | 'employee_issue' | 'status' | 'created_date' | 'books_count';
@@ -111,16 +109,14 @@ const hasActiveFilters = computed(() => {
          f.statuses.length > 0;
 });
 
-const totalPages = computed(() => 
-  Math.ceil(pagination.value.total / pagination.value.limit)
-);
+const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.value.limit));
 
 const requestParams = computed((): ModeratorOrdersFilters => {
   const params: ModeratorOrdersFilters = {
     page: pagination.value.page,
-    page_size: pagination.value.limit
+    page_size: pagination.value.limit,
   };
-  
+
   if (activeFilters.value.fullname) params.fullname = activeFilters.value.fullname;
   if (activeFilters.value.libraryName) params.library_name = activeFilters.value.libraryName;
   if (activeFilters.value.employeeCollect) params.employee_collect = activeFilters.value.employeeCollect;
@@ -130,12 +126,12 @@ const requestParams = computed((): ModeratorOrdersFilters => {
   if (activeFilters.value.statuses && activeFilters.value.statuses.length > 0) {
     params.statuses = activeFilters.value.statuses;
   }
-  
+
   if (sortField.value) {
     params.sort_by = sortField.value;
     params.sort_order = sortDirection.value;
   }
-  
+
   return params;
 });
 
@@ -146,7 +142,7 @@ const validateDates = (): boolean => {
     dateError.value = 'Дата начала не может быть больше даты окончания';
     return false;
   }
-  
+
   return true;
 };
 
@@ -159,25 +155,25 @@ const validateDateRange = (from: string, to: string): boolean => {
 
 const loadOrdersData = async () => {
   if (!validateDates()) return;
-  
+
   if (abortController) {
     abortController.abort();
   }
-  
+
   abortController = new AbortController();
   loading.value = true;
-  
+
   try {
     const response = await getModeratorOrders(requestParams.value);
     ordersData.value = response.results;
     pagination.value.total = response.count;
   } catch (error: any) {
-    if (error.name !== 'AbortError') {
-      console.error('Ошибка загрузки данных:', error);
+    if (error.name !== "AbortError") {
+      console.error("Ошибка загрузки данных:", error);
       if (error.response?.status === 400) {
-        dateError.value = 'Ошибка в параметрах запроса. Проверьте введенные данные.';
+        dateError.value = "Ошибка в параметрах запроса. Проверьте введенные данные.";
       } else {
-        dateError.value = 'Произошла ошибка при загрузке данных. Попробуйте позже.';
+        dateError.value = "Произошла ошибка при загрузке данных. Попробуйте позже.";
       }
     }
   } finally {
@@ -188,13 +184,13 @@ const loadOrdersData = async () => {
 
 const applyFilters = () => {
   if (!validateDates()) return;
-  
+
   activeFilters.value = { ...localFilters.value };
   pagination.value.page = 1;
   loadOrdersData();
 };
 
-const handleSort = (field: string, direction: 'asc' | 'desc') => {
+const handleSort = (field: string, direction: "asc" | "desc") => {
   sortField.value = field as SortField;
   sortDirection.value = direction;
   pagination.value.page = 1;
@@ -261,12 +257,12 @@ useAuthentication((isAuthenticated) => {
 
 .page-header {
   margin-bottom: 1rem;
-  
+
   h2 {
     color: var(--color-text-800);
     margin: 0;
   }
-  
+
   .stats {
     color: var(--color-text-800);
     display: flex;

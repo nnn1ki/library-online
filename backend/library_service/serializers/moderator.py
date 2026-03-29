@@ -51,6 +51,36 @@ class StaffStatsSerializer(aserializers.ModelSerializer):
             "cancelled_orders",
         ]
 
+
+class StaffNotificationRecipientSerializer(aserializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", read_only=True, allow_blank=True)
+    last_name = serializers.CharField(source="user.last_name", read_only=True, allow_blank=True)
+    fullname = serializers.CharField(read_only=True, allow_null=True)
+    department = serializers.CharField(read_only=True, allow_null=True)
+    current_role = serializers.CharField(read_only=True, allow_null=True)
+    last_seen = serializers.DateTimeField(read_only=True, allow_null=True)
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "fullname",
+            "department",
+            "current_role",
+            "last_seen",
+            "staff_notification_mode",
+        ]
+
+
+class StaffNotificationModeSerializer(aserializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ["staff_notification_mode"]
+        
 class ModeratorOrderSerializer(aserializers.ModelSerializer):
     fullname = serializers.CharField(source="user.profile.fullname", read_only=True)
     library_card = serializers.CharField(

@@ -1,4 +1,4 @@
-import { api } from "./axios"
+import { api } from "./axios";
 import type { Scenario } from "./types";
 
 export async function scenariosList(): Promise<Scenario[]> {

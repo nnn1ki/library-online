@@ -177,7 +177,7 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'update:isOpen', value: boolean): void;
+  (e: "update:isOpen", value: boolean): void;
 }
 
 const props = defineProps<Props>();
@@ -282,7 +282,7 @@ watch(() => props.isOpen, (isOpen) => {
   top: 0;
   background: white;
   z-index: 1;
-  
+
   h3 {
     margin: 0;
     color: var(--color-text-800);
@@ -371,12 +371,12 @@ watch(() => props.isOpen, (isOpen) => {
   .status-item {
     position: relative;
     margin-bottom: 1.5rem;
-    
+  
     &:last-child {
       margin-bottom: 0;
     }
   }
-  
+
   .status-dot {
     position: absolute;
     left: -2rem;
@@ -409,7 +409,7 @@ watch(() => props.isOpen, (isOpen) => {
       background: var(--color-error-500);
     }
   }
-  
+
   .status-content {
     background: var(--color-background-100);
     padding: 1rem;
@@ -424,12 +424,12 @@ watch(() => props.isOpen, (isOpen) => {
     margin-bottom: 0.5rem;
     gap: 1rem;
   }
-  
+
   .status-type {
     font-weight: 600;
     color: var(--color-text-800);
   }
-  
+
   .status-date {
     font-size: 0.875rem;
     color: var(--color-text-600);
@@ -441,7 +441,7 @@ watch(() => props.isOpen, (isOpen) => {
     color: var(--color-text-700);
     margin-bottom: 0.25rem;
   }
-  
+
   .status-description {
     font-size: 0.875rem;
     color: var(--color-text-600);
@@ -470,18 +470,18 @@ watch(() => props.isOpen, (isOpen) => {
       background: var(--color-warning-50);
     }
   }
-  
+
   .book-main-info {
     flex: 1;
   }
-  
+
   .book-title {
     font-weight: 600;
     color: var(--color-text-800);
     margin-bottom: 0.25rem;
     line-height: 1.4;
   }
-  
+
   .book-authors {
     font-size: 0.875rem;
     color: var(--color-text-600);
@@ -537,22 +537,22 @@ watch(() => props.isOpen, (isOpen) => {
     padding: 0.125rem 0.375rem;
     font-size: 0.7rem;
   }
-  
+
   &.status-new {
     background: var(--color-info-100);
     color: var(--color-info-700);
   }
-  
+
   &.status-processing {
     background: var(--color-warning-100);
     color: var(--color-warning-700);
   }
-  
+
   &.status-ready {
     background: var(--color-success-100);
     color: var(--color-success-700);
   }
-  
+
   &.status-done {
     background: var(--color-primary-100);
     color: var(--color-primary-700);
@@ -609,7 +609,6 @@ watch(() => props.isOpen, (isOpen) => {
   cursor: pointer;
   font-size: 0.875rem;
   transition: background-color 0.2s;
-  
   &:hover {
     background: var(--color-primary-600);
   }

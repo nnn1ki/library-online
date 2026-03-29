@@ -5,6 +5,11 @@ User = get_user_model()
 
 
 class UserProfile(models.Model):
+    class StaffNotificationMode(models.TextChoices):
+        AUTO = "auto", "По активности"
+        ALWAYS = "always", "Всегда получать"
+        DISABLED = "disabled", "Не получать"
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     library_card = models.CharField(verbose_name="Номер читательского билета", max_length=255)
     campus_id = models.CharField(verbose_name="ID кампуса", max_length=255, null=True, blank=True)
@@ -14,6 +19,13 @@ class UserProfile(models.Model):
     banned_status_our = models.BooleanField(verbose_name="Статус бана в нашей системе", default=False)
     #banned_status_external = models.BooleanField(verbose_name="Статус бана во внешней системе", default=False)
     current_role = models.TextField(verbose_name="Текущая роль", null=True, blank=True)
+    last_seen = models.DateTimeField(verbose_name="Последняя активность", null=True, blank=True)
+    staff_notification_mode = models.CharField(
+        verbose_name="Режим получения уведомлений о необработанных заказах",
+        max_length=16,
+        choices=StaffNotificationMode.choices,
+        default=StaffNotificationMode.AUTO,
+    )
 
     class Meta:
         verbose_name = "Профиль"

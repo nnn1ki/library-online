@@ -1,4 +1,4 @@
-import { api } from "./axios"
+import { api } from "./axios";
 import type { ReaderStats, PaginatedReaders, ReadersFilters, Order } from "./types";
 
 
@@ -6,7 +6,7 @@ import type { ReaderStats, PaginatedReaders, ReadersFilters, Order } from "./typ
 export async function getReaders(filters?: ReadersFilters): Promise<PaginatedReaders> {
   try {
     const { current_order_statuses, ...restFilters } = filters ?? {};
-    const { data } = await axios.get("/api/readers/", {
+    const { data } = await api.get("/api/readers/", {
       params: {
         ...restFilters,
         ...(current_order_statuses && current_order_statuses.length > 0 && {
@@ -14,8 +14,8 @@ export async function getReaders(filters?: ReadersFilters): Promise<PaginatedRea
         })
       },
       paramsSerializer: {
-        indexes: null
-      }
+        indexes: null,
+      },
     });
     return data;
   } catch (error) {

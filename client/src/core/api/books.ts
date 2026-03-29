@@ -1,5 +1,5 @@
 import type { Book } from "./types";
-import { api } from "./axios"
+import { api } from "./axios";
 
 export async function searchBooks(expression: string, library?: number): Promise<Book[]> {
   try {

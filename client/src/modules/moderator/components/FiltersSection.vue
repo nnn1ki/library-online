@@ -43,10 +43,10 @@
           label="Дата заказа"
           :disabled="loading"
         />
-          
-        <button 
+
+        <button
           v-if="hasActiveFilters"
-          @click="$emit('clear-filters')" 
+          @click="$emit('clear-filters')"
           class="clear-filters-btn"
           type="button"
           :disabled="loading"
@@ -63,6 +63,7 @@ import { ref, watch } from 'vue';
 import FilterInput from '@modules/moderator/components/FilterInput.vue';
 import DateRangeFilter from '@modules/moderator/components/DateRangeFilter.vue';
 import StatusFilter from '@modules/moderator/components/StatusFilter.vue';
+import { computed } from "vue";
 
 interface Props {
   filters: any;
@@ -73,9 +74,9 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'apply-filters', filters: any): void;
-  (e: 'clear-filters'): void;
-  (e: 'update:filters', filters: any): void;
+  (e: "apply-filters", filters: any): void;
+  (e: "clear-filters"): void;
+  (e: "update:filters", filters: any): void;
 }
 
 const props = defineProps<Props>();
@@ -94,6 +95,12 @@ watch(
   (val) => { emit('update:filters', { ...val }); },
   { deep: true }
 );
+// =======
+// const localFilters = computed({
+//   get: () => props.filters,
+//   set: (value) => emit("update:filters", value),
+// });
+// >>>>>>> dev
 </script>
 
 <style scoped lang="scss">
@@ -122,11 +129,11 @@ watch(
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.875rem;
-  
+
   &:hover:not(:disabled) {
     background: var(--color-primary-600);
   }
-  
+
   &:disabled {
     background: var(--color-text-300);
     cursor: not-allowed;

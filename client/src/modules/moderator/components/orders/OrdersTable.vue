@@ -123,12 +123,22 @@ import Pagination from '@modules/moderator/components/Pagination.vue';
 import OrdersEmptyState from '@moderator/components/orders/OrdersEmptyState.vue';
 import type { ModeratorOrderStats } from "@api/types";
 import { computed } from 'vue';
+// =======
+// import OrdersTableRow from "../orders/OrdersTableRow.vue";
+// import SortableHeader from "@modules/moderator/components/SortableHeader.vue";
+// import Pagination from "@modules/moderator/components/Pagination.vue";
+// import EmptyState from "@modules/moderator/components/EmptyState.vue";
+// import type { OrderStats } from "@api/types";
+// import { computed } from "vue";
+// import { orderStatuses } from "@api/types";
+// import type { OrderStatusEnum } from "@api/types";
+// >>>>>>> dev
 
 interface Props {
   ordersData: ModeratorOrderStats[];
   loading: boolean;
   sortField: string;
-  sortDirection: 'asc' | 'desc';
+  sortDirection: "asc" | "desc";
   pagination: {
     page: number;
     total: number;
@@ -150,21 +160,43 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<Emits>();
 
-const totalPages = computed(() => 
-  Math.ceil(props.pagination.total / props.pagination.limit)
-);
+const totalPages = computed(() => Math.ceil(props.pagination.total / props.pagination.limit));
 
-const onSort = (field: string, direction: 'asc' | 'desc') => {
-  emit('sort', field, direction);
+const onSort = (field: string, direction: "asc" | "desc") => {
+  emit("sort", field, direction);
 };
 
 const prevPage = () => {
-  emit('prev-page');
+  emit("prev-page");
 };
 
 const nextPage = () => {
-  emit('next-page');
+  emit("next-page");
 };
+
+// нормализуем список заказов и заранее считаем метку последнего статуса
+const normalizedOrders = computed(() => {
+  return props.ordersData.map((o: any) => {
+    let label = "-";
+
+    if (Array.isArray(o.statuses) && o.statuses.length > 0) {
+      const last = o.statuses[o.statuses.length - 1];
+      if (typeof last?.status === "string" && last.status in orderStatuses) {
+        label = orderStatuses[last.status as OrderStatusEnum];
+      } else {
+        label = last?.status ?? "-";
+      }
+    } else {
+      if (typeof o.status === "string" && o.status in orderStatuses) {
+        label = orderStatuses[o.status as OrderStatusEnum];
+      } else {
+        label = o.status ?? "-";
+      }
+    }
+
+    return { ...o, _lastStatusLabel: label };
+  });
+});
 </script>
 
 <style scoped lang="scss">
