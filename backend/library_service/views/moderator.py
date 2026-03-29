@@ -717,7 +717,7 @@ class ModeratorOrderViewset(AsyncGenericViewSet):
                     return Order.objects.select_related(
                         'library', 'user__profile'
                     ).prefetch_related(
-                        'statuses__staff__profile', 'books__book'
+                        'statuses__staff__profile', 'books'
                     ).get(id=order_id)
                 except Order.DoesNotExist:
                     return None

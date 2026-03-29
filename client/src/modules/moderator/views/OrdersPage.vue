@@ -33,6 +33,7 @@
       v-if="selectedOrder"
       v-model:isOpen="isDetailsModalOpen"
       :order-id="selectedOrder.id"
+      :selected-order="selectedOrder"
     />
 
     <LoadingModal :model-value="loading" />
