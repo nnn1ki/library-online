@@ -173,30 +173,6 @@ const prevPage = () => {
 const nextPage = () => {
   emit("next-page");
 };
-
-// нормализуем список заказов и заранее считаем метку последнего статуса
-const normalizedOrders = computed(() => {
-  return props.ordersData.map((o: any) => {
-    let label = "-";
-
-    if (Array.isArray(o.statuses) && o.statuses.length > 0) {
-      const last = o.statuses[o.statuses.length - 1];
-      if (typeof last?.status === "string" && last.status in orderStatuses) {
-        label = orderStatuses[last.status as OrderStatusEnum];
-      } else {
-        label = last?.status ?? "-";
-      }
-    } else {
-      if (typeof o.status === "string" && o.status in orderStatuses) {
-        label = orderStatuses[o.status as OrderStatusEnum];
-      } else {
-        label = o.status ?? "-";
-      }
-    }
-
-    return { ...o, _lastStatusLabel: label };
-  });
-});
 </script>
 
 <style scoped lang="scss">
