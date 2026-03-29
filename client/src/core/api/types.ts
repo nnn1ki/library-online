@@ -265,10 +265,6 @@ export type StaffFilters = {
   search?: string;
   sort_by?: 'fullname' | 'total_orders' | 'cancelled_orders';
   sort_order?: 'asc' | 'desc';
-// =======
-//   sort_by?: "fullname" | "department" | "total_orders" | "cancelled_orders";
-//   sort_order?: "asc" | "desc";
-// >>>>>>> dev
   page?: number;
   page_size?: number;
 };

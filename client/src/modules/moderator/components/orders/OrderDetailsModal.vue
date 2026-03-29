@@ -3,37 +3,22 @@
     <div class="modal-content large" @click.stop>
       <div class="modal-header">
         <h3>Детали заказа #{{ orderId }}</h3>
-        <button class="close-btn" @click="close" aria-label="Закрыть">
-          &times;
-        </button>
+        <button class="close-btn" @click="close" aria-label="Закрыть">&times;</button>
       </div>
 
-      <div v-if="loading" class="loading-state">
-        Загрузка деталей заказа...
-      </div>
-
-      <div v-else-if="error" class="error-state">
-        {{ error }}
-      </div>
+      <div v-if="loading" class="loading-state">Загрузка деталей заказа...</div>
+      <div v-else-if="error" class="error-state">{{ error }}</div>
 
       <div v-else-if="order" class="order-details">
         <div class="section">
           <h4>Информация о читателе</h4>
           <div class="info-grid">
+            <div class="info-item"><strong>ФИО:</strong> {{ selectedOrder.fullname }}</div>
             <div class="info-item">
-              <strong>ФИО:</strong> {{ order.user.fullname }}
+              <strong>Читательский билет:</strong> {{ selectedOrder.library_card || 'Не указан' }}
             </div>
             <div class="info-item">
-              <strong>Подразделение:</strong> {{ order.user.department }}
-            </div>
-            <div class="info-item">
-              <strong>Читательский билет:</strong> {{ order.user.library_card || 'Не указан' }}
-            </div>
-            <div class="info-item">
-              <strong>Campus ID:</strong> {{ order.user.campus_id || 'Не указан' }}
-            </div>
-            <div class="info-item">
-              <strong>MIRA ID:</strong> {{ order.user.mira_id || 'Не указан' }}
+              <strong>Институт:</strong> {{ selectedOrder.library_name || 'Не указан' }}
             </div>
           </div>
         </div>
@@ -44,9 +29,7 @@
             <div class="info-item">
               <strong>Библиотека:</strong> {{ order.library.description }}
             </div>
-            <div class="info-item">
-              <strong>Адрес:</strong> {{ order.library.address }}
-            </div>
+            <div class="info-item"><strong>Адрес:</strong> {{ order.library.address }}</div>
             <div class="info-item">
               <strong>Текущий статус:</strong>
               <span class="status-badge" :class="getStatusClass(currentStatus)">
@@ -54,7 +37,13 @@
               </span>
             </div>
             <div class="info-item">
-              <strong>Дата создания:</strong> {{ formatDateTime(order.statuses[0]?.date) }}
+              <strong>Дата создания:</strong> {{ formatDateTime(selectedOrder.created_date) }}
+            </div>
+            <div class="info-item">
+              <strong>Сотрудник (сбор):</strong> {{ selectedOrder.employee_collect }}
+            </div>
+            <div class="info-item">
+              <strong>Сотрудник (выдача):</strong> {{ selectedOrder.employee_issue }}
             </div>
           </div>
         </div>
@@ -62,20 +51,11 @@
         <div class="section">
           <h4>История статусов</h4>
           <div class="status-timeline">
-            <div 
-              v-for="(status, index) in order.statuses" 
-              :key="index"
-              class="status-item"
-            >
-              <div class="status-dot" :class="getStatusClass(status.status)"></div>
+            <div v-for="(status, index) in order.statuses" :key="index" class="status-item">
+              <div class="status-dot"></div>
               <div class="status-content">
-                <div class="status-header">
-                  <div class="status-type">{{ getStatusText(status.status) }}</div>
-                  <div class="status-date">{{ formatDateTime(status.date) }}</div>
-                </div>
-                <div class="status-staff">
-                  Сотрудник: {{ status.staff.fullname }}
-                </div>
+                <div class="status-type">{{ getStatusText(status.status) }}</div>
+                <div class="status-date">{{ formatDateTime(status.date) }}</div>
                 <div v-if="status.description" class="status-description">
                   {{ status.description }}
                 </div>
@@ -87,69 +67,18 @@
         <div class="section">
           <h4>Книги в заказе ({{ order.books?.length || 0 }})</h4>
           <div class="books-list">
-            <div 
-              v-for="bookItem in order.books" 
-              :key="bookItem.id"
-              class="book-item"
-            >
+            <div v-for="bookItem in order.books" :key="bookItem.id" class="book-item">
               <div class="book-main-info">
-                <div class="book-title">
-                  {{ bookItem.book.title?.[0] || 'Без названия' }}
-                </div>
+                <div class="book-title">{{ bookItem.book.title?.[0] || 'Без названия' }}</div>
                 <div class="book-authors">
                   {{ bookItem.book.author?.join(', ') || 'Автор не указан' }}
                 </div>
-                <div class="book-meta">
-                  <span class="book-id">ID: {{ bookItem.book.id }}</span>
-                  <span v-if="bookItem.book.year" class="book-year">
-                    • Год: {{ bookItem.book.year }}
-                  </span>
-                </div>
+                <div class="book-id">ID: {{ bookItem.book.id }}</div>
               </div>
-              <div class="book-status-info">
+              <div class="book-status">
                 <span class="status-badge small" :class="getBookStatusClass(bookItem.status)">
                   {{ getBookStatusText(bookItem.status) }}
                 </span>
-                <div v-if="bookItem.handed_date" class="book-dates">
-                  <div>Выдана: {{ formatDate(bookItem.handed_date) }}</div>
-                  <div v-if="bookItem.to_return_date">
-                    Вернуть до: {{ formatDate(bookItem.to_return_date) }}
-                  </div>
-                  <div v-if="bookItem.returned_date">
-                    Возвращена: {{ formatDate(bookItem.returned_date) }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="order.books_to_return && order.books_to_return.length > 0" class="section">
-          <h4>Книги к возврату ({{ order.books_to_return.length }})</h4>
-          <div class="books-list">
-            <div 
-              v-for="bookItem in order.books_to_return" 
-              :key="bookItem.id"
-              class="book-item warning"
-            >
-              <div class="book-main-info">
-                <div class="book-title">
-                  {{ bookItem.book.title?.[0] || 'Без названия' }}
-                </div>
-                <div class="book-authors">
-                  {{ bookItem.book.author?.join(', ') || 'Автор не указан' }}
-                </div>
-              </div>
-              <div class="book-status-info">
-                <span class="status-badge small status-warning">
-                  Требуется возврат
-                </span>
-                <div class="book-dates">
-                  <div>Выдана: {{ formatDate(bookItem.handed_date) }}</div>
-                  <div class="overdue">
-                    Вернуть до: {{ formatDate(bookItem.to_return_date) }}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -157,9 +86,7 @@
       </div>
 
       <div class="modal-footer">
-        <button class="close-modal-btn" @click="close">
-          Закрыть
-        </button>
+        <button class="close-modal-btn" @click="close">Закрыть</button>
       </div>
     </div>
   </div>
@@ -167,17 +94,18 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
-import type { Order } from "@api/types";
-import { orderStatuses, orderBookStatuses } from "@api/types";
-import { getModeratorOrderDetail } from "@api/orders";
+import type { Order, ModeratorOrderStats } from '@api/types';
+import { orderStatuses, orderBookStatuses } from '@api/types';
+import { getModeratorOrderDetail } from '@api/orders';
 
 interface Props {
   isOpen: boolean;
   orderId: number;
+  selectedOrder: ModeratorOrderStats;
 }
 
 interface Emits {
-  (e: "update:isOpen", value: boolean): void;
+  (e: 'update:isOpen', value: boolean): void;
 }
 
 const props = defineProps<Props>();
@@ -187,53 +115,33 @@ const order = ref<Order | null>(null);
 const loading = ref(false);
 const error = ref('');
 
+const close = () => emit('update:isOpen', false);
+
 const currentStatus = computed(() => {
   if (!order.value?.statuses || order.value.statuses.length === 0) return 'unknown';
   return order.value.statuses[order.value.statuses.length - 1].status;
 });
 
-const close = () => {
-  emit('update:isOpen', false);
-};
-
 const loadOrderDetails = async () => {
   loading.value = true;
   error.value = '';
-  
   try {
     order.value = await getModeratorOrderDetail(props.orderId);
-  } catch (err: any) {
-    console.error('Ошибка загрузки деталей заказа:', err);
+  } catch {
     error.value = 'Не удалось загрузить детали заказа. Попробуйте позже.';
   } finally {
     loading.value = false;
   }
 };
 
-const getStatusClass = (status: string) => {
-  return `status-${status}`;
-};
+const getStatusClass = (status: string) => `status-${status}`;
+const getStatusText = (status: string) => orderStatuses[status as keyof typeof orderStatuses] || status;
+const getBookStatusClass = (status: string) => `status-${status}`;
+const getBookStatusText = (status: string) => orderBookStatuses[status as keyof typeof orderBookStatuses] || status;
 
-const getStatusText = (status: string) => {
-  return orderStatuses[status as keyof typeof orderStatuses] || status;
-};
-
-const getBookStatusClass = (status: string) => {
-  return `status-${status}`;
-};
-
-const getBookStatusText = (status: string) => {
-  return orderBookStatuses[status as keyof typeof orderBookStatuses] || status;
-};
-
-const formatDateTime = (dateString: string) => {
+const formatDateTime = (dateString: string | null | undefined) => {
   if (!dateString) return '—';
   return new Date(dateString).toLocaleString('ru-RU');
-};
-
-const formatDate = (dateString: string | null) => {
-  if (!dateString) return '—';
-  return new Date(dateString).toLocaleDateString('ru-RU');
 };
 
 watch(() => props.isOpen, (isOpen) => {
