@@ -13,7 +13,7 @@
           }}</StyledButton>
         </div>
 
-        <div v-for="book in books" :key="book.description" class="book-card">
+        <div v-for="book in books" :key="book.id" class="book-card">
           <StyledCheckbox
             :checked="selectedBooks.includes(book.id)"
             @change="toggleBookSelection(book.id)"
@@ -21,8 +21,6 @@
           />
           <BookCard :book="book" :basket-cart="true" />
         </div>
-
-        <AboutBookDialog v-if="modalBook !== undefined" :book="modalBook" v-model="bookModalOpen" />
       </div>
     </SurfaceCard>
 
@@ -58,13 +56,13 @@
       <!-- Модальное окно для подтверждения сохранения -->
       <ModalDialog v-model="saveModalOpen">
         <p>Вы хотите распечатать книги:</p>
-        <hr />
-        <div v-html="bookList"></div>
-        <hr />
+          <hr />
+            <div v-html="sanitizedBookList"></div>
+          <hr />
         <p>Всего книг: {{ selectedBooks.length }}</p>
 
         <label>
-          <input type="radio" value="txt" v-model="fileFormat" checked />
+          <input type="radio" value="txt" v-model="fileFormat" />
           Текстовый файл (.txt)
         </label>
 
@@ -84,7 +82,7 @@
         </div>
       </ModalDialog>
 
-      <!-- Модальное окно авторзиации -->
+      <!-- Модальное окно авторизации -->
       <NotAllowedBanner v-model="authModalOpen" />
     </SurfaceCard>
   </div>
@@ -92,7 +90,6 @@
 
 <script setup lang="ts">
 import type { Book } from "@api/types";
-import AboutBookDialog from "@reader/components/AboutBookDialog.vue";
 import NotAllowedBanner from "@reader/components/NotAllowedBanner.vue";
 import { useBasketStore } from "@reader/store/basket";
 import { useAuthStore } from "@core/store/auth";
@@ -107,6 +104,8 @@ import StyledButton from "@components/StyledButton.vue";
 import BookCard from "@reader/components/BookCard.vue";
 import StyledCheckbox from "@components/StyledCheckbox.vue";
 import { jsPDF } from "jspdf";
+import DOMPurify from "dompurify";
+
 const router = useRouter();
 const basketStore = useBasketStore();
 const orderStore = useOrderStore();
@@ -114,6 +113,7 @@ const auth = useAuthStore();
 
 const { books } = storeToRefs(basketStore);
 const selectedBooks = ref<string[]>([]);
+
 const selectedBooksText = computed(() => {
   const amount = selectedBooks.value.length;
   const lastDigit = amount % 10;
@@ -128,9 +128,6 @@ const selectedBooksText = computed(() => {
     return `${amount} книг`;
   }
 });
-
-const bookModalOpen = ref(false);
-const modalBook = ref<Book>();
 
 const saveModalOpen = ref(false);
 const authModalOpen = ref(false);
@@ -154,48 +151,35 @@ function toggleSelectAll() {
   }
 }
 
-// Вычисляемое свойство для проверки, выбраны ли все книги
 const allSelected = computed(() => {
   return books.value.length > 0 && selectedBooks.value.length === books.value.length;
 });
 
 watch(books, () => {
-  selectedBooks.value = selectedBooks.value.filter(
-    (item) => books.value.filter((b) => b.id === item).length !== 0
-  );
+  const bookIds = new Set(books.value.map((b) => b.id));
+  selectedBooks.value = selectedBooks.value.filter((item) => bookIds.has(item));
 });
 
-// Расчитываемое свойство для книг в модальном окне
 const bookList = computed(() => {
-  // Разъединяем книги на русском от книг на английском и фильтруем по названиям по алфавиту
-  const sortBooks = (language?: string) => {
-    const filteredBooks = selectedBooks.value
-      .map((bookId) => books.value.find((item) => item.id == bookId)!)
-      .filter((book) => (language !== undefined ? book.language[0] === language : true));
+  const allMapped = selectedBooks.value
+    .map((bookId) => books.value.find((item) => item.id === bookId))
+    .filter((book): book is Book => book !== undefined);
 
-    return filteredBooks.sort((a, b) => {
-      const titleA = a.title[0];
-      const titleB = b.title[0];
+  const allSorted = allMapped.sort((a, b) => a.title[0].localeCompare(b.title[0]));
 
-      return titleA.localeCompare(titleB);
-    });
-  };
-
-  const russianBooks = sortBooks("rus");
-  const englishBooks = sortBooks("eng");
-  const otherBooks = sortBooks().filter(
-    (book) => book.language[0] !== "rus" && book.language[0] !== "eng"
+  const russianBooks = allSorted.filter((b) => b.language[0] === "rus");
+  const englishBooks = allSorted.filter((b) => b.language[0] === "eng");
+  const otherBooks = allSorted.filter(
+    (b) => b.language[0] !== "rus" && b.language[0] !== "eng"
   );
 
   const combinedBooks = [...russianBooks, ...englishBooks, ...otherBooks];
 
-  // Формируем список литературы
   return combinedBooks
     .map((book, index) => {
       const brief = book.brief;
 
       if (brief !== null) {
-        // Извлекаем часть до разделителя ": ил. –" или "– ISBN"
         const endIndex1 = brief.indexOf(": ил. –");
         const endIndex2 = brief.indexOf("– ISBN");
 
@@ -214,19 +198,26 @@ const bookList = computed(() => {
     .join("<hr>");
 });
 
-async function saveBooks() {
-  saveModalOpen.value = false;
+const sanitizedBookList = computed(() => DOMPurify.sanitize(bookList.value));
 
+async function saveBooks() {
   const today = new Date();
   const defaultFileName = `Заказ Литературы_${today.toISOString().split("T")[0]}`;
+  const filename = prompt("Введите имя файла:", defaultFileName);
+
+  if (filename === null || filename.trim() === "") {
+    return;
+  }
+
+  saveModalOpen.value = false;
 
   try {
     if (fileFormat.value === "txt") {
-      await saveAsText(defaultFileName);
+      await saveAsText(filename);
     } else if (fileFormat.value === "docx") {
-      await saveAsDocx(defaultFileName);
+      await saveAsDocx(filename);
     } else if (fileFormat.value === "pdf") {
-      await saveAsPdf(defaultFileName);
+      await saveAsPdf(filename);
     } else {
       throw new Error("Неподдерживаемый формат файла.");
     }
@@ -235,15 +226,13 @@ async function saveBooks() {
   }
 }
 
-async function saveAsText(defaultFileName: string) {
-  // Формируем содержимое для текстового файла
+async function saveAsText(filename: string) {
   const content = bookList.value.split("<hr>").join("\n");
   const blob = new Blob([content], { type: "text/plain" });
-  downloadBlob(blob, defaultFileName);
+  downloadBlob(blob, filename);
 }
 
-async function saveAsDocx(defaultFileName: string) {
-  // Формируем содержимое для Word документа
+async function saveAsDocx(filename: string) {
   const content = bookList.value.split("<hr>");
   const doc = new Document({
     sections: [
@@ -265,18 +254,13 @@ async function saveAsDocx(defaultFileName: string) {
   });
 
   const blob = await Packer.toBlob(doc);
-  downloadBlob(blob, defaultFileName);
+  downloadBlob(blob, filename);
 }
 
-async function saveAsPdf(defaultFileName: string) {
+async function saveAsPdf(filename: string) {
   const pdf = new jsPDF();
   await loadFont(pdf);
 
-  const filename = prompt("Введите имя файла для PDF:", defaultFileName);
-  if (filename === null || filename.trim() === "") {
-    return;
-  }
-  // Формируем содержимое для PDF документа
   const content = bookList.value
     .split("<hr>")
     .map((item) => item.trim())
@@ -284,59 +268,57 @@ async function saveAsPdf(defaultFileName: string) {
 
   pdf.text("Список литературы:", 10, 10);
 
-  // Устанавливаем начальную позицию для текста
   let yOffset = 20;
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const lineHeight = 10;
+  const marginBottom = 10;
 
   content.forEach((item) => {
-    // Разбиваем текст на строки, чтобы они не выходили за пределы страницы
-    const lines = pdf.splitTextToSize(item, 190); // 190 - ширина текста
+    const lines = pdf.splitTextToSize(item, 190);
+    const blockHeight = lines.length * lineHeight;
+
+    if (yOffset + blockHeight > pageHeight - marginBottom) {
+      pdf.addPage();
+      yOffset = 10;
+    }
+
     pdf.text(lines, 10, yOffset);
-    yOffset += lines.length * 10; // Увеличиваем смещение по Y на количество строк
+    yOffset += blockHeight;
   });
 
   pdf.save(filename);
 }
 
-// Функция для загрузки шрифта
 async function loadFont(pdf: jsPDF) {
-  try {
-    const fontName = "TimesNewRoman";
-    const response = await fetch(`src/modules/reader/views/${fontName}.ttf`);
-    const fontData = await response.arrayBuffer();
-    const uint8Array = new Uint8Array(fontData);
+  const fontName = "TimesNewRoman";
+  const response = await fetch(`/${fontName}.ttf`);
 
-    // Преобразование Uint8Array в строку
-    let binaryString = "";
-    for (let i = 0; i < uint8Array.length; i++) {
-      binaryString += String.fromCharCode(uint8Array[i]);
-    }
-
-    pdf.addFileToVFS(`${fontName}.ttf`, btoa(binaryString));
-    pdf.addFont(`${fontName}.ttf`, fontName, "normal");
-    pdf.setFont(fontName);
-    pdf.setFontSize(14);
-  } catch (error) {
-    console.error("Ошибка загрузки шрифта:", error);
+  if (!response.ok) {
+    throw new Error(`Не удалось загрузить шрифт: ${response.statusText}`);
   }
+
+  const fontData = await response.arrayBuffer();
+  const uint8Array = new Uint8Array(fontData);
+
+  const base64 = btoa(
+    uint8Array.reduce((data, byte) => data + String.fromCharCode(byte), "")
+  );
+
+  pdf.addFileToVFS(`${fontName}.ttf`, base64);
+  pdf.addFont(`${fontName}.ttf`, fontName, "normal");
+  pdf.setFont(fontName);
+  pdf.setFontSize(14);
 }
 
-function downloadBlob(blob: Blob, defaultFilename: string) {
-  // Запрашиваем имя файла у пользователя
-  const filename = prompt("Введите имя файла:", defaultFilename);
-
-  // Если пользователь нажал "Отмена" или оставил поле пустым, выходим из функции
-  if (filename === null || filename.trim() === "") {
-    return;
-  }
-
-  const url = URL.createObjectURL(blob); // Создаём URL для Blob
-  const a = document.createElement("a"); // Создаём элемент <a>
-  a.href = url; // Устанавливаем href как URL Blob
-  a.download = filename; // Устанавливаем имя файла для скачивания
-  document.body.appendChild(a); // Добавляем элемент в DOM
-  a.click(); // Эмулируем клик для скачивания
-  document.body.removeChild(a); // Удаляем элемент из DOM
-  URL.revokeObjectURL(url); // Освобождаем память
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 async function onCreateOrderClick() {
@@ -436,5 +418,13 @@ hr {
   display: flex;
   flex-direction: row;
   column-gap: 1rem;
+}
+
+:deep(.modal-dialog) {
+  width: 80%;
+
+  @include media-max-lg {
+    width: 100%;
+  }
 }
 </style>
