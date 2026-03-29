@@ -11,7 +11,7 @@
           <h4>Информация о сотруднике</h4>
           <div class="info-grid">
             <div class="info-item"><strong>ФИО:</strong> {{ staff.fullname }}</div>
-            <div class="info-item"><strong>Подразделение:</strong> {{ staff.department }}</div>
+            <!-- <div class="info-item"><strong>Подразделение:</strong> {{ staff.department }}</div> -->
             <div class="info-item"><strong>Всего заказов:</strong> {{ staff.total_orders }}</div>
             <div class="info-item">
               <strong>Отмененные заказы:</strong> {{ staff.cancelled_orders }}
