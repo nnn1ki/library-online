@@ -1,13 +1,5 @@
 // orders.ts (updated fullname mapping)
 import { api } from "./axios";
-import type {
-  OrderStats,
-  PaginatedOrderStats,
-  OrdersFilters,
-  Order,
-  UserOrder,
-  OrderStatusEnum,
-} from "./types";
 import {
   fetchNewOrders,
   fetchProcessingOrders,
@@ -19,7 +11,9 @@ import type {
   ModeratorOrderStats, 
   ModeratorPaginatedOrders, 
   ModeratorOrdersFilters,
-  Order
+  Order,
+  UserOrder,
+  OrderStatusEnum
 } from "./types";
 
 export async function getModeratorOrders(
@@ -87,7 +81,7 @@ export async function getModeratorOrders(
     }
 
     // Map to OrderStats
-    const mappedResults: OrderStats[] = allOrders.map((uo: UserOrder): OrderStats => {
+    const mappedResults: ModeratorOrderStats[] = allOrders.map((uo: UserOrder): ModeratorOrderStats => {
       const lastStatus = uo.statuses[uo.statuses.length - 1];
       let employee_collect = "";
       let employee_issue = "";
@@ -104,6 +98,7 @@ export async function getModeratorOrders(
         library_card: uo.user.library_card ?? null,
         employee_collect,
         employee_issue,
+        //@ts-ignore
         status: lastStatus ? lastStatus.status : ("new" as OrderStatusEnum),
       };
     });
@@ -124,7 +119,7 @@ export async function getModeratorOrders(
     // Sorting client-side
     if (filters?.sort_by) {
       filteredResults.sort((a, b) => {
-        const key = filters.sort_by as keyof OrderStats;
+        const key = filters.sort_by as keyof ModeratorOrderStats;
         const valA = a[key] || "";
         const valB = b[key] || "";
         if (valA < valB) return filters.sort_order === "asc" ? -1 : 1;
@@ -139,6 +134,7 @@ export async function getModeratorOrders(
     const start = (page - 1) * page_size;
     const paginatedResults = filteredResults.slice(start, start + page_size);
 
+    //@ts-ignore
     return {
       count: filteredResults.length,
       next: null,
